@@ -1,0 +1,29 @@
+# Claude Code / AI tooling
+.claude/
+.agents/
+skills-lock.json
+CLAUDE.md
+PRODUCT.md
+DESIGN.md
+WRITEUP.md
+RATIONALE.md
+
+# Environment
+.env.local
+.env*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
