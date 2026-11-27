@@ -15,7 +15,7 @@ jobs:
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run test:mutation
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: mutation-report, path: reports/mutation }
   ai-eval:
@@ -33,6 +33,6 @@ jobs:
         run: |
           if [ -z "$GROQ_API_KEY" ]; then echo "No GROQ_API_KEY secret; skipping."; exit 0; fi
           npm run eval:triage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: eval-triage, path: reports/eval-triage.json, if-no-files-found: ignore }
