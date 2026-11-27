@@ -4,12 +4,15 @@ import { X, Settings, CheckCircle, RefreshCw } from 'lucide-react'
 import { SlackIcon } from './ui/brand-icons'
 import { useSprintStore } from '../store/useSprintStore'
 import type { TaskType } from '../types'
+import { useCan } from './auth/SessionProvider'
 
 export function AgentSettings({ onClose }: { onClose: () => void }) {
   const { slackWebhookUrl, setSlackWebhookUrl, outboundWebhookUrl, setOutboundWebhookUrl, autonomyConfig, setAutonomyConfig } = useSprintStore()
   const [url, setUrl] = useState(slackWebhookUrl)
   const [outboundUrl, setOutboundUrl] = useState(outboundWebhookUrl)
   const [saved, setSaved] = useState(false)
+  const canEditPolicy = useCan('policy:edit')
+  const canManageTasks = useCan('task:manage')
   const [outboundSaved, setOutboundSaved] = useState(false)
   const [rebalancing, setRebalancing] = useState(false)
   const [rebalanceResult, setRebalanceResult] = useState('')
@@ -94,6 +97,12 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {!canEditPolicy && (
+            <p role="note" className="rounded-lg border border-border bg-muted px-3 py-2 text-[11px] text-muted-foreground">
+              Read-only — only workspace admins can change autonomy policy and integrations.
+            </p>
+          )}
+          <fieldset disabled={!canEditPolicy} style={{ display: 'contents' }}>
           {/* Slack webhook */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
@@ -278,7 +287,10 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
+          </fieldset>
+
           {/* Fix #11: manual rebalance */}
+          <fieldset disabled={!canManageTasks} style={{ display: 'contents' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
               <RefreshCw size={13} style={{ color: 'var(--act)' }} strokeWidth={1.5} />
@@ -300,6 +312,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
               <p style={{ fontSize: 10, color: 'var(--ok)', marginTop: 6, fontWeight: 500, lineHeight: 1.5 }}>{rebalanceResult}</p>
             )}
           </div>
+          </fieldset>
         </div>
       </motion.div>
       </div>

@@ -27,6 +27,7 @@ Optional: add `GROQ_API_KEY` to `.env.local` to enable AI.
 ```bash
 npm run db:reset     # re-apply migrations + demo seed
 npm run db:test      # RLS / integrity tests (pgTAP)
+npm run test:e2e     # Playwright end-to-end (needs db:start)
 npm run db:generate  # new migration after editing src/db/schema.ts
 npm run db:types     # regenerate typed client definitions
 ```

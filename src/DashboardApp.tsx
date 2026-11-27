@@ -13,6 +13,9 @@ import { Search, AlertTriangle, Zap, Settings2, HelpCircle, Menu } from 'lucide-
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from './components/ui/theme-toggle'
+import { UserMenu } from './components/auth/UserMenu'
+import { useSession } from './components/auth/SessionProvider'
+import { ROLE_LABEL } from './lib/permissions'
 import { AgentSettings } from './components/AgentSettings'
 import { SmartHelp } from './components/SmartHelp'
 import { useAgentBootstrap } from './hooks/useAgentBootstrap'
@@ -34,6 +37,9 @@ const VIEW_LABELS: Record<string, string> = {
 function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOpen: boolean; setSettingsOpen: (v: boolean) => void; onSidebarToggle: () => void }) {
   const { sprint, escalations, activeView } = useSprintStore()
   const { setIsOpen } = useCommandPaletteStore()
+  const { current } = useSession()
+  const workspaceName = current.workspace.name
+  const roleLabel = ROLE_LABEL[current.role]
   const [helpOpen, setHelpOpen] = useState(false)
   const openEsc = escalations.filter(e => !e.resolved).length
   const pct = Math.round((sprint.completedPoints / sprint.committedPoints) * 100)
@@ -73,7 +79,8 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
 
       {/* Left — breadcrumb */}
       <div className="header-view-label" style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, flexShrink: 0 }}>
-        <span style={{ color: 'var(--t3)', fontWeight: 500 }}>Sprint Agent</span>
+        <span style={{ color: 'var(--t3)', fontWeight: 500 }}>{workspaceName}</span>
+        <span className="hidden sm:inline rounded-full border border-border px-1.5 py-px text-[10px] font-medium text-muted-foreground">{roleLabel}</span>
         <span style={{ color: 'var(--b3)', fontSize: 11 }}>›</span>
         <span style={{ color: 'var(--t1)', fontWeight: 700, fontSize: 13, letterSpacing: '-0.01em' }}>
           {VIEW_LABELS[activeView]}
@@ -188,6 +195,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
         {/* Settings */}
         <button
           onClick={() => setSettingsOpen(true)}
+          aria-label="Agent settings"
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 28, height: 28, borderRadius: '50%',
@@ -230,6 +238,8 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
             color: 'var(--t3)', lineHeight: 1.5,
           }}>⌘K</kbd>
         </button>
+
+        <UserMenu />
       </div>
     </header>
   )

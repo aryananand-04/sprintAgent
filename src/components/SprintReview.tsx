@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { BurndownChart } from './BurndownChart'
 import { Flag, TrendingUp, CheckCircle, AlertTriangle, RotateCcw, Zap, ThumbsUp, ThumbsDown, Lightbulb, Archive, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
+import { useCan } from './auth/SessionProvider'
 import { GaugeCircle } from './ui/GaugeCircle'
 import { VelocityChart } from './VelocityChart'
 import { Download, RotateCcw as UndoIcon } from 'lucide-react'
@@ -140,6 +141,7 @@ function SprintHistorySection({ sprintHistory }: { sprintHistory: SprintArchive[
 
 export function SprintReview() {
   const { tasks, sprint, team, escalations, sprintHistory, archiveSprint, startNewSprint, setView, exportToCSV, undoLastAgentAction, actionHistory } = useSprintStore()
+  const canManageSprint = useCan('sprint:manage')
   const [showNewSprint, setShowNewSprint] = useState(false)
   const nextNum = parseInt(sprint.name.replace(/\D/g, '') || '23') + 1
   const nextStart = new Date().toISOString().slice(0, 10)
@@ -320,12 +322,14 @@ export function SprintReview() {
         {/* Archive + New Sprint */}
         <div style={{ paddingTop: 4, borderTop: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', gap: 6 }}>
+            {canManageSprint && <>
             <button data-feature-id="archive-btn" onClick={() => { archiveSprint(); setShowNewSprint(true) }} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', gap: 5 }}>
               <Archive size={12} strokeWidth={1.5} /> Archive Sprint
             </button>
             <button onClick={() => setShowNewSprint(true)} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center', gap: 5 }}>
               <Plus size={12} strokeWidth={2} /> New Sprint
             </button>
+            </>}
             <button onClick={exportToCSV} className="btn btn-secondary" style={{ gap: 5 }}>
               <Download size={12} strokeWidth={1.5} /> CSV
             </button>

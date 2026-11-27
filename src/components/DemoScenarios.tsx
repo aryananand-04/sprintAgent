@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Zap, X, AlertCircle, PaintbrushIcon, Users, MessageCircle, Package, Check } from 'lucide-react'
 import { useState } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
+import { useCan } from './auth/SessionProvider'
 
 const SCENARIOS: { id: string; icon: React.ElementType; label: string; description: string; isUrgent?: boolean }[] = [
   { id: 'urgent-bug',    icon: AlertCircle,    label: 'Urgent Bug',        description: 'CRITICAL: Checkout 500 errors in production', isUrgent: true },
@@ -17,8 +18,10 @@ export function DemoScenarios() {
   // Track scenarios fired this session — cooldown prevents re-trigger
   const [fired, setFired] = useState<Set<string>>(new Set())
 
+  const canRun = useCan('scenario:run')
+
   const handle = (id: string) => {
-    if (firing || fired.has(id)) return
+    if (!canRun || firing || fired.has(id)) return
     setFiring(id)
     triggerScenario(id)
     if (['urgent-bug', 'vague-request', 'scope-creep'].includes(id)) setView('intake')

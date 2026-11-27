@@ -13,6 +13,10 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Public placeholders so the build can validate env; no real project is contacted.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_key
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,13 +30,13 @@ jobs:
       - run: npm run build
       - name: Assert no LLM SDK or secrets in client bundle
         run: |
-          if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com" .next/static/; then
+          if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com|SUPABASE_SECRET_KEY|sb_secret_" .next/static/; then
             echo "::error::Server-only code leaked into the client bundle"; exit 1
           fi
 
-  database:
+  integration:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,9 +54,21 @@ jobs:
         run: |
           npm run db:seed:gen
           git diff --exit-code --stat supabase/seed.sql || (echo "::error::Run npm run db:seed:gen"; exit 1)
-      - run: npx supabase db start
+      - name: Start Supabase (db, auth, rest, mail)
+        run: npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,supavisor,postgres-meta
       - run: npx supabase test db
       - name: Generated types are up to date
         run: |
           npm run db:types
           git diff --exit-code src/db/database.types.ts || (echo "::error::Run npm run db:types"; exit 1)
+      - name: E2E (Playwright)
+        run: |
+          npm run db:env
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

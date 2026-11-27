@@ -18,7 +18,8 @@
     "db:env": "tsx scripts/sync-local-env.ts",
     "db:generate": "drizzle-kit generate",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
-    "db:seed:gen": "tsx scripts/generate-seed.ts"
+    "db:seed:gen": "tsx scripts/generate-seed.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -35,11 +36,13 @@
     "postgres": "^4.1.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.6.7",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/react": "^19.3.3",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.19",

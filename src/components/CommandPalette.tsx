@@ -4,6 +4,7 @@ import { Search, Zap, Inbox, AlertTriangle, BarChart2, Shield, Clock, Flag, Book
 import type { LucideIcon } from 'lucide-react'
 import { useCommandPaletteStore } from '../store/commandPaletteStore'
 import { useSprintStore } from '../store/useSprintStore'
+import { useCan } from './auth/SessionProvider'
 
 interface Command {
   id: string; label: string; subtitle?: string
@@ -38,6 +39,8 @@ const SCENARIOS = [
 export function CommandPalette() {
   const { isOpen, setIsOpen } = useCommandPaletteStore()
   const { tasks, setView, triageTaskById, assignTaskById, triggerScenario } = useSprintStore()
+  const canRunScenarios = useCan('scenario:run')
+  const canManage = useCan('task:manage')
   const [query, setQuery] = useState('')
   const [sel, setSel] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -45,18 +48,18 @@ export function CommandPalette() {
 
   const allCmds = useMemo<Command[]>(() => [
     ...NAV.map(n => ({ id: n.id, label: n.label, group: 'navigate' as const, icon: n.icon, keywords: n.kw, action: () => setView(n.view) })),
-    ...SCENARIOS.map(s => ({ id: s.id, label: s.label, subtitle: s.sub, group: 'scenario' as const, icon: s.icon, keywords: [s.label, s.sId], action: () => { triggerScenario(s.sId); setView('sprint') } })),
+    ...(canRunScenarios ? SCENARIOS : []).map(s => ({ id: s.id, label: s.label, subtitle: s.sub, group: 'scenario' as const, icon: s.icon, keywords: [s.label, s.sId], action: () => { triggerScenario(s.sId); setView('sprint') } })),
     ...tasks.filter(t => t.status === 'backlog' || t.status === 'triaged').slice(0, 6).map(t => ({
       id: `t-${t.id}`, label: `Triage: ${t.title.slice(0, 44)}${t.title.length > 44 ? '…' : ''}`,
       subtitle: `${t.urgency} · ${t.type}`, group: 'triage' as const, icon: Activity,
       keywords: ['triage', t.type, t.urgency], action: () => void triageTaskById(t.id),
     })),
-    ...tasks.filter(t => t.decision === 'ACT' && !t.assigneeId && t.status !== 'done').slice(0, 5).map(t => ({
+    ...(canManage ? tasks : []).filter(t => t.decision === 'ACT' && !t.assigneeId && t.status !== 'done').slice(0, 5).map(t => ({
       id: `a-${t.id}`, label: `Assign: ${t.title.slice(0, 44)}${t.title.length > 44 ? '…' : ''}`,
       subtitle: 'Auto-assign best fit', group: 'assign' as const, icon: Zap,
       keywords: ['assign', t.type], action: () => assignTaskById(t.id),
     })),
-  ], [tasks])
+  ], [tasks, canRunScenarios, canManage])
 
   const filtered = useMemo(() => {
     if (!query.trim()) return allCmds

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react'
 import { useState } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
+import { useCan } from './auth/SessionProvider'
 import type { EscalationItem } from '../types'
 
 const CAT_LABEL: Record<EscalationItem['category'], string> = {
@@ -46,6 +47,7 @@ function formatTime(iso: string): string {
 }
 
 function EscCard({ esc, onResolve }: { esc: EscalationItem; onResolve: (id: string) => void }) {
+  const canResolve = useCan('escalation:resolve')
   const [open, setOpen] = useState(!esc.resolved)
   const u = URG_CONFIG[esc.urgency]
 
@@ -154,7 +156,7 @@ function EscCard({ esc, onResolve }: { esc: EscalationItem; onResolve: (id: stri
                 </p>
               </div>
 
-              {!esc.resolved && (
+              {!esc.resolved && canResolve && (
                 <button
                   onClick={e => { e.stopPropagation(); onResolve(esc.id) }}
                   className="btn btn-secondary"
