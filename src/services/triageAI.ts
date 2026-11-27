@@ -1,17 +1,8 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
-import type { AgentDecision, AutonomyConfig, Task, TriageResult } from '../types'
+import type { AutonomyConfig, Task, TriageAudit, TriageResult } from '../types'
 import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
 import { aiQueue, AiError } from '../lib/aiQueue'
-
-/** How the AI and the rules saw a ticket. Logged with each decision for calibration. */
-export interface TriageAudit {
-  ai: AgentDecision
-  rules: AgentDecision
-  disagreed: boolean
-  overruled: boolean
-  suspicious: boolean
-}
 
 let disabled = false
 

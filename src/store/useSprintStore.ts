@@ -207,9 +207,12 @@ export const useSprintStore = create<SprintStore>()(
 
     let result
     let isAITriaged = false
+    let triageAudit: Task['triageAudit']
 
     try {
-      result = await triageWithAI(task, autonomyConfig)
+      const ai = await triageWithAI(task, autonomyConfig)
+      result = ai
+      triageAudit = ai.audit
       isAITriaged = true
     } catch (err) {
       result = triageTask(task, autonomyConfig)
@@ -232,6 +235,7 @@ export const useSprintStore = create<SprintStore>()(
               decisionReason: result.reason,
               triageScore: result.score,
               isAITriaged,
+              triageAudit,
               confidence: bestAssignee?.confidence ?? t.confidence,
               status: t.status === 'backlog' ? 'triaged' : t.status,
             }
@@ -241,7 +245,9 @@ export const useSprintStore = create<SprintStore>()(
 
     addFeedEvent({
       type: 'triage',
-      message: `${isAITriaged ? '[AI] ' : ''}Triaged "${task.title}" → ${effectiveDecision}. Score: ${result.score}. ${result.reason.slice(0, 80)}...`,
+      message: triageAudit?.overruled
+        ? `Triaged "${task.title}" → ${effectiveDecision}. The model wanted ${triageAudit.ai}; the rules said no.`
+        : `${isAITriaged ? '[AI] ' : ''}Triaged "${task.title}" → ${effectiveDecision}. Score: ${result.score}. ${result.reason.slice(0, 80)}...`,
       taskId,
       decision: effectiveDecision,
     })

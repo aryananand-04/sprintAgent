@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+import type { TriageAudit } from '../types'
 import { avatarColor } from '../lib/avatarColors'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -200,6 +201,7 @@ export function TriagePanel() {
                         />
                       </div>
                     )}
+                    {task?.triageAudit && !isLoading && <TriageAuditNote audit={task.triageAudit} />}
                     {/* Acceptance criteria for ASK decisions */}
                     {dec === 'ASK' && !isLoading && (
                       <div style={{ marginTop: 10 }}>
@@ -381,5 +383,21 @@ export function TriagePanel() {
         </>
       )}
     </AnimatePresence>
+  )
+}
+
+/** Shows when AI and rules disagreed, and flags suspected prompt injection. Calm and factual. */
+function TriageAuditNote({ audit }: { audit: TriageAudit }) {
+  if (!audit.disagreed && !audit.suspicious) return null
+  return (
+    <div data-testid="triage-audit" className="mt-2.5 space-y-1 rounded-md border border-[var(--border)] px-2.5 py-2 text-[11px] leading-snug text-[var(--t2)]">
+      {audit.disagreed && (
+        <p>
+          AI suggested <strong>{audit.ai}</strong>, rules said <strong>{audit.rules}</strong>.{' '}
+          {audit.overruled ? 'The rules won: the model can make a call more cautious, never bolder.' : 'The more cautious call was kept.'}
+        </p>
+      )}
+      {audit.suspicious && <p>This ticket contains text that looks like instructions to the AI. It was treated as plain text. Worth a look.</p>}
+    </div>
   )
 }

@@ -68,19 +68,16 @@ export function useAgentBootstrap(enabled = true) {
       message: `Agent online. Processing ${unprocessed.length} unanalyzed task${unprocessed.length > 1 ? 's' : ''}.`,
     })
 
-    unprocessed.forEach((task, i) => {
-      setTimeout(async () => {
-        addFeedEvent({ type: 'triage', message: `Analyzing: "${task.title.slice(0, 60)}"`, taskId: task.id })
-        await triageTaskById(task.id)
-        const updated = useSprintStore.getState().tasks.find(t => t.id === task.id)
-        if (updated?.decision === 'ACT' && !updated.assigneeId) {
-          setTimeout(() => assignTaskById(task.id), 600)
-        }
-      }, i * 3000)
-    })
+    // The AI queue paces requests (concurrency + backoff), so no fixed stagger or cap is needed here.
+    const triageOne = async (task: (typeof unprocessed)[number]) => {
+      addFeedEvent({ type: 'triage', message: `Analyzing: "${task.title.slice(0, 60)}"`, taskId: task.id })
+      await triageTaskById(task.id)
+      const updated = useSprintStore.getState().tasks.find(t => t.id === task.id)
+      if (updated?.decision === 'ACT' && !updated.assigneeId) assignTaskById(task.id)
+    }
 
-    // Fix #4: post a summary after all triages complete
-    setTimeout(() => {
+    // Post a summary once every triage has settled
+    void Promise.allSettled(unprocessed.map(triageOne)).then(() => {
       const state = useSprintStore.getState()
       const results = unprocessed.map(t => state.tasks.find(tt => tt.id === t.id)?.decision)
       const actN = results.filter(d => d === 'ACT').length
@@ -95,6 +92,6 @@ export function useAgentBootstrap(enabled = true) {
         message: `Bootstrap complete. Processed ${unprocessed.length} task${unprocessed.length > 1 ? 's' : ''}: ${parts.join(', ')}.`,
       })
       useSprintStore.setState({ isBootstrapping: false })
-    }, unprocessed.length * 3000 + 1500)
+    })
   }, [enabled])
 }

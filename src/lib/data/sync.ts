@@ -57,7 +57,7 @@ export function planWrites(prev: State, next: State, ctx: Omit<SyncContext, 'sup
       if (t.decision) {
         agent.decisions.push({
           taskId: t.id, kind: 'triage', source: t.isAITriaged ? 'ai' : 'rules', decision: t.decision,
-          rationale: t.decisionReason || `Triaged as ${t.decision}`, payload: { score: t.triageScore ?? null },
+          rationale: t.decisionReason || `Triaged as ${t.decision}`, payload: { score: t.triageScore ?? null, ...(t.triageAudit && { audit: t.triageAudit }) },
         })
       }
       if (t.dependencies.length) {
@@ -85,7 +85,7 @@ export function planWrites(prev: State, next: State, ctx: Omit<SyncContext, 'sup
       if (b.decision && (a.decision !== b.decision || a.decisionReason !== b.decisionReason)) {
         agent.decisions.push({
           taskId: b.id, kind: 'triage', source: b.isAITriaged ? 'ai' : 'rules', decision: b.decision,
-          rationale: b.decisionReason || `Triaged as ${b.decision}`, payload: { score: b.triageScore ?? null },
+          rationale: b.decisionReason || `Triaged as ${b.decision}`, payload: { score: b.triageScore ?? null, ...(b.triageAudit && { audit: b.triageAudit }) },
         })
       }
       if (b.assigneeId && a.assigneeId !== b.assigneeId && b.confidence !== undefined && b.confidence !== a.confidence) {

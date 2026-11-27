@@ -47,6 +47,8 @@ export interface Task {
   isAdHoc?: boolean
   isNew?: boolean
   isAITriaged?: boolean
+  /** How AI and rules saw this ticket at its last triage (client cache; durable copy in the decision log). */
+  triageAudit?: TriageAudit
   createdAt: string
   adHocResolution?: AdHocResolution
   adHocSwappedTaskId?: string
@@ -196,6 +198,16 @@ export interface AutonomyRule {
   condition: string
   rationale: string
   examples: string[]
+}
+
+export interface TriageAudit {
+  ai: AgentDecision
+  rules: AgentDecision
+  disagreed: boolean
+  /** Rules overruled a bolder AI call. */
+  overruled: boolean
+  /** Ticket text looked like a prompt-injection attempt. */
+  suspicious: boolean
 }
 
 export interface TriageResult {
