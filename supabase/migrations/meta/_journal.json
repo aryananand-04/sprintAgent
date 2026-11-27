@@ -36,6 +36,20 @@
       "when": 1795793678638,
       "tag": "20261127153438_sprint_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795803675389,
+      "tag": "20261127182115_integrations_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795803687186,
+      "tag": "20261127182127_integrations_security",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,7 @@
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(35);
+select plan(42);
 
 -- Fixtures: a second workspace + outsider user
 insert into auth.users (id, email, aud, role) values
@@ -140,6 +140,31 @@ select is((select name from public.sprints where workspace_id = md5('demo-worksp
   'new sprint is the only active one');
 select is((select count(*)::int from public.tasks where sprint_id = md5('sprint-23')::uuid and status <> 'done'), 0,
   'unfinished work rolled into the new sprint');
+
+-- ── integrations (admin only) & outbox (server writes, PM reads) ─────
+select pg_temp.login('admin@demo.sprintagent.dev');
+select is(pg_temp.affected($q$insert into public.integrations (workspace_id, kind, url)
+  values (md5('demo-workspace')::uuid, 'slack_webhook', 'https://hooks.slack.com/services/T/B/x')$q$), 1, 'admin can add an integration');
+select throws_ok($q$insert into public.integrations (workspace_id, kind, url)
+  values (md5('demo-workspace')::uuid, 'outbound_webhook', 'http://insecure.example')$q$, '23514', null, 'integration URLs must be https');
+select pg_temp.logout();
+
+select pg_temp.login('pm@demo.sprintagent.dev');
+select is((select count(*)::int from public.integrations), 0, 'PM cannot read webhook URLs');
+select throws_ok($q$insert into public.outbox (workspace_id, integration_id, event, payload)
+  select workspace_id, id, 'x', '{}' from public.integrations$q$, '42501', null, 'PM cannot write the outbox');
+select pg_temp.logout();
+
+insert into public.outbox (workspace_id, integration_id, event, payload)
+  select workspace_id, id, 'escalation', '{}'::jsonb from public.integrations where kind = 'slack_webhook';
+select pg_temp.login('pm@demo.sprintagent.dev');
+select is((select count(*)::int from public.outbox), 1, 'PM can read delivery status');
+select pg_temp.logout();
+
+select pg_temp.login('dev@demo.sprintagent.dev');
+select is((select count(*)::int from public.outbox), 0, 'contributor cannot read the outbox');
+select is((select count(*)::int from public.integrations), 0, 'contributor cannot read integrations');
+select pg_temp.logout();
 
 select * from finish();
 rollback;

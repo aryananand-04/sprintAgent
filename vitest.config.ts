@@ -8,6 +8,8 @@ export default defineConfig({
   resolve: { alias: { '@': path.resolve(__dirname, './src'), 'server-only': path.resolve(__dirname, './src/test/empty.ts') } },
   test: {
     include: ['src/**/*.test.ts'],
+    // *.db.test.ts need a running local Supabase: npm run test:db
+    exclude: ['**/node_modules/**', ...(process.env.VITEST_DB ? [] : ['**/*.db.test.ts'])],
     environment: 'node',
     coverage: {
       provider: 'v8',

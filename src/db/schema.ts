@@ -227,3 +227,33 @@ export const calibration = pgTable('calibration', {
   primaryKey({ columns: [t.workspaceId, t.decision] }),
   check('calibration_counts', sql`${t.correct} between 0 and ${t.total}`),
 ])
+
+// ── Integrations & outbox (P4) ─────────────────────────────────────────────
+export const integrationKind = pgEnum('integration_kind', ['slack_webhook', 'outbound_webhook'])
+export const outboxStatus = pgEnum('outbox_status', ['pending', 'sent', 'dead'])
+
+/** One per workspace and kind. `url` is a secret: only admins can read it (RLS). */
+export const integrations = pgTable('integrations', {
+  id: id(),
+  workspaceId: workspaceId(),
+  kind: integrationKind('kind').notNull(),
+  url: text('url').notNull(),
+  enabled: boolean('enabled').notNull().default(true),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (t) => [uniqueIndex('integrations_ws_kind_uq').on(t.workspaceId, t.kind)])
+
+/** Durable delivery queue. Written and delivered by the server only; PMs can read status. */
+export const outbox = pgTable('outbox', {
+  id: id(),
+  workspaceId: workspaceId(),
+  integrationId: uuid('integration_id').notNull().references(() => integrations.id, { onDelete: 'cascade' }),
+  event: text('event').notNull(),
+  payload: jsonb('payload').notNull(),
+  status: outboxStatus('status').notNull().default('pending'),
+  attempts: smallint('attempts').notNull().default(0),
+  nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).notNull().defaultNow(),
+  lastError: text('last_error'),
+  sentAt: timestamp('sent_at', { withTimezone: true }),
+  createdAt: createdAt(),
+}, (t) => [index('outbox_due_idx').on(t.status, t.nextAttemptAt)])

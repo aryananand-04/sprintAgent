@@ -9,6 +9,7 @@
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "arch": "depcruise src --config .dependency-cruiser.cjs",
+    "test:db": "VITEST_DB=1 vitest run db.test",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
     "eval:triage": "tsx --conditions=react-server scripts/eval-triage.ts",

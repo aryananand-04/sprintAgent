@@ -68,6 +68,7 @@ jobs:
       - name: E2E (Playwright)
         run: |
           npm run db:env
+          npm run test:db
           npx playwright install --with-deps chromium
           npm run test:e2e
       - uses: actions/upload-artifact@v4
