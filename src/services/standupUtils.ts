@@ -52,15 +52,3 @@ export function generateStandupText(
 }
 
 /** Posts the standup text to Slack as a formatted message. */
-export async function postStandupToSlack(text: string, webhookUrl: string): Promise<void> {
-  await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      blocks: [
-        { type: 'section', text: { type: 'mrkdwn', text: text } },
-        { type: 'context', elements: [{ type: 'mrkdwn', text: 'Posted automatically by Sprint Agent at 9am' }] },
-      ],
-    }),
-  })
-}

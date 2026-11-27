@@ -2,20 +2,16 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, Settings, CheckCircle, RefreshCw } from 'lucide-react'
-import { SlackIcon } from '../ui/brand-icons'
+import { X, Settings, RefreshCw } from 'lucide-react'
+import { IntegrationsSettings } from './IntegrationsSettings'
 import { useSprintStore } from '../../store/useSprintStore'
 import type { TaskType } from '../../types'
 import { useCan } from '../auth/SessionProvider'
 
 export function AgentSettings({ onClose }: { onClose: () => void }) {
-  const { slackWebhookUrl, setSlackWebhookUrl, outboundWebhookUrl, setOutboundWebhookUrl, autonomyConfig, setAutonomyConfig } = useSprintStore()
-  const [url, setUrl] = useState(slackWebhookUrl)
-  const [outboundUrl, setOutboundUrl] = useState(outboundWebhookUrl)
-  const [saved, setSaved] = useState(false)
+  const { autonomyConfig, setAutonomyConfig } = useSprintStore()
   const canEditPolicy = useCan('policy:edit')
   const canManageTasks = useCan('task:manage')
-  const [outboundSaved, setOutboundSaved] = useState(false)
   const [rebalancing, setRebalancing] = useState(false)
   const [rebalanceResult, setRebalanceResult] = useState('')
 
@@ -37,23 +33,6 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
     addFeedEvent({ type: 'status', message: `Manual rebalance: ${msg}` })
     setRebalanceResult(msg)
     setTimeout(() => { setRebalancing(false); setRebalanceResult('') }, 3000)
-  }
-
-  const handleSave = () => {
-    setSlackWebhookUrl(url.trim())
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-  }
-
-  const handleTest = async () => {
-    if (!url.trim()) return
-    try {
-      await fetch(url.trim(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: '✅ Sprint Agent connected successfully. Escalations will appear here.' }),
-      })
-    } catch {}
   }
 
   return (
@@ -105,77 +84,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
             </p>
           )}
           <fieldset disabled={!canEditPolicy} style={{ display: 'contents' }}>
-          {/* Slack webhook */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
-              <SlackIcon size={13} style={{ color: '#4A154B' }} strokeWidth={1.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--foreground)' }}>Slack Escalation Webhook</span>
-            </div>
-            <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 10, lineHeight: 1.6 }}>
-              When the agent escalates a task, it posts to this Slack channel in real time.
-              Get your webhook URL from <strong>api.slack.com/apps → Incoming Webhooks</strong>.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <input
-                value={url}
-                onChange={e => setUrl(e.target.value)}
-                placeholder="https://hooks.slack.com/services/T…/B…/…"
-                style={{
-                  width: '100%', outline: 'none',
-                  background: 'var(--muted)', border: '1px solid var(--border)',
-                  borderRadius: 5, padding: '8px 11px',
-                  fontSize: 11, color: 'var(--foreground)',
-                  fontFamily: 'var(--font-mono), monospace',
-                  transition: 'border-color 0.12s',
-                }}
-                onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
-                onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-              />
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
-                  {saved ? <><CheckCircle size={11} /> Saved</> : 'Save webhook'}
-                </button>
-                <button onClick={handleTest} disabled={!url.trim()} className="btn btn-secondary" style={{ flexShrink: 0 }}>
-                  Send test
-                </button>
-              </div>
-            </div>
-            {slackWebhookUrl && (
-              <p style={{ fontSize: 10, color: 'var(--ok)', marginTop: 6, fontWeight: 500 }}>
-                Active — escalations will post to Slack
-              </p>
-            )}
-          </div>
-
-          {/* Outbound webhook */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--foreground)', marginBottom: 5 }}>Outbound Webhook (all decisions)</div>
-            <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 8, lineHeight: 1.6 }}>
-              Fires on every agent decision (ACT, ASK, ESCALATE). Build your own integrations on top.
-            </p>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <input
-                value={outboundUrl}
-                onChange={e => setOutboundUrl(e.target.value.trim())}
-                placeholder="https://your-endpoint.com/webhook"
-                style={{ flex: 1, outline: 'none', background: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 5, padding: '7px 10px', fontSize: 11, color: 'var(--foreground)', fontFamily: 'var(--font-mono), monospace', transition: 'border-color 0.12s' }}
-                onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
-                onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-              />
-              <button
-                onClick={() => { setOutboundWebhookUrl(outboundUrl); setOutboundSaved(true); setTimeout(() => setOutboundSaved(false), 2000) }}
-                className="btn btn-secondary"
-                style={{ flexShrink: 0 }}
-              >
-                {outboundSaved ? <><CheckCircle size={11} /> Saved</> : 'Save'}
-              </button>
-            </div>
-            {outboundWebhookUrl && (
-              <p style={{ fontSize: 10, color: 'var(--ok)', marginTop: 6, fontWeight: 500 }}>
-                Active — all decisions fire to this endpoint
-              </p>
-            )}
-          </div>
+          <IntegrationsSettings canEdit={canEditPolicy} />
 
           {/* Autonomy thresholds */}
           <div>

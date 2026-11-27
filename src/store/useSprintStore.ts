@@ -12,6 +12,7 @@ import { deriveBurndown } from '../logic/burndown'
 import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
 import { triageTask } from '../logic/triage'
 import { triageWithAI } from '../services/triageAI'
+import { sendEvent } from '../services/outbox'
 import { findBestAssignee } from '../logic/assign'
 import { resolveAdHoc } from '../logic/adHoc'
 import { LOAD_ELIGIBILITY_THRESHOLD, LOAD_MAX, LOAD_BASELINE } from '../logic/constants'
@@ -59,8 +60,6 @@ interface SprintStore {
   triageError: string | null
   isBootstrapping: boolean
 
-  slackWebhookUrl: string
-  outboundWebhookUrl: string          // fires on ALL agent decisions
   autonomyConfig: AutonomyConfig
   sprintHistory: SprintArchive[]
   burndownSnapshots: BurndownSnapshot[]
@@ -91,8 +90,6 @@ interface SprintStore {
   exportToCSV: () => void
 
   setSprintNarrative: (text: string) => void
-  setSlackWebhookUrl: (url: string) => void
-  setOutboundWebhookUrl: (url: string) => void
   setAutonomyConfig: (config: Partial<AutonomyConfig>) => void
   archiveSprint: () => void
   openArchivedSprint: (id: string) => void
@@ -148,8 +145,6 @@ export const useSprintStore = create<SprintStore>()(
   tasks: [],
   team: [],
   sprint: EMPTY_SPRINT,
-  slackWebhookUrl: '',
-  outboundWebhookUrl: '',
   autonomyConfig: DEFAULT_AUTONOMY_CONFIG,
   sprintHistory: [],
   burndownSnapshots: [],
@@ -332,16 +327,8 @@ export const useSprintStore = create<SprintStore>()(
     set(s => ({ actionHistory: [snapshot, ...s.actionHistory].slice(0, 10) }))
 
     // Outbound webhook — fires on every agent decision
-    const { outboundWebhookUrl } = get()
-    if (outboundWebhookUrl) {
-      fetch(outboundWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision: 'ACT', type: 'assign', taskId, taskTitle: task.title, assigneeId, rationale, timestamp: now() }),
-      }).catch(() => {
-        get().addFeedEvent({ type: 'risk', message: `Outbound webhook failed — check the URL in Agent Settings.`, decision: 'ASK' })
-      })
-    }
+    // Outbound webhook (server outbox decides whether one is configured, and retries)
+    sendEvent({ type: 'decision', taskTitle: task.title, decision: 'ACT', reason: rationale }).catch(() => {})
   },
 
   updateTaskStatus: (taskId, status) => {
@@ -608,8 +595,6 @@ export const useSprintStore = create<SprintStore>()(
   },
 
   setSprintNarrative: (text) => set({ sprintNarrative: text }),
-  setSlackWebhookUrl: (url) => set({ slackWebhookUrl: url }),
-  setOutboundWebhookUrl: (url) => set({ outboundWebhookUrl: url }),
 
   setAutonomyConfig: (config) =>
     set(s => ({ autonomyConfig: { ...s.autonomyConfig, ...config } })),
@@ -828,12 +813,7 @@ export const useSprintStore = create<SprintStore>()(
 
     get().addFeedEvent({ type: 'escalate', message: reason, taskId, decision: 'ESCALATE' })
 
-    const { slackWebhookUrl } = get()
-    if (slackWebhookUrl) {
-      import('../services/slack').then(({ postSlackEscalation }) => {
-        postSlackEscalation({ webhookUrl: slackWebhookUrl, taskTitle: esc.taskTitle, reason, recommendation, urgency, appUrl: window.location.href })
-      })
-    }
+    sendEvent({ type: 'escalation', taskTitle: esc.taskTitle, reason, recommendation, urgency }).catch(() => {})
     refreshSprintHealth(get, s => set(s as Partial<SprintStore>))
   },
 
@@ -936,8 +916,6 @@ export const useSprintStore = create<SprintStore>()(
       storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : window.localStorage)),
       partialize: (state) => ({
         activeView: state.activeView,
-        slackWebhookUrl: state.slackWebhookUrl,
-        outboundWebhookUrl: state.outboundWebhookUrl,
         sprintNarrative: state.sprintNarrative,
       }),
     }

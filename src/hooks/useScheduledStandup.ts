@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useEffect } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
-import { generateStandupText, postStandupToSlack } from '../services/standupUtils'
+import { generateStandupText } from '../services/standupUtils'
+import { sendEvent } from '../services/outbox'
 
 const LS_KEY = 'agent-standup-posted-date'
 const STANDUP_HOUR = 9   // 9am
@@ -16,9 +17,7 @@ const STANDUP_HOUR = 9   // 9am
 export function useScheduledStandup(enabled = true) {
   useEffect(() => {
     if (!enabled) return
-    const { tasks, team, sprint, escalations, slackWebhookUrl, addFeedEvent } = useSprintStore.getState()
-
-    if (!slackWebhookUrl) return   // no webhook configured
+    const { tasks, team, sprint, escalations, addFeedEvent } = useSprintStore.getState()
 
     const now = new Date()
     const todayKey = now.toISOString().slice(0, 10)   // YYYY-MM-DD
@@ -31,9 +30,11 @@ export function useScheduledStandup(enabled = true) {
     // Time to post
     const text = generateStandupText(tasks, team, sprint, escalations)
 
-    postStandupToSlack(text, slackWebhookUrl)
-      .then(() => {
+    // The server skips this if no Slack webhook is set or another PM already posted today.
+    sendEvent({ type: 'standup', text })
+      .then((queued) => {
         localStorage.setItem(LS_KEY, todayKey)
+        if (!queued) return
         addFeedEvent({
           type: 'status',
           message: `Standup posted to Slack for ${now.toLocaleDateString('en-US', { weekday: 'long' })}. ${team.length} engineers, ${sprint.daysRemaining} days remaining.`,
@@ -43,7 +44,7 @@ export function useScheduledStandup(enabled = true) {
         // Webhook failed — don't block the app
         addFeedEvent({
           type: 'risk',
-          message: 'Scheduled standup failed to post to Slack. Check webhook URL in Settings.',
+          message: 'Couldn’t queue the standup for Slack. It will try again tomorrow.',
         })
       })
   }, [enabled])
