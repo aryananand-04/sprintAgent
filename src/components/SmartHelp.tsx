@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { motion } from 'framer-motion'
 import { X, Zap, AlertTriangle, Users, Shield, Flag, FileText, BarChart2, Monitor, BookOpen, Sparkles, ArrowRight } from 'lucide-react'
 import { useSprintStore, type View } from '../store/useSprintStore'

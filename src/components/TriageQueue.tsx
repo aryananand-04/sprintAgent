@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { avatarColor } from '../lib/avatarColors'
 import { motion } from 'framer-motion'
 import { Activity, Zap, HelpCircle, AlertTriangle, ChevronRight, CheckCircle } from 'lucide-react'

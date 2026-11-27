@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 /** Rows added or changed between two immutable lists (compared by reference, keyed by id). */
 export function diffById<T extends { id: string }>(prev: readonly T[], next: readonly T[]) {
   const before = new Map(prev.map((x) => [x.id, x]))

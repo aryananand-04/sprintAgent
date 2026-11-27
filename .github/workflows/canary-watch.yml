@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: FSL-1.1-ALv2
+# SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+# Weekly search of public GitHub code for our provenance canary (src/lib/provenance.ts).
+# Hits outside our own repositories open an issue for review. A hit is not proof of misuse: forks within the license are fine.
+name: canary-watch
+on:
+  schedule: [{ cron: '0 6 * * 1' }]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Search and report
+        env:
+          GH_TOKEN: ${{ secrets.CANARY_SEARCH_TOKEN || secrets.GITHUB_TOKEN }}
+          OWN_REPOS: azzs11/sprintAgent aryananand-04/sprintAgent
+        run: |
+          canary=$(grep -o "sprintagent-prov-[0-9a-f]*" src/lib/provenance.ts)
+          hits=$(gh api -X GET search/code -f q="\"$canary\"" -f per_page=100 --jq '.items[] | .repository.full_name + " " + .html_url' || true)
+          for own in $OWN_REPOS; do hits=$(printf '%s\n' "$hits" | grep -v "^$own " || true); done
+          hits=$(printf '%s\n' "$hits" | sed '/^$/d')
+          if [ -z "$hits" ]; then echo "No external copies found."; exit 0; fi
+          echo "$hits"
+          title="Canary found in external repositories ($(date -u +%F))"
+          gh issue list --state open --search "in:title Canary found" --json number --jq 'length' | grep -qv '^0$' && { echo "Open canary issue exists; skipping."; exit 0; }
+          printf 'The provenance canary appeared in these public files:\n\n%s\n\nCheck each against LICENSE (FSL-1.1-ALv2) and TRADEMARKS.md before acting.\n' "$(printf '%s\n' "$hits" | sed 's/^/- /')" > body.md
+          gh issue create --title "$title" --body-file body.md

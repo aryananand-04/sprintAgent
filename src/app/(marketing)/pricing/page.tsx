@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { Metadata } from 'next'
 import { Check } from 'lucide-react'
 import { ButtonLink, Container, Tag } from '@/components/marketing/primitives'

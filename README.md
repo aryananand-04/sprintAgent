@@ -123,3 +123,7 @@ src/
 - **Zustand** — State management (no backend required)
 
 No external APIs. No auth. No database. Runs entirely in the browser.
+
+## License
+
+Source-available under the [Functional Source License 1.1 (ALv2 future)](LICENSE): free to use, modify and self-host for anything except a competing product. Each version becomes Apache-2.0 two years after release. © 2026 Akchhya Singh & Aryan Anand. "Sprint Agent" is a trademark; see [TRADEMARKS.md](TRADEMARKS.md).

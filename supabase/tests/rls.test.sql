@@ -1,3 +1,5 @@
+-- SPDX-License-Identifier: FSL-1.1-ALv2
+-- SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;

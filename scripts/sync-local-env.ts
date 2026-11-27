@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 /**
  * Writes local Supabase credentials into .env.local (keeps any other keys you set).
  * Run after `npm run db:start`: npm run db:env

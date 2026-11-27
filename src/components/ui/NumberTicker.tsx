@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 'use client'
 import { useEffect, useRef } from 'react'
 import { animate, useMotionValue, useTransform } from 'framer-motion'

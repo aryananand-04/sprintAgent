@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { motion } from 'framer-motion'
 import { Clock, Zap, AlertTriangle, Activity, TrendingUp, Plus, CheckCircle, Bot, ArrowRight } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'

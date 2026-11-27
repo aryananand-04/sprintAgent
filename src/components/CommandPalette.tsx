@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Zap, Inbox, AlertTriangle, BarChart2, Shield, Clock, Flag, BookOpen, Activity, AlertCircle, PaintbrushIcon, Users, MessageCircle, Package, CornerDownLeft } from 'lucide-react'

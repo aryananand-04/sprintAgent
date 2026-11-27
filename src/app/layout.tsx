@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { Metadata, Viewport } from 'next'
 import { JetBrains_Mono, Instrument_Sans, Kalam } from 'next/font/google'
 import '../index.css'
+import { BUILD_SHA, CANARY } from '@/lib/provenance'
 
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' })
 // One family everywhere: Instrument Sans is both the UI face and the display face.
@@ -11,6 +14,7 @@ export const metadata: Metadata = {
   title: 'Sprint Agent — AI-Native Sprint Operator',
   description: 'An AI sprint operator that runs the operational middle of your sprint and escalates only when human judgment is cheaper.',
   icons: { icon: '/favicon.svg' },
+  other: { 'sa-build': BUILD_SHA, 'sa-provenance': CANARY },
 }
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 }

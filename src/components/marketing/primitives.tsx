@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CANARY } from '@/lib/provenance'
 
 export type Tone = 'act' | 'ask' | 'esc' | 'agent'
 
@@ -16,10 +19,12 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn('inline-flex items-center gap-2 font-display text-[17px] font-semibold tracking-tight text-ink', className)}>
       <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <metadata>{`Sprint Agent™ mark © 2026 Akchhya Singh & Aryan Anand. ${CANARY}`}</metadata>
         <rect width="26" height="26" rx="8" className="fill-ink" />
-        <circle cx="8" cy="13" r="3.2" fill="#d7ea3a" />
-        <circle cx="13" cy="13" r="3.2" fill="#ff9a3c" />
-        <circle cx="18" cy="13" r="3.2" fill="#ff6b57" />
+        {/* A backlog getting shorter; the triaged item on top in the agent colour. */}
+        <rect x="6" y="7" width="14" height="3" rx="1.5" fill="#2bb3a3" />
+        <rect x="6" y="11.5" width="10" height="3" rx="1.5" className="fill-paper" />
+        <rect x="6" y="16" width="6" height="3" rx="1.5" className="fill-paper" />
       </svg>
       Sprint Agent
     </span>

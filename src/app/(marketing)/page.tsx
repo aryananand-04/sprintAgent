@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { Metadata } from 'next'
 import { ButtonLink, Container, Panel, Tag, TONE, type Tone } from '@/components/marketing/primitives'
 import { ClayBell, ClayDial, ClayFunnel, ClayLedger, ClayQuestion, ClayStamp } from '@/components/marketing/clay'

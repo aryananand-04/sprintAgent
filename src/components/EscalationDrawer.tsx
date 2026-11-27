@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react'
 import { useState } from 'react'

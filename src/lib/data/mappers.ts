@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Pure conversions between database rows (snake_case) and domain types (src/types).
 import type { Tables, TablesInsert, TablesUpdate } from '@/db/database.types'
 import type {

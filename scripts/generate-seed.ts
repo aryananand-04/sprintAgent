@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 /**
  * Generates supabase/seed.sql from the demo data in src/data (single source of truth).
  * IDs become deterministic UUIDs via md5(); timestamps become relative to now() so the

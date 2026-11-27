@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { analyzeRequest, askQuestion } from '@/logic/textSignals'
 import { triageTask } from '@/logic/triage'
 import type { AgentDecision, Task } from '@/types'

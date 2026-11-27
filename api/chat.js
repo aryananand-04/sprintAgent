@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { handleChat } from '../server/llm';
 export async function POST(req) {
     const body = await req.json().catch(() => null);

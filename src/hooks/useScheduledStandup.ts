@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useEffect } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
 import { generateStandupText, postStandupToSlack } from '../logic/standupUtils'

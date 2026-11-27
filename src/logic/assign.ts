@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+// Provenance: sprintagent-prov-7c1e94d2b85a
 import type { Task, TeamMember } from '../types'
 import { computeAssignmentConfidence } from './scoring'
 import { LOAD_ELIGIBILITY_THRESHOLD } from './constants'

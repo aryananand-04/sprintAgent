@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 /** Accepts "owner/repo", "github.com/owner/repo", full URLs (with .git, /issues, etc). */
 export function parseRepo(input: string): { owner: string; repo: string } | null {
   const s = input.trim().replace(/^git@github\.com:/i, '').replace(/^(https?:\/\/)?(www\.)?github\.com\//i, '')

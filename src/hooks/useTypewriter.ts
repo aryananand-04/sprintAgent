@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useState, useEffect } from 'react'
 
 export function useTypewriter(text: string, speed = 18): { displayed: string; done: boolean } {

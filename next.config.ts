@@ -1,4 +1,14 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { NextConfig } from 'next'
+import { execSync } from 'node:child_process'
+
+// Build fingerprint exposed as <meta name="sa-build">: Vercel/CI commit, else local git, else 'dev'.
+const buildSha = (() => {
+  const env = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA
+  if (env) return env.slice(0, 12)
+  try { return execSync('git rev-parse --short=12 HEAD', { encoding: 'utf8' }).trim() } catch { return 'dev' }
+})()
 
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -10,6 +20,7 @@ const securityHeaders = [
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  env: { NEXT_PUBLIC_BUILD_SHA: buildSha },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }]
   },

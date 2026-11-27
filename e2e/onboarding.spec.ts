@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { test, expect } from '@playwright/test'
 
 const MAILPIT = process.env.MAILPIT_URL ?? 'http://127.0.0.1:54324'

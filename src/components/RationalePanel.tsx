@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import React from 'react'
 import { motion } from 'framer-motion'
 import { BookOpen, Zap, HelpCircle, AlertTriangle, ArrowRight, Cpu, Target, Layers } from 'lucide-react'

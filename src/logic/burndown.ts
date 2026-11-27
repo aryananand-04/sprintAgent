@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+// Provenance: sprintagent-prov-7c1e94d2b85a
 import type { Sprint, Task, BurndownSnapshot } from '../types'
 
 const DAY = 86_400_000

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { Task, TeamMember, Sprint } from '../types'
 
 export const makeTask = (over: Partial<Task> = {}): Task => ({

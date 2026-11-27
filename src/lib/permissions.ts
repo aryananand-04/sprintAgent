@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // UI-side mirror of the RLS rules in supabase/migrations/*_security.sql.
 // The database is the source of truth; this only decides what to show.
 export const ROLES = ['viewer', 'contributor', 'pm', 'admin'] as const

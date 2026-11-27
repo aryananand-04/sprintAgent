@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { Sidebar } from './components/Sidebar'
 import { GuidedOverlay } from './components/GuidedOverlay'
 import { TourGuide } from './components/TourGuide'

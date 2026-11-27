@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 /**
  * Avatar fills keyed by the stored Tailwind class (team_members.color). Deep, on-brand hues that keep
  * white initials ≥ 6:1 in both themes. Single source; components must not redefine this map.

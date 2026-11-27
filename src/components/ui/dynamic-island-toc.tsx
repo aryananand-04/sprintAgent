@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useState, useEffect, ReactNode, useMemo } from 'react'
 import { motion, AnimatePresence, type Transition } from 'framer-motion'
 import { X } from 'lucide-react'

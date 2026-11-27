@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import Link from 'next/link'
 import { Logo } from '@/components/marketing/primitives'
 import { ClayFunnel } from '@/components/marketing/clay'

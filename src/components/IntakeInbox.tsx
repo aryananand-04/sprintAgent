@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: FSL-1.1-ALv2
+// SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Inbox, CheckCircle, Zap, AlertTriangle } from 'lucide-react'
