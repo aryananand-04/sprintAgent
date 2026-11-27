@@ -7,7 +7,7 @@ export function decideAutonomy(task: Task, config: AutonomyConfig = DEFAULT_AUTO
   // ESCALATE conditions — agent must defer
   if (task.clarity <= 1) return 'ESCALATE'
   if (task.risk >= 5 && task.effort >= 4) return 'ESCALATE'
-  if (task.dependencies.some((d) => !d.startsWith('task-'))) return 'ESCALATE'
+  if (task.externalBlockers.length > 0) return 'ESCALATE'
   if (task.type === 'urgent' && task.effort >= 5) return 'ESCALATE'
 
   // ASK conditions — uses PM-configured threshold
@@ -31,8 +31,8 @@ function buildReason(task: Task, decision: AgentDecision): string {
         return `Requirements clarity score is critically low (${task.clarity}/5). Cannot safely scope or assign without human input — risk of wasted effort or wrong solution.`
       if (task.risk >= 5)
         return `Maximum risk score (${task.risk}/5) combined with high effort (${task.effort}/5). Cross-functional impact requires PM and engineering lead sign-off.`
-      if (task.dependencies.some((d) => !d.startsWith('task-')))
-        return `External dependency detected (${task.dependencies.filter((d) => !d.startsWith('task-')).join(', ')}). Cannot resolve autonomously — human stakeholder action required.`
+      if (task.externalBlockers.length > 0)
+        return `External dependency detected (${task.externalBlockers.join(', ')}). Cannot resolve autonomously — human stakeholder action required.`
       return `Scope-breaking or high-ambiguity conditions detected. Agent cannot resolve without human judgment.`
 
     case 'ASK':

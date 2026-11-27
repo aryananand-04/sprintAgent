@@ -55,7 +55,8 @@ Impact: ${task.impact}/5
 Effort: ${task.effort}/5
 Risk: ${task.risk}/5
 Clarity: ${task.clarity}/5
-Dependencies: ${task.dependencies.length > 0 ? task.dependencies.join(', ') : 'none'}
+Depends on tasks: ${task.dependencies.length > 0 ? task.dependencies.join(', ') : 'none'}
+External blockers: ${task.externalBlockers.length > 0 ? task.externalBlockers.join(', ') : 'none'}
 Tags: ${task.tags?.join(', ') || 'none'}
 Story Points: ${task.storyPoints ?? 'unestimated'}
 

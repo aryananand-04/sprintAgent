@@ -1,14 +1,13 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type {
   Task, TeamMember, Sprint, FeedEvent, EscalationItem,
   TaskStatus, UrgencyLevel,
   AutonomyConfig, SprintArchive, BurndownSnapshot,
   CalibrationData, AgentActionSnapshot,
 } from '../types'
-import { INITIAL_TASKS } from '../data/tasks'
-import { TEAM } from '../data/team'
-import { SPRINT, INITIAL_ESCALATIONS, INITIAL_FEED, INITIAL_SPRINT_HISTORY, INITIAL_BURNDOWN } from '../data/sprint'
+import { deriveBurndown } from '../logic/burndown'
+import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
 import { triageTask } from '../logic/triage'
 import { triageWithAI } from '../logic/triageAI'
 import { findBestAssignee } from '../logic/assign'
@@ -19,18 +18,31 @@ import { scoreGoalAlignment } from '../logic/goalAlignment'
 
 type View = 'sprint' | 'intake' | 'triage' | 'escalations' | 'briefings' | 'autonomy' | 'timeline' | 'review' | 'rationale' | 'planner'
 
-const DEFAULT_AUTONOMY: AutonomyConfig = {
-  actMinClarity:   3,
-  askMaxClarity:   2,
-  escalateIfCriticalUnassignedHours: 1,
-  neverAutoAssignTypes: [],
-  capacityBreachThreshold: 90,
-  blockedHoursThreshold:   2,
-  escNudgeHours:           4,
-  velocityDeficitPts:      6,
+/** Everything loaded from the database for one workspace (see lib/data/loadWorkspace). */
+export interface WorkspaceSnapshot {
+  workspaceId: string
+  tasks: Task[]
+  team: TeamMember[]
+  sprint: Sprint
+  feed: FeedEvent[]
+  escalations: EscalationItem[]
+  autonomyConfig: AutonomyConfig
+  sprintHistory: SprintArchive[]
+  calibration: CalibrationData
+}
+
+const EMPTY_SPRINT: Sprint = {
+  id: '', name: '', goal: '', startDate: '1970-01-01', endDate: '1970-01-01',
+  totalPoints: 0, completedPoints: 0, committedPoints: 0, health: 'green', daysRemaining: 0, velocity: 0,
 }
 
 interface SprintStore {
+  workspaceId: string | null
+  viewingArchive: boolean          // read-only browse of an archived sprint; sync is paused
+  syncError: string | null
+  hydrate: (snapshot: WorkspaceSnapshot) => void
+  setSyncError: (message: string | null) => void
+
   tasks: Task[]
   team: TeamMember[]
   sprint: Sprint
@@ -88,11 +100,10 @@ interface SprintStore {
   triggerScenario: (scenarioId: string) => void
 }
 
-let feedCounter = 100
+const uid = () => crypto.randomUUID()
 
-function newFeedId() {
-  return `feed-${++feedCounter}`
-}
+// Server render (and private modes) have no usable localStorage.
+const noopStorage: StateStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} }
 
 function now() {
   return new Date().toISOString()
@@ -103,7 +114,7 @@ function now() {
 // Seeded loads represent mid-sprint reality (including meetings, code review, overhead) —
 // we add/subtract the task's proportional share rather than recomputing from scratch.
 
-function computeLoadsFromTasks(tasks: Task[], team: TeamMember[]): TeamMember[] {
+export function computeLoadsFromTasks(tasks: Task[], team: TeamMember[]): TeamMember[] {
   return team.map(m => {
     const activePts = tasks
       .filter(t => t.assigneeId === m.id && ['in-progress', 'assigned', 'blocked'].includes(t.status))
@@ -129,19 +140,22 @@ function refreshSprintHealth(get: () => SprintStore, set: (s: Partial<SprintStor
 export const useSprintStore = create<SprintStore>()(
   persist(
     (set, get) => ({
-  tasks: INITIAL_TASKS,
-  team: computeLoadsFromTasks(INITIAL_TASKS, TEAM),
-  sprint: SPRINT,
+  workspaceId: null,
+  viewingArchive: false,
+  syncError: null,
+  tasks: [],
+  team: [],
+  sprint: EMPTY_SPRINT,
   slackWebhookUrl: '',
   outboundWebhookUrl: '',
-  autonomyConfig: DEFAULT_AUTONOMY,
-  sprintHistory: INITIAL_SPRINT_HISTORY,
-  burndownSnapshots: INITIAL_BURNDOWN,
+  autonomyConfig: DEFAULT_AUTONOMY_CONFIG,
+  sprintHistory: [],
+  burndownSnapshots: [],
   calibration: { act: { correct: 0, total: 0 }, ask: { correct: 0, total: 0 }, escalate: { correct: 0, total: 0 } },
   actionHistory: [],
   sprintNarrative: '',
-  feed: INITIAL_FEED,
-  escalations: INITIAL_ESCALATIONS,
+  feed: [],
+  escalations: [],
   activeView: 'sprint',
   selectedTaskId: null,
   isTriagePanelOpen: false,
@@ -151,6 +165,23 @@ export const useSprintStore = create<SprintStore>()(
   triageError: null,
   isBootstrapping: false,
 
+  hydrate: (snap) => set({
+    workspaceId: snap.workspaceId,
+    viewingArchive: false,
+    syncError: null,
+    tasks: snap.tasks,
+    team: computeLoadsFromTasks(snap.tasks, snap.team),
+    sprint: snap.sprint,
+    feed: snap.feed,
+    escalations: snap.escalations,
+    autonomyConfig: snap.autonomyConfig,
+    sprintHistory: snap.sprintHistory,
+    calibration: snap.calibration,
+    burndownSnapshots: deriveBurndown(snap.sprint, snap.tasks),
+    actionHistory: [],
+  }),
+  setSyncError: (message) => set({ syncError: message }),
+
   setView: (view) => set({ activeView: view }),
   selectTask: (id) => set({ selectedTaskId: id }),
   setTriagePanelOpen: (open) => set({ isTriagePanelOpen: open }),
@@ -158,7 +189,7 @@ export const useSprintStore = create<SprintStore>()(
   setDemoOpen: (open) => set({ isDemoOpen: open }),
 
   addFeedEvent: (event) => {
-    const full: FeedEvent = { ...event, id: newFeedId(), timestamp: now() }
+    const full: FeedEvent = { ...event, id: uid(), timestamp: now() }
     set((s) => {
       const next = [full, ...s.feed]
       return { feed: next.slice(0, 100) }
@@ -267,7 +298,7 @@ export const useSprintStore = create<SprintStore>()(
 
     // Snapshot for undo
     const snapshot: AgentActionSnapshot = {
-      id: `action-${Date.now()}`,
+      id: uid(),
       type: 'assign',
       taskId,
       taskTitle: task.title,
@@ -329,8 +360,13 @@ export const useSprintStore = create<SprintStore>()(
     }
 
     set(s => {
-      const updatedTasks = s.tasks.map(t => t.id === taskId ? { ...t, status } : t)
-      return { tasks: updatedTasks, team: computeLoadsFromTasks(updatedTasks, s.team) }
+      const completedAt = status === 'done' ? (task.completedAt ?? now()) : undefined
+      const updatedTasks = s.tasks.map(t => t.id === taskId ? { ...t, status, completedAt } : t)
+      return {
+        tasks: updatedTasks,
+        team: computeLoadsFromTasks(updatedTasks, s.team),
+        burndownSnapshots: deriveBurndown(s.sprint, updatedTasks),
+      }
     })
 
     if (status === 'done') {
@@ -364,7 +400,7 @@ export const useSprintStore = create<SprintStore>()(
     const { sprint, team, tasks, addFeedEvent } = get()
 
     const newTask: Task = {
-      id: `adhoc-${Date.now()}`,
+      id: uid(),
       title,
       description,
       type: 'ad-hoc',
@@ -375,6 +411,7 @@ export const useSprintStore = create<SprintStore>()(
       risk: 2,
       clarity: 3,
       dependencies: [],
+      externalBlockers: [],
       source: 'Ad-hoc / Intake',
       isAdHoc: true,
       isNew: true,
@@ -434,7 +471,7 @@ export const useSprintStore = create<SprintStore>()(
     const { addFeedEvent } = get()
 
     const newTask: Task = {
-      id: `task-manual-${Date.now()}`,
+      id: uid(),
       title,
       description: '',
       type: 'chore',
@@ -446,6 +483,7 @@ export const useSprintStore = create<SprintStore>()(
       impact: 2, effort: 3, risk: 3, clarity: 1,
       assigneeId,
       dependencies: [],
+      externalBlockers: [],
       source: 'Manual / Board',
       storyPoints: 2,
       createdAt: now(),
@@ -476,7 +514,7 @@ export const useSprintStore = create<SprintStore>()(
 
   addComment: (taskId, text, author = 'PM') => {
     const comment = {
-      id: `comment-${Date.now()}`,
+      id: uid(),
       text,
       author,
       timestamp: now(),
@@ -661,7 +699,7 @@ export const useSprintStore = create<SprintStore>()(
     const recentVelocities = [sprint.completedPoints, ...sprintHistory.slice(0, 2).map(h => h.completedPoints)]
     const newVelocity = Math.round(recentVelocities.reduce((a, b) => a + b, 0) / recentVelocities.length)
     const archive: SprintArchive = {
-      id: `archive-${Date.now()}`,
+      id: uid(),
       name: sprint.name,
       goal: sprint.goal,
       startDate: sprint.startDate,
@@ -693,7 +731,7 @@ export const useSprintStore = create<SprintStore>()(
       const recentVelocities = [sprint.completedPoints, ...sprintHistory.slice(0, 2).map(h => h.completedPoints)]
       const v = Math.round(recentVelocities.reduce((a, b) => a + b, 0) / recentVelocities.length)
       const entry: SprintArchive = {
-        id: `archive-${Date.now()}`,
+        id: uid(),
         name: sprint.name, goal: sprint.goal, startDate: sprint.startDate,
         completedPoints: sprint.completedPoints, committedPoints: sprint.committedPoints,
         velocity: v, health: sprint.health,
@@ -715,6 +753,7 @@ export const useSprintStore = create<SprintStore>()(
       team: computeLoadsFromTasks(archivedTasks, s.team),
       feed: [],
       actionHistory: [],
+      viewingArchive: true,
     }))
     addFeedEvent({ type: 'status', message: `Opened archived sprint: "${archived.name}". All task and escalation data restored.` })
   },
@@ -724,7 +763,7 @@ export const useSprintStore = create<SprintStore>()(
     get().archiveSprint()
     const { sprint, tasks } = get()
     const newSprint: Sprint = {
-      id: `sprint-${Date.now()}`,
+      id: uid(),
       name, goal, startDate, endDate,
       totalPoints: committedPoints + 20,
       committedPoints,
@@ -749,24 +788,10 @@ export const useSprintStore = create<SprintStore>()(
     get().addFeedEvent({ type: 'status', message: `${name} started. Goal: "${goal}". Agent is ready — add tasks to begin sprint.` })
   },
 
+  // Burndown is derived from task completion times (tasks.completed_at), not stored snapshots.
   recordBurndownSnapshot: () => {
-    const { sprint } = get()
-    const today = new Date().toISOString().slice(0, 10)
-    const sprintLength = Math.max(1, Math.ceil(
-      (new Date(sprint.endDate).getTime() - new Date(sprint.startDate).getTime()) / 86_400_000
-    ))
-    const daysElapsed = Math.max(1, Math.ceil(
-      (Date.now() - new Date(sprint.startDate).getTime()) / 86_400_000
-    ))
-    const snapshot: BurndownSnapshot = {
-      date: today,
-      completed: sprint.completedPoints,
-      expected: Math.round((sprint.committedPoints / sprintLength) * Math.min(daysElapsed, sprintLength)),
-    }
-    set(s => {
-      const without = s.burndownSnapshots.filter(b => b.date !== today)
-      return { burndownSnapshots: [...without, snapshot].slice(-sprintLength) }
-    })
+    const { sprint, tasks } = get()
+    set({ burndownSnapshots: deriveBurndown(sprint, tasks) })
   },
 
   createEscalation: (taskId, reason, recommendation, urgency, category) => {
@@ -775,7 +800,7 @@ export const useSprintStore = create<SprintStore>()(
 
     const task = get().tasks.find((t) => t.id === taskId)
     const esc: EscalationItem = {
-      id: `esc-auto-${taskId}-${Date.now()}`,
+      id: uid(),
       taskId,
       taskTitle: task?.title ?? taskId,
       reason,
@@ -898,29 +923,13 @@ export const useSprintStore = create<SprintStore>()(
   },
 }),
     {
-      name: 'sprint-agent-v17',
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.team = computeLoadsFromTasks(state.tasks, state.team)
-          state.sprint = {
-            ...state.sprint,
-            daysRemaining: Math.max(0, Math.ceil((new Date(state.sprint.endDate).getTime() - Date.now()) / 86_400_000)),
-          }
-        }
-      },
+      // Domain data lives in Supabase; only per-browser preferences persist locally.
+      name: 'sprint-agent-prefs-v1',
+      storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : window.localStorage)),
       partialize: (state) => ({
-        tasks: state.tasks,
-        team: state.team,
-        sprint: state.sprint,
-        feed: state.feed,
-        escalations: state.escalations,
         activeView: state.activeView,
         slackWebhookUrl: state.slackWebhookUrl,
         outboundWebhookUrl: state.outboundWebhookUrl,
-        autonomyConfig: state.autonomyConfig,
-        sprintHistory: state.sprintHistory,
-        burndownSnapshots: state.burndownSnapshots,
-        calibration: state.calibration,
         sprintNarrative: state.sprintNarrative,
       }),
     }

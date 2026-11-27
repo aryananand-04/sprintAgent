@@ -10,8 +10,10 @@ const BURNDOWN_KEY   = 'sprint-agent-burndown-date'
  * Runs ONCE per browser session (not per React render).
  * Uses sessionStorage so Strict Mode double-invoke is harmless.
  */
-export function useAgentBootstrap() {
+/** Runs only for roles that may act on the board (PM+); other roles just watch. */
+export function useAgentBootstrap(enabled = true) {
   useEffect(() => {
+    if (!enabled) return
     if (sessionStorage.getItem(SESSION_KEY)) return
     sessionStorage.setItem(SESSION_KEY, '1')
 
@@ -92,5 +94,5 @@ export function useAgentBootstrap() {
       })
       useSprintStore.setState({ isBootstrapping: false })
     }, unprocessed.length * 3000 + 1500)
-  }, [])
+  }, [enabled])
 }

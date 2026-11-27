@@ -212,7 +212,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                       color: task.confidence >= 75 ? 'var(--ok)' : task.confidence >= 55 ? 'var(--warn)' : 'var(--crit)',
                     }}>{task.confidence}%</span>
                   )}
-                  {task.dependencies.length > 0 && <GitBranch size={9} style={{ color: 'var(--t3)' }} />}
+                  {task.dependencies.length + task.externalBlockers.length > 0 && <GitBranch size={9} style={{ color: 'var(--t3)' }} />}
                 </div>
               </div>
 

@@ -12,6 +12,7 @@ export const makeTask = (over: Partial<Task> = {}): Task => ({
   risk: 2,
   clarity: 4,
   dependencies: [],
+  externalBlockers: [],
   source: 'PM',
   tags: ['frontend'],
   storyPoints: 3,

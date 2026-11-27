@@ -10,8 +10,10 @@ const STANDUP_HOUR = 9   // 9am
  * Fires on the first app open after 9am — no backend scheduler needed.
  * Tracks "posted today" in localStorage to prevent duplicates.
  */
-export function useScheduledStandup() {
+/** Runs only for roles that may act on the board (PM+); other roles just watch. */
+export function useScheduledStandup(enabled = true) {
   useEffect(() => {
+    if (!enabled) return
     const { tasks, team, sprint, escalations, slackWebhookUrl, addFeedEvent } = useSprintStore.getState()
 
     if (!slackWebhookUrl) return   // no webhook configured
@@ -42,5 +44,5 @@ export function useScheduledStandup() {
           message: 'Scheduled standup failed to post to Slack. Check webhook URL in Settings.',
         })
       })
-  }, [])
+  }, [enabled])
 }

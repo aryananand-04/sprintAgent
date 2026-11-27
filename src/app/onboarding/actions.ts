@@ -30,7 +30,7 @@ export async function createWorkspace(_prev: OnboardingState, form: FormData): P
 }
 
 export async function switchWorkspace(form: FormData) {
-  const id = z.uuid().safeParse(form.get('workspaceId'))
+  const id = z.guid().safeParse(form.get('workspaceId'))
   if (id.success) {
     ;(await cookies()).set(WORKSPACE_COOKIE, id.data, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 60 * 60 * 24 * 365 })
   }

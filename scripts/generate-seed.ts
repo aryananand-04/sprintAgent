@@ -81,10 +81,11 @@ values (${uid(m.id)}, ${uid(WS)}, ${linked ? uid(linked.key) : 'null'}, ${q(m.na
 /* ── Sprints: active (relative dates) + archived history ───────────── */
 out.push(
   '',
+  // completed_points is maintained by the tasks_completion trigger from done tasks.
   `insert into public.sprints (id, workspace_id, name, goal, status, start_date, end_date, total_points,
-  committed_points, completed_points, velocity, health)
+  committed_points, velocity, health, created_at)
 values (${uid(SPRINT.id)}, ${uid(WS)}, ${q(SPRINT.name)}, ${q(SPRINT.goal)}, 'active', current_date - 7, current_date + 7,
-  ${SPRINT.totalPoints}, ${SPRINT.committedPoints}, ${SPRINT.completedPoints}, ${SPRINT.velocity}, '${SPRINT.health}');`,
+  ${SPRINT.totalPoints}, ${SPRINT.committedPoints}, ${SPRINT.velocity}, '${SPRINT.health}', now() - interval '8 days');`,
 )
 for (const s of INITIAL_SPRINT_HISTORY) {
   const end = `(${ago(s.endDate)})::date`
@@ -99,21 +100,24 @@ values (${uid(s.id)}, ${uid(WS)}, ${q(s.name)}, ${q(s.goal)}, 'archived', ${end}
 
 /* ── Tasks ──────────────────────────────────────────────────────────── */
 out.push('')
+let doneIndex = 0
 for (const t of INITIAL_TASKS) {
-  const external = t.dependencies.filter((d) => !taskIds.has(d))
+  // Spread completions over the first week of the sprint so the burndown has a shape.
+  const completedAt = t.status === 'done' ? `now() - interval '${6 - (doneIndex++ % 6)} days'` : 'null'
+  const external = t.externalBlockers
   out.push(
     `insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (${uid(t.id)}, ${uid(WS)}, ${uid(SPRINT.id)}, ${q(t.title)}, ${q(t.description)}, '${t.type}', '${t.status}',
   '${t.urgency}', ${t.impact}, ${t.effort}, ${t.risk}, ${t.clarity}, ${t.assigneeId ? uid(t.assigneeId) : 'null'},
   ${arr(external)}, ${q(t.source)}, ${num(t.storyPoints)}, ${arr(t.tags)}, ${t.decision ? `'${t.decision}'` : 'null'},
   ${q(t.decisionReason)}, ${num(t.triageScore)}, ${num(t.confidence)}, ${bool(t.isAITriaged)}, ${bool(t.isAdHoc)},
-  ${ago(t.createdAt)});`,
+  ${completedAt}, ${ago(t.createdAt)});`,
   )
 }
 for (const t of INITIAL_TASKS) {
-  for (const d of t.dependencies.filter((x) => taskIds.has(x))) {
+  for (const d of t.dependencies) {
     out.push(
       `insert into public.task_dependencies (workspace_id, task_id, depends_on_task_id) values (${uid(WS)}, ${uid(t.id)}, ${uid(d)});`,
     )

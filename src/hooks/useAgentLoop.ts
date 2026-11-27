@@ -35,8 +35,10 @@ async function narrate(prompt: string, fallback: string): Promise<string> {
   }
 }
 
-export function useAgentLoop() {
+/** Runs only for roles that may act on the board (PM+); other roles just watch. */
+export function useAgentLoop(enabled = true) {
   useEffect(() => {
+    if (!enabled) return
     const tick = async () => {
       const { tasks, team, sprint, escalations, autonomyConfig, addFeedEvent, assignTaskById, createEscalation } =
         useSprintStore.getState()
@@ -195,5 +197,5 @@ export function useAgentLoop() {
     const initial  = setTimeout(tick, 10_000)
     const interval = setInterval(tick, LOOP_MS)
     return () => { clearTimeout(initial); clearInterval(interval) }
-  }, [])
+  }, [enabled])
 }

@@ -11,6 +11,7 @@ interface GHIssue {
   body: string | null
   labels: { name: string }[]
   state: string
+  html_url: string
 }
 
 function labelToType(labels: string[]): TaskType {
@@ -74,7 +75,8 @@ export function GitHubImport() {
     const tasks: Task[] = toImport.map(issue => {
       const labels = issue.labels.map(l => l.name)
       return {
-        id: `gh-${issue.number}-${Date.now()}`,
+        id: crypto.randomUUID(),
+        externalRef: issue.html_url,
         title: `#${issue.number}: ${issue.title}`,
         description: (issue.body ?? '').slice(0, 300) || 'No description provided.',
         type: labelToType(labels),
@@ -84,6 +86,7 @@ export function GitHubImport() {
         clarity: issue.body && issue.body.length > 100 ? 3 : 1,
         storyPoints: 3,
         dependencies: [],
+        externalBlockers: [],
         source: `GitHub / ${repo.replace('https://github.com/', '')}`,
         tags: labels.slice(0, 3),
         createdAt: new Date().toISOString(),

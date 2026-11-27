@@ -304,13 +304,13 @@ export function TriagePanel() {
                   )
                 })()}
 
-                {task.dependencies.length > 0 && (
+                {task.dependencies.length + task.externalBlockers.length > 0 && (
                   <div>
                     <div className="label" style={{ marginBottom: 8 }}>Dependencies</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {task.dependencies.map(dep => {
+                      {[...task.dependencies, ...task.externalBlockers].map(dep => {
                         const depTask = tasks.find(t => t.id === dep)
-                        const isExt = !dep.startsWith('task-')
+                        const isExt = task.externalBlockers.includes(dep)
                         return (
                           <div key={dep} style={{
                             display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 5, fontSize: 11,

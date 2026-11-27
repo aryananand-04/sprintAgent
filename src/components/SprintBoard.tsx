@@ -353,16 +353,16 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                   )}
 
                   {/* Dependencies */}
-                  {task.dependencies.length > 0 && (
+                  {task.dependencies.length + task.externalBlockers.length > 0 && (
                     <div style={{ padding: '0 11px 8px' }}>
                       <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--muted-foreground)', marginBottom: 4 }}>
                         Dependencies
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        {task.dependencies.slice(0, 3).map(dep => (
+                        {[...task.dependencies, ...task.externalBlockers].slice(0, 3).map(dep => (
                           <div key={dep} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--muted-foreground)' }}>
                             <GitBranch size={9} strokeWidth={1.5} style={{ flexShrink: 0 }} />
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{dep}</span>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tasks.find(t => t.id === dep)?.title ?? dep}</span>
                           </div>
                         ))}
                       </div>

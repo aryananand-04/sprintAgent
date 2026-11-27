@@ -7,7 +7,7 @@ describe('decideAutonomy', () => {
   it.each([
     ['clarity 1', { clarity: 1 }, 'ESCALATE'],
     ['max risk + high effort', { risk: 5, effort: 4 }, 'ESCALATE'],
-    ['external dependency', { dependencies: ['legal-review'] }, 'ESCALATE'],
+    ['external blocker', { externalBlockers: ['legal-review'] }, 'ESCALATE'],
     ['huge urgent task', { type: 'urgent' as const, effort: 5 }, 'ESCALATE'],
     ['low clarity', { clarity: 2 }, 'ASK'],
     ['clear task', {}, 'ACT'],

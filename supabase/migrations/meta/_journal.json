@@ -15,6 +15,27 @@
       "when": 1795792331100,
       "tag": "20261127151211_security",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795793354136,
+      "tag": "20261127152914_task_completed_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795793354418,
+      "tag": "20261127152915_derived_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795793678638,
+      "tag": "20261127153438_sprint_lifecycle",
+      "breakpoints": true
     }
   ]
 }

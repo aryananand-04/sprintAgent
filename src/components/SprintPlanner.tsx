@@ -104,13 +104,13 @@ export function SprintPlanner() {
     if (!generated.length) return
     setImporting(true)
 
-    const tasks: Task[] = generated.map((g, i) => {
+    const tasks: Task[] = generated.map((g) => {
       const member = g.suggestedAssigneeName
         ? team.find(m => m.name.toLowerCase().startsWith(g.suggestedAssigneeName!.toLowerCase()))
         : undefined
 
       return {
-        id: `planned-${Date.now()}-${i}`,
+        id: crypto.randomUUID(),
         title: g.title,
         description: g.description,
         type: g.type,
@@ -123,6 +123,7 @@ export function SprintPlanner() {
         storyPoints: g.storyPoints,
         assigneeId: member?.id,
         dependencies: [],
+        externalBlockers: [],
         source: 'Sprint Planner / AI',
         createdAt: new Date().toISOString(),
         decisionReason: g.rationale,

@@ -97,9 +97,9 @@ values (md5('aisha')::uuid, md5('demo-workspace')::uuid, null, 'Aisha Khan', 'AI
   array['rag', 'embeddings', 'semantic-search', 'retrieval', 'python', 'llm', 'evals']::text[], 22, 20, 'bg-purple-400');
 
 insert into public.sprints (id, workspace_id, name, goal, status, start_date, end_date, total_points,
-  committed_points, completed_points, velocity, health)
+  committed_points, velocity, health, created_at)
 values (md5('sprint-23')::uuid, md5('demo-workspace')::uuid, 'Sprint 23', 'Ship redesigned checkout flow with flexible payment methods and promo code support', 'active', current_date - 7, current_date + 7,
-  89, 68, 34, 51, 'yellow');
+  89, 68, 51, 'yellow', now() - interval '8 days');
 insert into public.sprints (id, workspace_id, name, goal, status, start_date, end_date, committed_points,
   completed_points, velocity, health, snapshot)
 values (md5('archive-sprint-20')::uuid, md5('demo-workspace')::uuid, 'Sprint 20', 'Redesign onboarding flow and reduce drop-off rate by 15%', 'archived', (now() - interval '60480 minutes')::date - 14, (now() - interval '60480 minutes')::date, 60,
@@ -118,148 +118,148 @@ values (md5('archive-sprint-22')::uuid, md5('demo-workspace')::uuid, 'Sprint 22'
 
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-1')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Checkout: Payment fails on iOS after promo code', 'Users on iOS 17+ experience a hard crash when applying a promo code during checkout. Affects 12% of mobile transactions. Sentry: CHK-4421.', 'bug', 'in-progress',
   'critical', 5, 4, 4, 3, md5('arjun')::uuid,
-  array['task-auth-service']::text[], 'GitHub / Sentry', 5, array['payments', 'ios', 'critical']::text[], 'ACT',
+  '{}'::text[], 'GitHub / Sentry', 5, array['payments', 'ios', 'critical']::text[], 'ACT',
   'Critical production bug with clear reproduction steps. Assigned to Arjun Nair — backend/api/python skill match, low current load. Dependency on auth service is low-risk.', 78, 84, true, false,
-  now() - interval '180 minutes');
+  null, now() - interval '180 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-3')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Checkout flow: Redesign order summary sidebar', 'New design from Priya approved in Figma. Implement updated order summary with item breakdown, taxes, and estimated delivery. High visual fidelity required.', 'feature', 'in-progress',
   'high', 4, 3, 2, 5, md5('meera')::uuid,
   '{}'::text[], 'Sprint Planning', 3, array['checkout', 'ui', 'design-ready']::text[], 'ACT',
   'Clear spec, approved designs, no blockers. Frontend task assigned to Meera Patel — react, typescript, css, animations skill match, available capacity.', 72, 89, true, false,
-  now() - interval '300 minutes');
+  null, now() - interval '300 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-6')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'API: Payment method persistence across sessions', 'Save preferred payment method in user profile. Must encrypt card metadata per PCI-DSS. Backend endpoint + frontend integration needed.', 'feature', 'in-progress',
   'high', 4, 4, 3, 4, md5('rahul')::uuid,
   '{}'::text[], 'Sprint Planning', 5, array['payments', 'api', 'pci']::text[], 'ACT',
   'Full-stack task, well-specified, assigned to Rahul for cross-functional coverage. Moderate risk due to PCI compliance — flagged for QA review post-implementation.', 68, 81, true, false,
-  now() - interval '240 minutes');
+  null, now() - interval '240 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-9')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Checkout regression test suite — Sprint 23 scope', 'Full regression coverage for checkout flow changes in Sprint 23. Includes promo codes, payment methods, order summary, and mobile responsiveness.', 'chore', 'assigned',
   'high', 4, 3, 2, 5, md5('lakshmi')::uuid,
   '{}'::text[], 'QA Process', 3, array['qa', 'testing', 'regression']::text[], 'ACT',
   'Standard QA coverage task. Assigned to Lakshmi Subramaniam — testing, qa, automation, cypress skill match, lowest load on team. Depends on task-1 and task-3 being code-complete.', 65, 91, true, false,
-  now() - interval '120 minutes');
+  null, now() - interval '120 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-5')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Design: Payment method selection UI — WCAG 2.2 audit', 'Priya to audit new payment selection screens for accessibility compliance. Must pass WCAG 2.2 AA. Blocking final QA sign-off.', 'design', 'assigned',
   'medium', 3, 2, 2, 5, md5('meera')::uuid,
   '{}'::text[], 'Design Review', 2, array['design', 'accessibility', 'wcag']::text[], 'ACT',
   'Accessibility audit assigned to Meera Patel — design-systems, storybook, accessibility skill match. Low effort, clear scope, no blockers.', 61, 94, true, false,
-  now() - interval '360 minutes');
+  null, now() - interval '360 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-4')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Spike: Evaluate Stripe vs Adyen for international payments', 'Research spike to compare Stripe and Adyen APIs for multi-currency support in EU/APAC markets. Output: decision doc + cost analysis.', 'spike', 'triaged',
   'medium', 3, 2, 1, 4, null,
   '{}'::text[], 'PM / Strategy', 2, array['research', 'payments', 'international']::text[], 'ACT',
   'Well-scoped spike. No blockers, low risk, high strategic value. Recommend Rahul or Ananya based on availability at assignment time.', 58, 77, true, false,
-  now() - interval '480 minutes');
+  null, now() - interval '480 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-7')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Mobile: Fix checkout button overflow on small screens', 'On iPhone SE and 375px viewports, the "Complete Purchase" button overflows container. CSS layout regression introduced in last sprint.', 'bug', 'triaged',
   'medium', 2, 1, 1, 5, null,
   '{}'::text[], 'QA Report', 1, array['mobile', 'css', 'responsive']::text[], 'ACT',
   'Simple CSS fix, fully reproducible. Effort low, clarity high. Can be absorbed mid-sprint without disrupting sprint goal. Assign to Dev or Rahul.', 52, 88, true, false,
-  now() - interval '420 minutes');
+  null, now() - interval '420 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-10')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Performance: Checkout page LCP > 4s on 3G', 'Lighthouse audit shows checkout page LCP at 4.2s on slow 3G. Primary culprits: unoptimized hero image, layout shift from font loading.', 'chore', 'triaged',
   'low', 3, 2, 1, 4, null,
   '{}'::text[], 'Performance Monitoring', 2, array['performance', 'lcp', 'optimization']::text[], 'ASK',
   'Worth fixing but not sprint-critical. Asking PM: should this be included in Sprint 23 or backlogged for a perf sprint? Needs prioritization decision.', 44, 72, true, false,
-  now() - interval '300 minutes');
+  null, now() - interval '300 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-2')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Auth: Redesign session token storage for compliance', 'Legal flagged current session token storage as non-compliant with new EU data residency requirements. Full redesign of auth token lifecycle required.', 'feature', 'blocked',
   'high', 5, 5, 5, 1, null,
   array['legal-sign-off', 'arch-review']::text[], 'Legal / Compliance', 8, array['auth', 'compliance', 'legal']::text[], 'ESCALATE',
   'Critical compliance risk but zero clarity on requirements. High effort, high risk, two unresolved external dependencies. Human judgment required before any work begins.', 31, 22, true, false,
-  now() - interval '2880 minutes');
+  null, now() - interval '2880 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-11')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Promo code: UI validation and edge case handling', 'Frontend validation for promo code entry: invalid codes, expired codes, and the contested stacked discounts behavior. Spec unclear on stacking.', 'feature', 'blocked',
   'high', 3, 2, 3, 2, md5('vikram')::uuid,
   array['promo-spec-clarity']::text[], 'Sprint Planning', 2, array['promo', 'frontend', 'blocked']::text[], 'ESCALATE',
   'Vikram Bose assigned but blocked on spec ambiguity — tool-calling, typescript, node skill match. Stacked discounts spec contradicts Slack thread from VP Growth. PM arbitration needed to unblock.', 39, 41, true, false,
-  now() - interval '1440 minutes');
+  null, now() - interval '1440 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-8')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Stakeholder ask: Add Apple Pay to checkout', 'VP Sales requested Apple Pay support for checkout "before Q2 ends." Touches checkout flow, auth, and payment processing. PM decision: defer to Sprint 24. Spike task for payment provider selection to be scheduled first.', 'spike', 'backlog',
   'medium', 4, 5, 4, 1, null,
   array['payment-provider-decision']::text[], 'VP Sales / Slack', 13, array['apple-pay', 'stakeholder', 'deferred-sprint-24']::text[], 'ASK',
   'PM decision (Sprint 23): deferred to Sprint 24. Requires payment provider selection spike, product spec, and cross-team coordination across checkout, auth, and payments. 13 story points — scope-breaking mid-sprint.', 28, 18, true, false,
-  now() - interval '360 minutes');
+  null, now() - interval '360 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-12')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Analytics: Track checkout funnel drop-off events', 'Add Mixpanel events for each checkout step to track funnel drop-off. Required for post-launch analysis. Low urgency, clear spec.', 'chore', 'backlog',
   'low', 2, 2, 1, 5, null,
   '{}'::text[], 'Data Team', 2, array['analytics', 'mixpanel', 'tracking']::text[], 'ACT',
   'Well-defined, low-risk, low-effort analytics task. Can be absorbed at end of sprint or carried to Sprint 24. Assign to whoever finishes task-3 first.', 48, 82, true, false,
-  now() - interval '720 minutes');
+  null, now() - interval '720 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-13')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Error states: Empty cart and expired session flows', 'Checkout error states for empty cart redirect and expired session need redesign. Currently shows raw error codes. Low urgency, blocks polish.', 'feature', 'backlog',
   'low', 2, 2, 1, 4, null,
   '{}'::text[], 'Design Review', 2, array['ux', 'error-states', 'polish']::text[], 'ACT',
   'Low urgency polish item. Clear scope, low effort. Carry if sprint capacity allows, otherwise Sprint 24.', 45, 75, true, false,
-  now() - interval '600 minutes');
+  null, now() - interval '600 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-done-1')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Checkout: Multi-step form refactor (React)', 'Refactored multi-step checkout form to use React Hook Form. Reduced code by 40%, improved validation performance.', 'chore', 'done',
   'medium', 3, 3, 2, 5, md5('dev')::uuid,
   '{}'::text[], 'Sprint Planning', 5, array['refactor', 'checkout', 'react']::text[], 'ACT',
   null, 62, 95, true, false,
-  now() - interval '4320 minutes');
+  now() - interval '6 days', now() - interval '4320 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-done-2')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Payment: Stripe webhook handler for failed charges', 'Implemented Stripe webhook endpoint for charge.failed events. Triggers email notification and cart recovery flow.', 'feature', 'done',
   'high', 4, 3, 2, 5, md5('ananya')::uuid,
   '{}'::text[], 'Sprint Planning', 3, array['stripe', 'payments', 'webhooks']::text[], 'ACT',
   null, 70, 97, true, false,
-  now() - interval '5760 minutes');
+  now() - interval '5 days', now() - interval '5760 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-done-3')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'DB: Migrate orders table to partitioned schema', 'Database schema migration for orders table to support partition-based archiving. Backfill completed, indexes optimized.', 'chore', 'done',
   'medium', 3, 4, 3, 4, md5('rahul')::uuid,
   '{}'::text[], 'Engineering', 5, array['database', 'migration', 'performance']::text[], 'ACT',
   null, 58, 93, true, false,
-  now() - interval '7200 minutes');
+  now() - interval '4 days', now() - interval '7200 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-done-4')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'Design: Checkout flow wireframes — approved', 'Final wireframes for Sprint 23 checkout flow approved by PM and stakeholders. Delivered to engineering handoff.', 'design', 'done',
   'high', 5, 3, 1, 5, md5('priya')::uuid,
   '{}'::text[], 'Design Sprint', 3, array['design', 'wireframes', 'approved']::text[], 'ACT',
   null, 75, 99, true, false,
-  now() - interval '8640 minutes');
+  now() - interval '3 days', now() - interval '8640 minutes');
 insert into public.tasks (id, workspace_id, sprint_id, title, description, type, status, urgency, impact, effort,
   risk, clarity, assignee_id, external_blockers, source, story_points, tags, decision, decision_reason, triage_score,
-  confidence, is_ai_triaged, is_ad_hoc, created_at)
+  confidence, is_ai_triaged, is_ad_hoc, completed_at, created_at)
 values (md5('task-done-5')::uuid, md5('demo-workspace')::uuid, md5('sprint-23')::uuid, 'QA: Smoke test suite for Sprint 22 release', 'Ran full smoke test suite on Sprint 22 release candidate. 0 blockers, 3 minor issues logged.', 'chore', 'done',
   'high', 4, 2, 1, 5, md5('simran')::uuid,
   '{}'::text[], 'Release Process', 2, array['qa', 'smoke-test', 'release']::text[], 'ACT',
   null, 66, 98, true, false,
-  now() - interval '10080 minutes');
+  now() - interval '2 days', now() - interval '10080 minutes');
 insert into public.task_dependencies (workspace_id, task_id, depends_on_task_id) values (md5('demo-workspace')::uuid, md5('task-9')::uuid, md5('task-1')::uuid);
 insert into public.task_dependencies (workspace_id, task_id, depends_on_task_id) values (md5('demo-workspace')::uuid, md5('task-9')::uuid, md5('task-3')::uuid);
 insert into public.task_dependencies (workspace_id, task_id, depends_on_task_id) values (md5('demo-workspace')::uuid, md5('task-5')::uuid, md5('task-3')::uuid);

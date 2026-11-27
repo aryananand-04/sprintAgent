@@ -33,7 +33,8 @@ export interface Task {
   risk: number // 1–5
   clarity: number // 1–5
   assigneeId?: string
-  dependencies: string[]
+  dependencies: string[]        // ids of tasks in this workspace that must finish first
+  externalBlockers: string[]    // unresolved outside dependencies (legal, vendor, other team)
   source: string // "Slack", "PM", "Stakeholder", "GitHub", "Ad-hoc"
   confidence?: number // 0–100
   decision?: AgentDecision
@@ -50,6 +51,8 @@ export interface Task {
   comments?: TaskComment[]
   goalAlignment?: number        // 1-10: how much this task serves the sprint goal
   acceptanceCriteria?: string[] // AI-proposed, PM-approved criteria for ASK tasks
+  completedAt?: string          // set when status becomes done (DB trigger is the source of truth)
+  externalRef?: string          // e.g. GitHub issue URL; unique per workspace
 }
 
 export interface TaskComment {
@@ -124,6 +127,7 @@ export interface TeamMember {
   currentLoad: number // 0–100 percent
   capacity: number // available story points
   color: string // tailwind bg class for avatar
+  userId?: string | null // linked account, if this person can sign in
 }
 
 export interface Sprint {

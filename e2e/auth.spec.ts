@@ -1,20 +1,7 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { loginAs, skipTour } from './helpers'
 
-// Skip the first-run product tour so it doesn't cover the UI.
-test.beforeEach(async ({ context }) => {
-  await context.addInitScript(() => {
-    try { localStorage.setItem('libra-guide-v2', '1') } catch {}
-  })
-})
-
-async function loginAs(page: Page, who: 'admin' | 'pm' | 'dev' | 'viewer', next = '/app') {
-  await page.goto(`/login?next=${encodeURIComponent(next)}`)
-  await page.getByText('Demo accounts (development only)').click()
-  await page.getByLabel('Email', { exact: true }).fill(`${who}@demo.sprintagent.dev`)
-  await page.getByLabel('Password', { exact: true }).fill('password123')
-  await page.getByRole('button', { name: 'Sign in with password' }).click()
-  await page.waitForURL(`**${next}`)
-}
+test.beforeEach(async ({ context }) => skipTour(context))
 
 test('unauthenticated visitors are sent to login with a return path', async ({ page }) => {
   await page.goto('/app')

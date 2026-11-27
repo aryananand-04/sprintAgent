@@ -1,7 +1,7 @@
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(35);
 
 -- Fixtures: a second workspace + outsider user
 insert into auth.users (id, email, aud, role) values
@@ -87,16 +87,57 @@ select pg_temp.login('outsider@test.dev');
 select lives_ok($$select public.create_workspace('Other', 'other-ws')$$, 'any user can create a workspace');
 select is((select role::text from public.workspace_members where user_id = auth.uid()), 'admin', 'creator becomes admin');
 select is((select count(*)::int from public.calibration), 3, 'new workspace gets calibration rows');
+select is((select count(*)::int from public.sprints where status = 'active'), 1, 'new workspace starts with an active sprint');
+select is((select count(*)::int from public.team_members where user_id = auth.uid()), 1, 'creator joins the team');
 select pg_temp.logout();
 
 select throws_ok(
   $$update public.tasks set assignee_id = (select id from public.team_members limit 1)
     where workspace_id = md5('demo-workspace')::uuid and id = md5('task-1')::uuid;
-    insert into public.team_members (workspace_id, name, initials, title, color)
-    select id, 'X', 'X', 'X', 'x' from public.workspaces where slug = 'other-ws';
     update public.tasks set assignee_id = (select tm.id from public.team_members tm join public.workspaces w on w.id = tm.workspace_id where w.slug = 'other-ws')
     where id = md5('task-1')::uuid$$,
   '23503', null, 'cross-workspace assignee is rejected');
+
+-- ── derived sprint points (any role finishing work updates the sprint) ──
+select pg_temp.login('dev@demo.sprintagent.dev');
+create temp table pts_before as select completed_points p from public.sprints where status = 'active' and workspace_id = md5('demo-workspace')::uuid;
+update public.tasks set status = 'in-progress' where id = (
+  select id from public.tasks where assignee_id = md5('arjun')::uuid and status = 'done' limit 1);
+select pg_temp.logout();
+select ok((select completed_points from public.sprints where id = md5('sprint-23')::uuid) < (select p from pts_before),
+  'reopening a done task removes its points');
+select pg_temp.login('dev@demo.sprintagent.dev');
+update public.tasks set status = 'done' where assignee_id = md5('arjun')::uuid;
+select pg_temp.logout();
+select is((select completed_points from public.sprints where id = md5('sprint-23')::uuid), (select p from pts_before),
+  'contributor finishing the task again restores sprint points exactly');
+select ok((select bool_and(completed_at is not null) from public.tasks where status = 'done'), 'done tasks get completed_at');
+select is((select count(*)::int from public.tasks where status <> 'done' and completed_at is not null), 0,
+  'non-done tasks have no completed_at');
+
+-- ── requester can complete their own unassigned ticket, not others' ──
+select pg_temp.login('dev@demo.sprintagent.dev');
+insert into public.tasks (id, workspace_id, title, type, impact, effort, risk, clarity, created_by)
+values ('00000000-0000-0000-0000-0000000000c1', md5('demo-workspace')::uuid, 'Mine', 'bug', 3, 2, 2, 4, md5('user-contrib')::uuid);
+select is(pg_temp.affected($q$update public.tasks set decision = 'ACT', assignee_id = md5('ananya')::uuid
+  where id = '00000000-0000-0000-0000-0000000000c1'$q$), 1, 'requester can triage + assign own new ticket');
+select is(pg_temp.affected($q$update public.tasks set title = 'hijack'
+  where id = '00000000-0000-0000-0000-0000000000c1'$q$), 0, 'once assigned to someone else, requester loses edit');
+select pg_temp.logout();
+
+-- ── start_new_sprint ─────────────────────────────────────────────────
+select pg_temp.login('dev@demo.sprintagent.dev');
+select throws_ok($q$select public.start_new_sprint(md5('demo-workspace')::uuid, 'S24', '', current_date, current_date + 13, 30, 40)$q$,
+  '42501', null, 'contributor cannot start a sprint');
+select pg_temp.logout();
+select pg_temp.login('pm@demo.sprintagent.dev');
+select lives_ok($q$select public.start_new_sprint(md5('demo-workspace')::uuid, 'S24', 'g', current_date, current_date + 13, 30, 40)$q$,
+  'pm starts a new sprint');
+select pg_temp.logout();
+select is((select name from public.sprints where workspace_id = md5('demo-workspace')::uuid and status = 'active'), 'S24',
+  'new sprint is the only active one');
+select is((select count(*)::int from public.tasks where sprint_id = md5('sprint-23')::uuid and status <> 'done'), 0,
+  'unfinished work rolled into the new sprint');
 
 select * from finish();
 rollback;

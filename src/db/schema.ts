@@ -121,6 +121,7 @@ export const tasks = pgTable('tasks', {
   adHocSwappedTaskId: uuid('ad_hoc_swapped_task_id'),
   goalAlignment: smallint('goal_alignment'),
   acceptanceCriteria: text('acceptance_criteria').array(),
+  completedAt: timestamp('completed_at', { withTimezone: true }), // maintained by trigger
   createdBy: uuid('created_by').references(() => authUsers.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

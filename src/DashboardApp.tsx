@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from './components/ui/theme-toggle'
 import { UserMenu } from './components/auth/UserMenu'
-import { useSession } from './components/auth/SessionProvider'
+import { useSession, useCan } from './components/auth/SessionProvider'
 import { ROLE_LABEL } from './lib/permissions'
 import { AgentSettings } from './components/AgentSettings'
 import { SmartHelp } from './components/SmartHelp'
@@ -245,10 +245,33 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
   )
 }
 
+function SyncBanner() {
+  const { syncError, setSyncError } = useSprintStore()
+  if (!syncError) return null
+  return (
+    <div role="status" className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-1.5 text-xs text-foreground">
+      <span>{syncError}</span>
+      <button type="button" onClick={() => setSyncError(null)} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss">✕</button>
+    </div>
+  )
+}
+
+function ArchiveBanner() {
+  const viewingArchive = useSprintStore(s => s.viewingArchive)
+  if (!viewingArchive) return null
+  return (
+    <div role="status" className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-1.5 text-xs text-foreground">
+      <span>Viewing an archived sprint (read-only). Changes here are not saved.</span>
+      <button type="button" onClick={() => window.location.reload()} className="font-medium underline underline-offset-2">Back to current sprint</button>
+    </div>
+  )
+}
+
 export default function App() {
-  useAgentBootstrap()
-  useAgentLoop()
-  useScheduledStandup()
+  const agentEnabled = useCan('task:manage')
+  useAgentBootstrap(agentEnabled)
+  useAgentLoop(agentEnabled)
+  useScheduledStandup(agentEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -270,6 +293,8 @@ export default function App() {
           setSettingsOpen={setSettingsOpen}
           onSidebarToggle={() => setSidebarOpen(v => !v)}
         />
+        <SyncBanner />
+        <ArchiveBanner />
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           <Dashboard />
         </div>

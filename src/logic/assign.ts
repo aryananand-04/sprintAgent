@@ -25,7 +25,7 @@ export function findBestAssignee(
 
     const hasDependencyConflict = task.dependencies.some((dep) => {
       const depTask = allTasks.find((t) => t.id === dep)
-      return depTask?.assigneeId !== member.id && dep.startsWith('task-')
+      return !!depTask && depTask.assigneeId !== member.id
     })
 
     const confidence = computeAssignmentConfidence(
