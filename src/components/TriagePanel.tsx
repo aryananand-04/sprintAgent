@@ -86,7 +86,7 @@ export function TriagePanel() {
             initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 280, damping: 26 }}
             style={{
-              position: 'fixed', right: 0, top: 0, bottom: 0, width: 448, zIndex: 50,
+              position: 'fixed', right: 0, top: 0, bottom: 0, width: 'min(448px, 100vw)', zIndex: 50,
               display: 'flex', flexDirection: 'column', overflow: 'hidden',
               background: 'var(--card)', borderLeft: '1px solid var(--border)',
               boxShadow: '-6px 0 24px rgba(20, 19, 17,0.14)',

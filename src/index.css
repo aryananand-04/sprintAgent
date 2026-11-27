@@ -334,13 +334,13 @@
   min-height: 10px;
 }
 
-@utility tab-bar {
+.tab-bar {
   display: flex;
   border-bottom: 1px solid var(--border);
   gap: 0;
 }
 
-@utility tab-item {
+.tab-item {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -363,7 +363,7 @@
   }
 }
 
-@utility tab-item-active {
+.tab-item-active {
   color: var(--act) !important;
   border-bottom-color: var(--act) !important;
   font-weight: 600;

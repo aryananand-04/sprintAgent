@@ -165,6 +165,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
         initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
         exit={{ y: 16, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26, delay: hideIsland ? 0 : 0.2 }}
+        data-agent-island
         style={{ position: 'fixed', bottom: 24, left: '50%', x: '-50%', zIndex: 9999 }}
       >
         <motion.div

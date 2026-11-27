@@ -40,8 +40,10 @@ export function DemoScenarios() {
     <>
       <button
         onClick={() => setDemoOpen(true)}
+        // Phones: sit above the agent feed pill, which is centred at the bottom.
+        className="bottom-[84px] sm:bottom-5"
         style={{
-          position: 'fixed', bottom: 20, right: 20, zIndex: 30,
+          position: 'fixed', right: 20, zIndex: 30,
           display: 'flex', alignItems: 'center', gap: 6,
           padding: '7px 13px', borderRadius: 5,
           background: 'var(--act)', color: 'var(--background)',
@@ -75,9 +77,10 @@ export function DemoScenarios() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 6 }}
               transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+              className="bottom-[122px] sm:bottom-[58px]"
               style={{
-                position: 'fixed', bottom: 58, right: 20, zIndex: 50,
-                width: 300, borderRadius: 8,
+                position: 'fixed', right: 20, zIndex: 50,
+                width: 'min(300px, calc(100vw - 40px))', borderRadius: 8,
                 background: 'var(--card)', border: '1px solid var(--b2)',
                 boxShadow: '0 8px 24px rgba(20, 19, 17,0.18)', overflow: 'hidden',
               }}
