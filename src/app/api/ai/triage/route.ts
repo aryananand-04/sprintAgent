@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { getSession } from '@/lib/session'
 import { can } from '@/lib/permissions'
-import { groqCompleter } from '../../../../../server/llm'
-import { TriageRequest, runTriage } from '../../../../../server/ai/triage'
-import { createRateLimiter } from '../../../../../server/rateLimit'
+import { groqCompleter } from '@/server/llm'
+import { TriageRequest, runTriage } from '@/server/ai/triage'
+import { createRateLimiter } from '@/server/rateLimit'
 
 // 30 AI triages per user per minute: a backlog bootstrap fits, a runaway loop doesn't.
 const limit = createRateLimiter({ limit: 30, windowMs: 60_000 })

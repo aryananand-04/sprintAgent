@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import type { Metadata, Viewport } from 'next'
 import { JetBrains_Mono, Instrument_Sans, Kalam } from 'next/font/google'
-import '../index.css'
+import '../styles/app.css'
 import { BUILD_SHA, CANARY } from '@/lib/provenance'
 
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' })

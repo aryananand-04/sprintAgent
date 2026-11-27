@@ -8,7 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "typecheck": "tsc --noEmit",
-    "arch": "depcruise src server --config .dependency-cruiser.cjs",
+    "arch": "depcruise src --config .dependency-cruiser.cjs",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
     "spdx": "tsx scripts/spdx.ts",

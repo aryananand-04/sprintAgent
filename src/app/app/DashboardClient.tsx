@@ -11,7 +11,7 @@ import { useSession } from '@/components/auth/SessionProvider'
 import { refreshWorkspace } from './actions'
 
 // Client-only: the dashboard reads browser APIs (localStorage, matchMedia) during render.
-const DashboardApp = dynamic(() => import('../../DashboardApp'), { ssr: false })
+const DashboardApp = dynamic(() => import('../../components/dashboard/DashboardApp'), { ssr: false })
 
 export function DashboardClient({ snapshot }: { snapshot: WorkspaceSnapshot }) {
   const { user, current } = useSession()

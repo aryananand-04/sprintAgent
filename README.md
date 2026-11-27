@@ -42,10 +42,17 @@ npm run test:e2e   # end-to-end, needs the local database
 Next.js, React, TypeScript, Tailwind, Supabase (Postgres, auth, realtime) and Drizzle, tested with Vitest, Playwright and pgTAP.
 
 ```
-src/logic   decision engine: triage, scoring, assignment, autonomy
-src/app     pages and API routes
-src/db      schema; migrations live in supabase/
-server/     server-only AI code
+src/
+  app/          routes: marketing pages, the app, API endpoints
+  components/   dashboard/, marketing/, auth/, ui/
+  logic/        the decision engine: pure functions, no I/O
+  services/     client calls to AI and integrations
+  server/       server-only code: LLM access, AI triage, rate limits
+  store/        client state (Zustand)
+  lib/          shared helpers, Supabase clients, data sync
+  db/           schema (migrations live in supabase/)
+supabase/       migrations, seed, database tests
+e2e/            browser tests
 ```
 
 ## License

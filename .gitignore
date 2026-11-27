@@ -43,3 +43,6 @@ next-env.d.ts
 .stryker-tmp/
 reports/
 coverage/
+.lighthouseci/
+test-results/
+*.tsbuildinfo

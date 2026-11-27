@@ -8,14 +8,14 @@ module.exports = {
       comment: 'src/logic is the decision engine: no React, framework, IO, store or service imports.',
       severity: 'error',
       from: { path: '^src/logic' },
-      to: { path: '^src/(components|views|hooks|store|services|lib|app|db)|^server|node_modules/(react|react-dom|next|@supabase|zustand|framer-motion)' },
+      to: { path: '^src/(components|hooks|store|services|lib|app|db|server)|node_modules/(react|react-dom|next|@supabase|zustand|framer-motion)' },
     },
     {
       name: 'server-only-stays-on-server',
       comment: 'Client code must never import server modules (secrets, LLM keys).',
       severity: 'error',
-      from: { path: '^src/(components|views|hooks|store)' },
-      to: { path: '^server/|^src/lib/supabase/server|^src/lib/data/loadWorkspace' },
+      from: { path: '^src/(components|hooks|store|services|logic)' },
+      to: { path: '^src/server/|^src/lib/supabase/server|^src/lib/data/loadWorkspace' },
     },
     {
       name: 'no-circular',

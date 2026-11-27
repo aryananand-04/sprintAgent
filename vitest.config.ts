@@ -4,9 +4,10 @@ import { defineConfig } from 'vitest/config'
 import path from 'path'
 
 export default defineConfig({
-  resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+  // 'server-only' throws outside the React server build; tests run server code directly.
+  resolve: { alias: { '@': path.resolve(__dirname, './src'), 'server-only': path.resolve(__dirname, './src/test/empty.ts') } },
   test: {
-    include: ['src/**/*.test.ts', 'server/**/*.test.ts'],
+    include: ['src/**/*.test.ts'],
     environment: 'node',
     coverage: {
       provider: 'v8',
