@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { MarkBadge } from '@/components/brand/LogoMarks'
 
 export type Tone = 'act' | 'ask' | 'esc' | 'agent'
 
@@ -13,21 +12,25 @@ export const TONE = {
   agent: { tint: 'bg-agent-tint', ink: 'text-agent-ink', accent: 'text-agent-accent', pop: 'bg-agent-pop', ring: 'ring-agent-accent/30', solid: 'bg-agent-accent' },
 } as const satisfies Record<Tone, Record<string, string>>
 
-/** Brand lockup: Tally mark + Lilita One wordmark. (Mark variant pending owner pick; see components/brand/LogoMarks.) */
-export function Logo({ className, size = 30 }: { className?: string; size?: number }) {
+export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex items-center gap-2 font-display text-[21px] leading-none text-ink', className)}>
-      <MarkBadge size={size} />
-      <span>sprint agent</span>
+    <span className={cn('inline-flex items-center gap-2 font-display text-[17px] font-semibold tracking-tight text-ink', className)}>
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect width="26" height="26" rx="8" className="fill-ink" />
+        <circle cx="8" cy="13" r="3.2" fill="#d7ea3a" />
+        <circle cx="13" cy="13" r="3.2" fill="#ff9a3c" />
+        <circle cx="18" cy="13" r="3.2" fill="#ff6b57" />
+      </svg>
+      Sprint Agent
     </span>
   )
 }
 
 const BUTTON = {
-  primary: 'bg-ink text-paper-2',
-  secondary: 'bg-paper-2 text-ink',
-  lime: 'bg-esc-pop text-ink',          // the loud one: tomato
-  outline: 'bg-paper-2 text-ink',
+  primary: 'bg-ink text-paper hover:bg-ink-2',
+  secondary: 'bg-paper-2 text-ink hover:bg-paper-3',
+  lime: 'bg-act-pop text-[#141311] hover:brightness-95',
+  outline: 'bg-paper text-ink ring-1 ring-inset ring-line hover:bg-paper-2',
 } as const
 
 export function ButtonLink({ href, variant = 'primary', size = 'md', arrow, className, children }: {
@@ -40,24 +43,26 @@ export function ButtonLink({ href, variant = 'primary', size = 'md', arrow, clas
 }) {
   return (
     <Link href={href} className={cn(
-      'group inline-flex items-center justify-center gap-2 rounded-[14px] border-[3px] border-ink font-display tracking-[0.01em]',
-      'shadow-[4px_4px_0_var(--ink)] transition-[transform,box-shadow] duration-100',
-      'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--ink)]',
-      'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-agent-pop',
-      size === 'md' ? 'h-11 px-4 text-[17px]' : 'h-[54px] px-6 text-xl',
+      'group inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-[background-color,filter,transform] duration-150',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agent-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper active:scale-[0.98]',
+      size === 'md' ? 'h-10 px-4 text-sm' : 'h-12 px-5 text-base',
       BUTTON[variant], className,
     )}>
       {children}
-      {arrow && <ArrowRight size={size === 'md' ? 17 : 20} strokeWidth={3} className="transition-transform group-hover:translate-x-0.5" aria-hidden />}
+      {arrow && <ArrowRight size={size === 'md' ? 15 : 17} className="transition-transform group-hover:translate-x-0.5" aria-hidden />}
     </Link>
   )
 }
 
-/** Sticker label: a tilted, outlined pill. */
+/** Pill label with the stacked-disc motif. */
 export function Tag({ tone, children }: { tone: Tone; children: React.ReactNode }) {
+  const t = TONE[tone]
   return (
-    <span className={cn('inline-block -rotate-2 rounded-full border-[3px] border-ink px-3.5 py-1 font-display text-[15px] leading-none text-ink shadow-[3px_3px_0_var(--ink)]', TONE[tone].pop)}>
-      {children}
+    <span className="inline-flex items-center">
+      <span className={cn('relative z-10 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-paper', t.solid)}>{children}</span>
+      {[0.45, 0.28, 0.15].map((o, i) => (
+        <span key={i} aria-hidden className={cn('-ml-3 h-7 w-7 rounded-full', t.solid)} style={{ opacity: o, zIndex: 9 - i }} />
+      ))}
     </span>
   )
 }
@@ -66,10 +71,10 @@ export function Container({ className, children }: { className?: string; childre
   return <div className={cn('mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8', className)}>{children}</div>
 }
 
-/** Section surface: tinted, ink-outlined, hard shadow. */
+/** Large rounded, tinted section surface. */
 export function Panel({ tone, className, children, id }: { tone?: Tone; className?: string; children: React.ReactNode; id?: string }) {
   return (
-    <section id={id} className={cn('overflow-hidden rounded-[1.5rem] border-[3px] border-ink shadow-[8px_8px_0_var(--ink)] sm:rounded-panel', tone ? TONE[tone].tint : 'bg-paper-2', className)}>
+    <section id={id} className={cn('grain overflow-hidden rounded-[2rem] sm:rounded-panel', tone ? TONE[tone].tint : 'bg-paper-2', className)}>
       {children}
     </section>
   )
