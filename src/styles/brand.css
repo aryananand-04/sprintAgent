@@ -83,3 +83,24 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ── Ambient motion (subtle; disabled by prefers-reduced-motion above) ── */
+@theme {
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-bob: bob 3.2s ease-in-out infinite;
+  --animate-drop: drop 3.6s cubic-bezier(0.55, 0, 0.7, 1) infinite;
+  --animate-caret: caret 1s steps(1) infinite;
+
+  @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(-0.6deg); } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes drop {
+    0%, 18% { transform: translateY(0); opacity: 0; }
+    24% { opacity: 1; }
+    62% { transform: translateY(54px); opacity: 1; }
+    70%, 100% { transform: translateY(54px); opacity: 0; }
+  }
+  @keyframes caret { 50% { opacity: 0; } }
+}
+
+/* SVG parts animate around their own box. */
+.clay-part { transform-box: fill-box; transform-origin: center; }

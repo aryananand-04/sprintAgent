@@ -5,6 +5,7 @@ import { ClayBell, ClayDial, ClayFunnel, ClayLedger, ClayQuestion, ClayStamp } f
 import { TriageDemo } from '@/components/marketing/TriageDemo'
 import { LoopTabs } from '@/components/marketing/LoopTabs'
 import { AutonomyLicense } from '@/components/marketing/AutonomyLicense'
+import { Reveal, RiseWords } from '@/components/marketing/Reveal'
 import { GithubIcon, SlackIcon } from '@/components/ui/brand-icons'
 import { cn } from '@/lib/utils'
 
@@ -55,9 +56,7 @@ export default function LandingPage() {
           <p className="inline-flex items-center gap-2 rounded-full bg-paper-2 px-3 py-1 text-xs font-medium text-ink-2 ring-1 ring-line-soft">
             <span className="h-1.5 w-1.5 rounded-full bg-act-accent" aria-hidden /> For teams that ship every week
           </p>
-          <h1 className="display-xl mt-6 text-ink">
-            Your sprint, run by an agent <span className="text-agent-accent">you can audit.</span>
-          </h1>
+          <RiseWords className="display-xl mt-6 text-ink" text="Your sprint, run by an agent" accent="you can audit." />
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-2">
             Sprint Agent triages, assigns and rebalances the routine work in your sprint. The risky, vague and
             political calls go to a person, and every decision comes with its reasons.
@@ -68,7 +67,7 @@ export default function LandingPage() {
           </div>
           <p className="mt-4 text-sm text-mute">Free for small teams. No credit card.</p>
         </div>
-        <TriageDemo />
+        <Reveal delay={0.25}><TriageDemo /></Reveal>
       </Container>
 
       {/* Facts strip (no fake logos) */}
@@ -79,13 +78,13 @@ export default function LandingPage() {
             { icon: ScrollText, k: 'Every decision logged', v: 'Append-only, with the reason attached' },
             { icon: ShieldCheck, k: 'Least privilege', v: 'Viewer, contributor, PM, admin, enforced in the database' },
           ].map(({ icon: Icon, k, v }) => (
-            <div key={k} className="bg-paper p-5">
+            <div key={k} className="bg-paper p-5 transition-colors hover:bg-paper-2">
               <Icon size={18} className="text-mute" aria-hidden />
               <p className="mt-3 font-display text-lg font-semibold tracking-tight text-ink">{k}</p>
               <p className="mt-1 text-sm text-mute">{v}</p>
             </div>
           ))}
-          <div className="bg-paper p-5">
+          <div className="bg-paper p-5 transition-colors hover:bg-paper-2">
             <div className="flex gap-2 text-ink" aria-hidden><GithubIcon size={18} /><SlackIcon size={18} /></div>
             <p className="mt-3 font-display text-lg font-semibold tracking-tight text-ink">Works where you work</p>
             <p className="mt-1 text-sm text-mute">GitHub and Slack today. Linear and Jira next.</p>
@@ -95,23 +94,26 @@ export default function LandingPage() {
 
       {/* How it works */}
       <Container className="mt-24">
+        <Reveal>
         <Panel id="how" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
             <div>
               <Tag tone="agent">The loop</Tag>
               <h2 className="display-lg mt-6 text-ink">One loop, <span className="text-agent-accent">all sprint long</span></h2>
             </div>
-            <ClayFunnel className="mx-auto h-auto w-full max-w-[380px] lg:ml-auto lg:mr-0" />
+            <ClayFunnel className="mx-auto h-auto w-full max-w-[380px] animate-float lg:ml-auto lg:mr-0" />
           </div>
           <div className="mt-10"><LoopTabs /></div>
         </Panel>
+        </Reveal>
       </Container>
 
       {/* Decisions */}
       <Container className="mt-6 space-y-6" >
         <div id="decisions" className="scroll-mt-24" />
         {DECISIONS.map((d) => (
-          <Panel key={d.tag} tone={d.tone} className="px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
+          <Reveal key={d.tag}>
+          <Panel tone={d.tone} className="group px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
               <div>
                 <Tag tone={d.tone}>{d.tag}</Tag>
@@ -129,15 +131,17 @@ export default function LandingPage() {
                 </ul>
               </div>
               <div className="rounded-[1.75rem] bg-gradient-to-b from-paper to-paper-3 p-6 sm:p-10">
-                <d.art className="mx-auto h-auto w-full max-w-[420px]" />
+                <d.art className="mx-auto h-auto w-full max-w-[420px] animate-float transition-transform duration-500 group-hover:scale-[1.03]" />
               </div>
             </div>
           </Panel>
+          </Reveal>
         ))}
       </Container>
 
       {/* Earned Autonomy */}
       <Container className="mt-6">
+        <Reveal>
         <Panel id="autonomy" tone="agent" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
             <div>
@@ -161,14 +165,16 @@ export default function LandingPage() {
               </ol>
             </div>
             <div className="relative">
-              <ClayDial level={2} className="mx-auto -mb-10 h-auto w-full max-w-[300px]" />
+              <ClayDial level={2} className="mx-auto -mb-10 h-auto w-full max-w-[300px] animate-float" />
               <AutonomyLicense />
             </div>
           </div>
         </Panel>
+        </Reveal>
       </Container>
 
       {/* Closing CTA */}
+      <Reveal>
       <Container className="mt-24 text-center">
         <h2 className="display-lg mx-auto max-w-3xl text-ink">What should your agent handle <span className="text-act-accent">first?</span></h2>
         <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">Connect a repo, import your backlog and see where the agent lands on every item, before it changes anything.</p>
@@ -177,6 +183,7 @@ export default function LandingPage() {
           <ButtonLink href="/pricing" size="lg" variant="outline">See pricing</ButtonLink>
         </div>
       </Container>
+      </Reveal>
     </>
   )
 }

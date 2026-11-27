@@ -59,3 +59,28 @@ for (const path of ['/', '/pricing', '/login']) {
     })
   }
 }
+
+test('demo plays itself, then hands control to the visitor', async ({ page }) => {
+  await page.goto('/')
+  const box = page.getByLabel('Paste a messy request')
+  await expect(page.getByText('Live demo. Click to try your own')).toBeVisible()
+  await expect(box).not.toHaveValue(/premium/, { timeout: 8_000 }) // moved on to the next example
+
+  await box.click()
+  await expect(page.getByText('Live demo. Click to try your own')).toHaveCount(0)
+  await box.fill('fix it')
+  await page.waitForTimeout(4_000)
+  await expect(box).toHaveValue('fix it') // autoplay did not overwrite the visitor
+})
+
+test('reduced motion: no autoplay, content fully visible', async ({ browser }) => {
+  const ctx = await browser.newContext({ reducedMotion: 'reduce' })
+  const page = await ctx.newPage()
+  await page.goto('/')
+  await expect(page.getByText('Live demo. Click to try your own')).toBeHidden()
+  await page.waitForTimeout(3_500)
+  await expect(page.getByLabel('Paste a messy request')).toHaveValue(/premium/)
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await expect(page.getByRole('heading', { name: /handle first/ })).toBeVisible()
+  await ctx.close()
+})

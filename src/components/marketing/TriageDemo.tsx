@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CornerDownLeft } from 'lucide-react'
 import { analyzeRequest, type TextAnalysis } from '@/logic/textSignals'
@@ -38,10 +38,32 @@ function run(text: string): Outcome {
 export function TriageDemo() {
   const [text, setText] = useState(EXAMPLES[0].text)
   const [outcome, setOutcome] = useState<Outcome>(() => run(EXAMPLES[0].text))
+  const [auto, setAuto] = useState(true)
   const reduce = useReducedMotion()
   const inputId = useId()
 
+  // Self-playing demo: type the next example, triage it, pause, repeat. Any interaction stops it for good.
+  useEffect(() => {
+    if (!auto || reduce) return
+    let cancelled = false
+    const timers: ReturnType<typeof setTimeout>[] = []
+    const later = (fn: () => void, ms: number) => timers.push(setTimeout(() => { if (!cancelled) fn() }, ms))
+
+    const play = (i: number) => {
+      const target = EXAMPLES[i % EXAMPLES.length].text
+      const step = Math.max(10, Math.min(22, 1400 / target.length))
+      for (let n = 1; n <= target.length; n++) later(() => setText(target.slice(0, n)), n * step)
+      later(() => setOutcome(run(target)), target.length * step + 250)
+      later(() => play(i + 1), target.length * step + 3400)
+    }
+    later(() => play(1), 3200)
+    return () => { cancelled = true; timers.forEach(clearTimeout) }
+  }, [auto, reduce])
+
+  const stopAuto = () => { if (auto) setAuto(false) }
+
   const submit = (value = text) => {
+    stopAuto()
     if (!value.trim()) return
     setOutcome(run(value))
   }
@@ -51,12 +73,24 @@ export function TriageDemo() {
   return (
     <div className="rounded-[1.75rem] bg-paper p-4 shadow-lift ring-1 ring-line-soft sm:p-6">
       <form onSubmit={(e) => { e.preventDefault(); submit() }}>
-        <label htmlFor={inputId} className="text-sm font-medium text-ink">Paste a messy request</label>
+        <div className="flex items-center justify-between gap-3">
+          <label htmlFor={inputId} className="text-sm font-medium text-ink">Paste a messy request</label>
+          {auto && (
+            <span className="flex items-center gap-1.5 text-[11px] text-mute motion-reduce:hidden">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-act-accent opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-act-accent" />
+              </span>
+              Live demo. Click to try your own
+            </span>
+          )}
+        </div>
         <div className="mt-2 rounded-2xl bg-paper-2 ring-1 ring-inset ring-line focus-within:ring-2 focus-within:ring-agent-accent">
           <textarea
             id={inputId}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => { stopAuto(); setText(e.target.value) }}
+            onFocus={stopAuto}
             onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submit() } }}
             rows={3}
             maxLength={600}
@@ -85,7 +119,7 @@ export function TriageDemo() {
           return (
             <div key={l.d} role="listitem" aria-current={on ? 'true' : undefined}
               className={cn('relative rounded-2xl px-3 py-2.5 transition-colors duration-300', on ? TONE[l.tone].tint : 'bg-paper-2')}>
-              {on && !reduce && (
+              {on && (
                 <motion.span layoutId="lane-glow" className={cn('absolute inset-0 rounded-2xl ring-2', TONE[l.tone].ring)}
                   transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
               )}
@@ -99,9 +133,9 @@ export function TriageDemo() {
       {/* Result */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={outcome.analysis.task.description + outcome.result.decision}
-          initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? undefined : { opacity: 0, y: -6 }}
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-          className="mt-4 rounded-2xl bg-paper-2 p-4" aria-live="polite">
+          className="mt-4 rounded-2xl bg-paper-2 p-4" aria-live={auto ? 'off' : 'polite'}>
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-sm text-ink">
               <span className={cn('font-semibold', TONE[lane.tone].accent)}>{lane.title}</span>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Inbox, Filter, UserCheck, Newspaper, Bell } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -30,7 +30,6 @@ const STEPS = [
 
 export function LoopTabs() {
   const [active, setActive] = useState(0)
-  const reduce = useReducedMotion()
   const base = useId()
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
   const step = STEPS[active]
@@ -56,7 +55,7 @@ export function LoopTabs() {
               i === active ? 'text-ink' : 'text-mute hover:text-ink')}>
             {i === active && (
               <motion.span layoutId="loop-tab" className="absolute inset-0 rounded-xl bg-paper shadow-soft"
-                transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }} />
+                transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
             )}
             <s.icon size={15} className="relative" aria-hidden />
             <span className="relative">{i + 1}. {s.title}</span>
@@ -66,12 +65,12 @@ export function LoopTabs() {
 
       <div id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${step.id}`} className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.3fr] lg:items-center">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.p key={step.id} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? undefined : { opacity: 0 }}
+          <motion.p key={step.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="display-sm text-ink">{step.blurb}</motion.p>
         </AnimatePresence>
         <div className="rounded-3xl bg-paper p-3 shadow-soft ring-1 ring-line-soft">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.ul key={step.id} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }}
+            <motion.ul key={step.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="divide-y divide-line-soft">
               {step.rows.map(([a, b]) => (
                 <li key={a} className="flex items-center justify-between gap-4 px-3 py-3.5 text-sm">

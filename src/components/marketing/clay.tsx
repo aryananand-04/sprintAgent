@@ -55,15 +55,18 @@ export function ClayFunnel({ className }: Props) {
       </defs>
       <Ground id={g.shadow} rx={150} />
       {/* balls waiting in the funnel */}
-      <circle cx="168" cy="52" r="15" fill={`url(#${g.ask})`} />
-      <circle cx="200" cy="44" r="16" fill={`url(#${g.esc})`} />
-      <circle cx="232" cy="54" r="14" fill={`url(#${g.act})`} />
+      <g className="clay-part animate-bob">
+        <circle cx="168" cy="52" r="15" fill={`url(#${g.ask})`} />
+        <circle cx="200" cy="44" r="16" fill={`url(#${g.esc})`} />
+        <circle cx="232" cy="54" r="14" fill={`url(#${g.act})`} />
+      </g>
       <circle cx="186" cy="70" r="13" fill={`url(#${g.act})`} />
       <circle cx="217" cy="72" r="12" fill={`url(#${g.ask})`} />
       {/* funnel */}
       <path d="M120 78 Q200 104 280 78 L218 150 L218 176 L182 176 L182 150 Z" fill={`url(#${g.funnel})`} />
       <ellipse cx="200" cy="78" rx="80" ry="16" fill={`url(#${g.rim})`} />
       <ellipse cx="200" cy="79" rx="70" ry="11" fill="#bfae94" opacity="0.55" />
+      <circle cx="200" cy="170" r="9" fill={`url(#${g.act})`} className="clay-part animate-drop" />
       <rect x="194" y="176" width="12" height="44" rx="6" fill={`url(#${g.stem})`} />
       {/* sorted cups */}
       {[{ x: 110, f: g.act }, { x: 200, f: g.ask }, { x: 290, f: g.esc }].map(({ x, f }) => (
