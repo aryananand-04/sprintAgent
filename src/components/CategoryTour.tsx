@@ -139,12 +139,12 @@ export function CategoryTour() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <span style={{
                 fontSize: 9, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase',
-                padding: '2px 6px', borderRadius: 4, fontFamily: 'JetBrains Mono, monospace',
+                padding: '2px 6px', borderRadius: 4, fontFamily: 'var(--font-mono), monospace',
                 background: `${categoryColor}18`, color: categoryColor, border: `1px solid ${categoryColor}40`,
               }}>
                 {categoryLabel}
               </span>
-              <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>
+              <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace', fontWeight: 600 }}>
                 {index + 1} / {steps.length}
               </span>
             </div>
@@ -193,7 +193,7 @@ export function CategoryTour() {
                   flex: 2, height: 28, display: 'inline-flex', alignItems: 'center',
                   justifyContent: 'center', gap: 4, fontSize: 11, fontWeight: 700,
                   padding: '0 12px', borderRadius: 'var(--r-ui)', border: 'none',
-                  cursor: 'pointer', fontFamily: 'Outfit, sans-serif', color: '#fff',
+                  cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif', color: '#fff',
                   background: categoryColor, transition: 'filter 0.1s',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.12)')}

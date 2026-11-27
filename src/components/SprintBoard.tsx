@@ -53,7 +53,7 @@ function StatItem({ icon: Icon, label, value, color }: { icon: React.ElementType
       <span style={{
         fontSize: isAlert ? 14 : 12, fontWeight: isAlert ? 800 : 700,
         color: color ?? 'var(--foreground)',
-        fontFamily: 'JetBrains Mono, monospace', fontVariantNumeric: 'tabular-nums',
+        fontFamily: 'var(--font-mono), monospace', fontVariantNumeric: 'tabular-nums',
         marginLeft: 2, letterSpacing: '-0.02em',
       }}>{value}</span>
     </div>
@@ -177,7 +177,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                   border: `1px solid ${URGENCY_COLORS[task.urgency]}44`,
                   color: URGENCY_COLORS[task.urgency], fontWeight: 700,
                   letterSpacing: '0.06em', textTransform: 'uppercase',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                 }}>{task.urgency}</Badge>
               )}
               <Badge style={{
@@ -190,7 +190,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                   fontSize: 9, padding: '1px 6px', borderRadius: 3,
                   background: dec.bg, border: `1px solid ${dec.border}`,
                   color: dec.text, fontWeight: 800, letterSpacing: '0.06em',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                 }}>{task.decision === 'ESCALATE' ? 'ESC' : task.decision}</Badge>
               )}
               {task.tags?.slice(0, 2).map(tag => (
@@ -209,7 +209,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                     fontSize: 9, padding: '1px 6px', borderRadius: 3,
                     background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
                     color: 'var(--crit)', fontWeight: 800, letterSpacing: '0.04em',
-                    fontFamily: 'JetBrains Mono, monospace', animation: h >= 2 ? 'pulseDot 2s ease-in-out infinite' : 'none',
+                    fontFamily: 'var(--font-mono), monospace', animation: h >= 2 ? 'pulseDot 2s ease-in-out infinite' : 'none',
                   }}>{label}</Badge>
                 )
               })()}
@@ -219,7 +219,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 7, borderTop: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--muted-foreground)' }}>
                 {task.storyPoints && (
-                  <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: 'var(--muted-foreground)' }}>
+                  <span style={{ fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 600, color: 'var(--muted-foreground)' }}>
                     {task.storyPoints}pt
                   </span>
                 )}
@@ -233,7 +233,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                       trackColor="var(--border)" showValue={false}
                     />
                     <span style={{
-                      fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600,
+                      fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 600,
                       color: loadColor(assignee.currentLoad),
                     }}>{assignee.currentLoad}%</span>
                   </div>
@@ -247,7 +247,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                     border: `1px solid ${showComments ? 'var(--act-bd)' : 'transparent'}`,
                     borderRadius: 4, padding: '1px 5px',
                     color: showComments ? 'var(--act)' : 'var(--muted-foreground)',
-                    cursor: 'pointer', transition: 'all 0.12s', fontFamily: 'Outfit, sans-serif',
+                    cursor: 'pointer', transition: 'all 0.12s', fontFamily: 'var(--font-sans), sans-serif',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.background = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}
                   onMouseLeave={e => {
@@ -256,7 +256,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                 >
                   <MessageCircle size={11} strokeWidth={1.5} />
                   {(task.comments?.length ?? 0) > 0 && (
-                    <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }}>
+                    <span style={{ fontSize: 9, fontFamily: 'var(--font-mono), monospace', fontWeight: 700 }}>
                       {task.comments!.length}
                     </span>
                   )}
@@ -314,7 +314,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <button
                         onClick={e => { e.stopPropagation(); setShowComments(false); selectTask(task.id); setTriagePanelOpen(true) }}
-                        style={{ fontSize: 10, fontWeight: 600, color: 'var(--act)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}
+                        style={{ fontSize: 10, fontWeight: 600, color: 'var(--act)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif' }}
                       >
                         Full analysis
                       </button>
@@ -376,7 +376,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                         <div key={c.id} style={{ padding: '7px 9px', borderRadius: 5, background: 'var(--card)', border: '1px solid var(--border)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                             <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--foreground)' }}>{c.author}</span>
-                            <span style={{ fontSize: 9, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace' }}>{formatTime(c.timestamp)}</span>
+                            <span style={{ fontSize: 9, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace' }}>{formatTime(c.timestamp)}</span>
                           </div>
                           <p style={{ fontSize: 11, color: 'var(--foreground)', lineHeight: 1.55, margin: 0 }}>{c.text}</p>
                         </div>
@@ -399,7 +399,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                           background: 'var(--card)', border: '1px solid var(--border)',
                           borderRadius: 6, padding: '7px 9px',
                           fontSize: 11, color: 'var(--foreground)',
-                          fontFamily: 'Outfit, sans-serif', lineHeight: 1.5,
+                          fontFamily: 'var(--font-sans), sans-serif', lineHeight: 1.5,
                           transition: 'border-color 0.12s',
                         }}
                         onFocus={e => { e.currentTarget.style.borderColor = 'var(--act)' }}
@@ -492,20 +492,20 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--t1)', letterSpacing: '-0.01em' }}>{m.name}</span>
                       {/* Combined badge: current + best fit together */}
                       {isCombined && (
-                        <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'var(--font-mono), monospace', display: 'flex', alignItems: 'center', gap: 3 }}>
                           <Star size={7} strokeWidth={2} /> Assigned · Best fit
                         </span>
                       )}
                       {/* Overloaded current assignee */}
                       {isOverloadedCurrent && (
                         <>
-                          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>Current</span>
-                          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.28)', color: 'var(--crit)', fontFamily: 'JetBrains Mono, monospace' }}>High load</span>
+                          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'var(--font-mono), monospace' }}>Current</span>
+                          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.28)', color: 'var(--crit)', fontFamily: 'var(--font-mono), monospace' }}>High load</span>
                         </>
                       )}
                       {/* Suggested alternative when current is overloaded */}
                       {isSuggestedAlternative && (
-                        <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'var(--font-mono), monospace', display: 'flex', alignItems: 'center', gap: 3 }}>
                           <Star size={7} strokeWidth={2} /> Best fit
                         </span>
                       )}
@@ -515,7 +515,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                   {/* Load */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                     <GaugeCircle value={m.currentLoad} size={22} strokeWidth={2.5} color={lc} trackColor="var(--border)" showValue={false} />
-                    <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: lc }}>{m.currentLoad}%</span>
+                    <span style={{ fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: lc }}>{m.currentLoad}%</span>
                   </div>
                 </button>
               )
@@ -612,7 +612,7 @@ export function SprintBoard() {
                 transition={{ duration: 0.8, ease: 'easeOut' }}
               />
             </div>
-            <span style={{ fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>
+            <span style={{ fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace', fontWeight: 600 }}>
               {sprint.completedPoints}/{sprint.committedPoints}
             </span>
           </div>
@@ -624,7 +624,7 @@ export function SprintBoard() {
           <StatItem icon={Users}         label="Avg load" value={`${teamAvgLoad}%`}    color={teamAvgLoad > 80 ? 'var(--warn)' : undefined} />
           <div className="section-rule" style={{ height: 14 }} />
           <StatItem icon={CheckCircle}   label="Done"     value={String(doneCount)}    color={doneCount > 0 ? 'var(--ok)' : undefined} />
-          <span style={{ marginLeft: 'auto', paddingLeft: 10, fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace' }}>
+          <span style={{ marginLeft: 'auto', paddingLeft: 10, fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace' }}>
             {daysRemaining}d left
           </span>
         </div>
@@ -671,7 +671,7 @@ export function SprintBoard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {colTasks.length > 0 && (
                       <span style={{
-                        fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700,
+                        fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 700,
                         color: col.id === 'blocked' ? 'var(--crit)' : col.id === 'done' ? 'var(--ok)' : 'var(--muted-foreground)',
                         background: 'rgba(9,9,11,0.06)', padding: '0 5px', borderRadius: 10, lineHeight: '16px',
                       }}>{colTasks.length}</span>
@@ -716,7 +716,7 @@ export function SprintBoard() {
                             background: 'var(--card)', border: '1px solid var(--border)',
                             borderRadius: 5, padding: '6px 9px',
                             fontSize: 12, fontWeight: 500, color: 'var(--foreground)',
-                            fontFamily: 'Outfit, sans-serif', transition: 'border-color 0.12s',
+                            fontFamily: 'var(--font-sans), sans-serif', transition: 'border-color 0.12s',
                           }}
                           onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
                           onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
@@ -757,7 +757,7 @@ export function SprintBoard() {
                                     color={lc} trackColor="var(--border)"
                                     showValue={false}
                                   />
-                                  <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: lc }}>
+                                  <span style={{ fontSize: 9, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: lc }}>
                                     {m.currentLoad}%
                                   </span>
                                 </button>
@@ -772,7 +772,7 @@ export function SprintBoard() {
                               background: newTitle.trim() ? 'var(--act)' : 'var(--muted)',
                               color: newTitle.trim() ? '#fff' : 'var(--muted-foreground)',
                               fontSize: 11, fontWeight: 700, cursor: newTitle.trim() ? 'pointer' : 'not-allowed',
-                              fontFamily: 'Outfit, sans-serif',
+                              fontFamily: 'var(--font-sans), sans-serif',
                             }}>
                             Add — agent triages
                           </button>
@@ -780,7 +780,7 @@ export function SprintBoard() {
                             style={{
                               padding: '5px 10px', borderRadius: 5, fontSize: 11, cursor: 'pointer',
                               background: 'transparent', border: '1px solid var(--border)',
-                              color: 'var(--muted-foreground)', fontFamily: 'Outfit, sans-serif',
+                              color: 'var(--muted-foreground)', fontFamily: 'var(--font-sans), sans-serif',
                             }}>Cancel</button>
                         </div>
                       </div>

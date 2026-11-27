@@ -87,7 +87,7 @@ function FeedRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
       {/* Event type tag */}
       <span style={{
         fontSize: 8, fontWeight: 900, letterSpacing: '0.08em',
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'var(--font-mono), monospace',
         color: meta.color, minWidth: 40, flexShrink: 0,
         textTransform: 'uppercase', paddingTop: 1,
       }}>
@@ -108,7 +108,7 @@ function FeedRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
       {/* Time */}
       <span style={{
         fontSize: 9, color: 'var(--t3)', flexShrink: 0,
-        fontFamily: 'JetBrains Mono, monospace', paddingTop: 1,
+        fontFamily: 'var(--font-mono), monospace', paddingTop: 1,
       }}>
         {formatTime(event.timestamp)}
       </span>
@@ -234,7 +234,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 style={{
                   fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
                   background: 'rgba(174,42,25,0.12)', border: '1px solid rgba(174,42,25,0.28)',
-                  color: 'var(--esc-t)', fontFamily: 'JetBrains Mono, monospace',
+                  color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace',
                   letterSpacing: '0.06em', flexShrink: 0,
                 }}
               >
@@ -267,7 +267,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ok)', animation: 'pulseDot 2.4s ease-in-out infinite' }} />
                 <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.012em' }}>Agent Feed</span>
                 {feed.length > 0 && (
-                  <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{feed.length}</span>
+                  <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{feed.length}</span>
                 )}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -275,7 +275,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                   <span style={{
                     fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
                     background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
-                    color: 'var(--esc-t)', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em',
+                    color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.06em',
                   }}>
                     {escCount} ESC
                   </span>
@@ -287,7 +287,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                     style={{
                       fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3,
                       background: 'var(--s2)', border: '1px solid var(--b2)',
-                      color: 'var(--t2)', cursor: 'pointer', fontFamily: 'Outfit, sans-serif',
+                      color: 'var(--t2)', cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif',
                       transition: 'all 0.1s',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--b3)'; e.currentTarget.style.color = 'var(--t1)' }}
@@ -317,7 +317,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 <span style={{ fontSize: 9, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
                   {sprint.name}
                 </span>
-                <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>
                   {sprint.completedPoints}/{sprint.committedPoints}pt · {pct}%
                 </span>
               </div>
@@ -343,7 +343,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                     style={{
                       padding: '2px 7px', borderRadius: 4, border: '1px solid',
                       fontSize: 9, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
-                      fontFamily: 'JetBrains Mono, monospace',
+                      fontFamily: 'var(--font-mono), monospace',
                       background: active ? color : 'transparent',
                       borderColor: active ? color : 'var(--b2)',
                       color: active ? '#fff' : 'var(--t3)',

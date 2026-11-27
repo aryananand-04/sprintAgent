@@ -70,7 +70,7 @@ export function GaugeCircle({
         }}>
           <span style={{
             fontSize: size * 0.26, fontWeight: 700, lineHeight: 1,
-            fontFamily: 'JetBrains Mono, monospace', fontVariantNumeric: 'tabular-nums',
+            fontFamily: 'var(--font-mono), monospace', fontVariantNumeric: 'tabular-nums',
             color,
             ...valueStyle,
           }}>

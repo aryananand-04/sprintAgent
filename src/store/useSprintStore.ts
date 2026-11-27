@@ -600,11 +600,11 @@ export const useSprintStore = create<SprintStore>()(
     )
 
     const taskMap = new Map(tasks.map(t => [t.id, { ...t }]))
-    let assigned = 0, skipped = 0, escalated = 0
+    let assigned = 0, escalated = 0
 
     for (const taskId of taskIds) {
       const task = taskMap.get(taskId)
-      if (!task || task.assigneeId) { skipped++; continue }
+      if (!task || task.assigneeId) continue
 
       const eligible = team
         .filter(m => vLoad[m.id] < LOAD_ELIGIBILITY_THRESHOLD)

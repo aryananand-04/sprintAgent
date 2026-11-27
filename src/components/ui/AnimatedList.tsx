@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 interface AnimatedListProps {
@@ -7,7 +7,7 @@ interface AnimatedListProps {
   delay?: number
 }
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: 12, filter: 'blur(2px)' },
   visible: (i: number) => ({
     opacity: 1,

@@ -173,7 +173,7 @@ export function SprintPlanner() {
               background: 'var(--card)', border: '1px solid var(--border)',
               borderRadius: 6, padding: '10px 12px',
               fontSize: 12, color: 'var(--foreground)',
-              fontFamily: 'Outfit, sans-serif', lineHeight: 1.6,
+              fontFamily: 'var(--font-sans), sans-serif', lineHeight: 1.6,
               transition: 'border-color 0.12s, box-shadow 0.12s',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'var(--act)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--act-bg)' }}
@@ -211,7 +211,7 @@ export function SprintPlanner() {
                   background: totalPts > remaining ? 'var(--esc-bg)' : 'var(--act-bg)',
                   color: totalPts > remaining ? 'var(--esc-t)' : 'var(--act-t)',
                   border: `1px solid ${totalPts > remaining ? 'var(--esc-bd)' : 'var(--act-bd)'}`,
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                 }}>
                   {remaining}pt capacity remaining
                 </span>
@@ -251,7 +251,7 @@ export function SprintPlanner() {
                           </p>
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--foreground)', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--foreground)', fontFamily: 'var(--font-mono), monospace', lineHeight: 1 }}>
                             {task.storyPoints}pt
                           </div>
                           {member && (

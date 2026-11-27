@@ -23,10 +23,11 @@ AI calls go through a server-side route (`/api/chat`); the key never reaches the
 **Quality checks:**
 ```bash
 npm run typecheck
+npm run lint
 npm test
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open [http://localhost:3000](http://localhost:3000)
 
 **Build for production:**
 ```bash

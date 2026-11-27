@@ -55,7 +55,7 @@ function SprintHistorySection({ sprintHistory }: { sprintHistory: SprintArchive[
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
         <Archive size={12} style={{ color: 'var(--t2)' }} strokeWidth={1.5} />
         <div className="label">Sprint History</div>
-        <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{sprintHistory.length} archived</span>
+        <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{sprintHistory.length} archived</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         {sprintHistory.map(s => {
@@ -74,7 +74,7 @@ function SprintHistorySection({ sprintHistory }: { sprintHistory: SprintArchive[
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.01em' }}>{s.name}</span>
-                    <span style={{ fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: pct >= 70 ? 'rgba(22,163,74,0.1)' : pct >= 50 ? 'rgba(217,119,6,0.1)' : 'rgba(220,38,38,0.08)', color: hColor, fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: pct >= 70 ? 'rgba(22,163,74,0.1)' : pct >= 50 ? 'rgba(217,119,6,0.1)' : 'rgba(220,38,38,0.08)', color: hColor, fontFamily: 'var(--font-mono), monospace' }}>
                       {pct}%
                     </span>
                   </div>
@@ -105,7 +105,7 @@ function SprintHistorySection({ sprintHistory }: { sprintHistory: SprintArchive[
                         ].map(({ label, value, color }) => (
                           <div key={label}>
                             <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--t3)', marginBottom: 2 }}>{label}</div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color, fontFamily: 'JetBrains Mono, monospace' }}>{value}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color, fontFamily: 'var(--font-mono), monospace' }}>{value}</div>
                           </div>
                         ))}
                       </div>
@@ -172,7 +172,7 @@ export function SprintReview() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
           <Flag size={13} style={{ color: 'var(--act)' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.015em' }}>Sprint Review</span>
-          <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'JetBrains Mono, monospace' }}>
+          <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'var(--font-mono), monospace' }}>
             {sprint.name}
           </span>
         </div>
@@ -198,9 +198,9 @@ export function SprintReview() {
             <div>
               <div className="label" style={{ marginBottom: 4 }}>Delivery</div>
               <div style={{ fontSize: 11, color: 'var(--t2)', lineHeight: 1.6 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: hc }}>{sprint.completedPoints}pt</span> shipped
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: hc }}>{sprint.completedPoints}pt</span> shipped
                 <br />
-                of <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>{sprint.committedPoints}pt</span> committed
+                of <span style={{ fontFamily: 'var(--font-mono), monospace', fontWeight: 600 }}>{sprint.committedPoints}pt</span> committed
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ export function SprintReview() {
             <div>
               <div className="label" style={{ marginBottom: 4 }}>Velocity</div>
               <div style={{ fontSize: 11, color: 'var(--t2)', lineHeight: 1.6 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--act)' }}>{sprint.velocity}pt</span> / sprint
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--act)' }}>{sprint.velocity}pt</span> / sprint
                 <br />
                 <span style={{ fontWeight: 600, color: velocityPct >= 100 ? 'var(--ok)' : velocityPct >= 75 ? 'var(--warn)' : 'var(--crit)' }}>
                   {velocityPct >= 100 ? 'On target' : velocityPct >= 75 ? 'Below target' : 'Off target'}
@@ -247,9 +247,9 @@ export function SprintReview() {
                 borderRight: i < arr.length - 1 ? '1px solid var(--b1)' : 'none',
               }}>
                 <Icon size={12} style={{ color, marginBottom: 6 }} />
-                <div style={{ fontSize: 20, fontWeight: 800, color, fontFamily: 'JetBrains Mono, monospace', lineHeight: 1, marginBottom: 2 }}>{count}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color, fontFamily: 'var(--font-mono), monospace', lineHeight: 1, marginBottom: 2 }}>{count}</div>
                 <div style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 500 }}>{label}</div>
-                {pts > 0 && <div style={{ fontSize: 9, color, opacity: 0.7, fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>{pts}pt</div>}
+                {pts > 0 && <div style={{ fontSize: 9, color, opacity: 0.7, fontFamily: 'var(--font-mono), monospace', marginTop: 2 }}>{pts}pt</div>}
               </div>
             ))}
           </div>
@@ -276,7 +276,7 @@ export function SprintReview() {
                         {assignee.initials}
                       </div>
                     )}
-                    {task.storyPoints && <span style={{ fontSize: 9, color: 'var(--ok)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>{task.storyPoints}pt</span>}
+                    {task.storyPoints && <span style={{ fontSize: 9, color: 'var(--ok)', fontFamily: 'var(--font-mono), monospace', flexShrink: 0 }}>{task.storyPoints}pt</span>}
                   </motion.div>
                 )
               })}
@@ -298,7 +298,7 @@ export function SprintReview() {
                 >
                   <AlertTriangle size={11} style={{ color: 'var(--crit)', flexShrink: 0 }} />
                   <span style={{ fontSize: 12, color: 'var(--t1)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</span>
-                  {task.storyPoints && <span style={{ fontSize: 9, color: 'var(--crit)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>{task.storyPoints}pt</span>}
+                  {task.storyPoints && <span style={{ fontSize: 9, color: 'var(--crit)', fontFamily: 'var(--font-mono), monospace', flexShrink: 0 }}>{task.storyPoints}pt</span>}
                 </motion.div>
               ))}
             </div>
@@ -382,7 +382,7 @@ export function SprintReview() {
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                         <div className="label">Committed points</div>
-                        <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--act)' }}>{newPts}pt</span>
+                        <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--act)' }}>{newPts}pt</span>
                       </div>
                       <input type="range" min={10} max={120} value={newPts} onChange={e => setNewPts(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--act)' }} />
                       <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3 }}>Previous velocity: {sprint.velocity}pt</p>

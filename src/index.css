@@ -136,7 +136,7 @@ html.dark {
   html, body, #root { height: 100%; width: 100%; overflow: hidden; }
 
   body {
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     background: var(--bg);
     color: var(--t1);
     -webkit-font-smoothing: antialiased;
@@ -165,7 +165,7 @@ html.dark {
     display: inline-flex; align-items: center; gap: 3px;
     padding: 2px 6px; border-radius: 3px;
     font-size: 10px; font-weight: 800; letter-spacing: 0.05em;
-    font-family: 'JetBrains Mono', monospace; line-height: 1; white-space: nowrap;
+    font-family: var(--font-mono), monospace; line-height: 1; white-space: nowrap;
   }
   .chip-act { background: var(--act-bg); border: 1px solid var(--act-bd); color: var(--act-t); }
   .chip-ask { background: var(--ask-bg); border: 1px solid var(--ask-bd); color: var(--ask-t); }
@@ -175,7 +175,7 @@ html.dark {
     display: inline-flex; align-items: center;
     padding: 2px 6px; border-radius: 3px;
     font-size: 9px; font-weight: 900; letter-spacing: 0.10em;
-    font-family: 'JetBrains Mono', monospace; text-transform: uppercase; line-height: 1;
+    font-family: var(--font-mono), monospace; text-transform: uppercase; line-height: 1;
   }
   .stamp-crit { background: var(--crit);  color: #fff; }
   .stamp-warn { background: var(--warn);  color: #fff; }
@@ -219,7 +219,7 @@ html.dark {
     font-size: 12px; font-weight: 600; cursor: pointer;
     transition: background 0.12s, border-color 0.12s, transform 0.08s;
     border: 1px solid transparent;
-    font-family: 'Outfit', sans-serif; letter-spacing: -0.01em;
+    font-family: var(--font-sans), sans-serif; letter-spacing: -0.01em;
   }
   .btn-primary {
     background: var(--act); color: #fff;
@@ -266,7 +266,7 @@ html.dark {
     padding: 8px 12px; font-size: 12px; font-weight: 500; color: var(--muted-foreground);
     background: transparent; border: none; border-bottom: 2px solid transparent;
     margin-bottom: -1px; cursor: pointer; transition: color 0.12s, border-color 0.12s;
-    font-family: 'Outfit', sans-serif; white-space: nowrap;
+    font-family: var(--font-sans), sans-serif; white-space: nowrap;
   }
   .tab-item:hover { color: var(--foreground); }
   .tab-item-active { color: var(--act) !important; border-bottom-color: var(--act) !important; font-weight: 600; }
@@ -277,7 +277,7 @@ html.dark {
 /* ─── Utilities ─────────────────────────────── */
 @layer utilities {
   .font-tabnum  { font-variant-numeric: tabular-nums; }
-  .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+  .font-mono-num { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums; }
   .text-1 { color: var(--t1); }
   .text-2 { color: var(--t2); }
   .text-3 { color: var(--t3); }

@@ -60,7 +60,7 @@ export function AgentTimeline() {
           ].map((s, i, arr) => (
             <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
               <div style={{ textAlign: 'center', padding: '0 12px' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: s.color, fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: s.color, fontFamily: 'var(--font-mono), monospace', lineHeight: 1 }}>{s.value}</div>
                 <div className="label" style={{ marginTop: 2 }}>{s.label}</div>
               </div>
               {i < arr.length - 1 && <div style={{ width: 1, height: 24, background: 'var(--b2)' }} />}
@@ -124,7 +124,7 @@ export function AgentTimeline() {
                             {event.decision === 'ESCALATE' ? 'ESC' : event.decision}
                           </span>
                         )}
-                        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>
                           {formatFullTime(event.timestamp)}
                         </span>
                       </div>

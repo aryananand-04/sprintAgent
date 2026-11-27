@@ -6,7 +6,7 @@ import { AgentFeedIsland } from './components/AgentFeedIsland'
 import { TriagePanel } from './components/TriagePanel'
 import { DemoScenarios } from './components/DemoScenarios'
 import { CommandPalette } from './components/CommandPalette'
-import { Dashboard } from './pages/Dashboard'
+import { Dashboard } from './views/Dashboard'
 import { useSprintStore } from './store/useSprintStore'
 import { useCommandPaletteStore } from './store/commandPaletteStore'
 import { Search, AlertTriangle, Zap, Settings2, HelpCircle, Menu } from 'lucide-react'
@@ -102,7 +102,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
           </div>
           <span style={{
             fontSize: 11, color: 'var(--t2)', fontWeight: 600,
-            fontFamily: 'JetBrains Mono, monospace', fontVariantNumeric: 'tabular-nums',
+            fontFamily: 'var(--font-mono), monospace', fontVariantNumeric: 'tabular-nums',
           }}>{pct}%</span>
         </div>
 
@@ -127,7 +127,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
 
         <div className="section-rule" style={{ height: 14 }} />
 
-        <span style={{ fontSize: 11, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>
+        <span style={{ fontSize: 11, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>
           {sprint.daysRemaining}d left
         </span>
       </div>
@@ -146,7 +146,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
                 borderRadius: 'var(--r-ui)',
                 background: 'rgba(174,42,25,0.09)', border: '1px solid rgba(174,42,25,0.26)',
                 fontSize: 11, color: 'var(--esc-t)', fontWeight: 700, cursor: 'default',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'var(--font-mono), monospace',
               }}
             >
               {/* #11 — strokeWidth 1.5 */}
@@ -216,7 +216,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
             display: 'flex', alignItems: 'center', gap: 6, padding: '4px 9px',
             borderRadius: 'var(--r-ui)', background: 'var(--s2)', border: '1px solid var(--b2)',
             color: 'var(--t3)', fontSize: 11, cursor: 'pointer',
-            transition: 'border-color 0.1s, color 0.1s', fontFamily: 'Outfit, sans-serif',
+            transition: 'border-color 0.1s, color 0.1s', fontFamily: 'var(--font-sans), sans-serif',
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--b3)'; e.currentTarget.style.color = 'var(--t2)' }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--b2)'; e.currentTarget.style.color = 'var(--t3)' }}
@@ -225,7 +225,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
           <Search size={10} strokeWidth={1.5} />
           <span>Search</span>
           <kbd style={{
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 9, padding: '1px 4px',
+            fontFamily: 'var(--font-mono), monospace', fontSize: 9, padding: '1px 4px',
             background: 'var(--card)', border: '1px solid var(--b2)', borderRadius: 3,
             color: 'var(--t3)', lineHeight: 1.5,
           }}>⌘K</kbd>

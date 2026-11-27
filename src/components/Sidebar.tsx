@@ -82,7 +82,7 @@ export function Sidebar({ open = true, onClose }: { open?: boolean; onClose?: ()
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', lineHeight: 1 }}>
               Sprint Agent
             </div>
-            <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'var(--muted-foreground)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
+            <div style={{ fontSize: 9, fontFamily: 'var(--font-mono), monospace', color: 'var(--muted-foreground)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
               AI Operator
             </div>
           </div>
@@ -123,10 +123,10 @@ export function Sidebar({ open = true, onClose }: { open?: boolean; onClose?: ()
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace' }}>
               <span style={{ color: 'var(--foreground)', fontWeight: 600 }}>{sprint.completedPoints}</span>/{sprint.committedPoints} pts
             </span>
-            <span style={{ fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace' }}>
               <span style={{ color: 'var(--foreground)', fontWeight: 600 }}>{daysRemaining}</span>d left
             </span>
           </div>
@@ -152,7 +152,7 @@ export function Sidebar({ open = true, onClose }: { open?: boolean; onClose?: ()
                   fontSize: 10, fontWeight: 800, minWidth: 16, height: 16, borderRadius: 8,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: '0 4px', flexShrink: 0,
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   background: item.id === 'escalations' ? 'var(--esc-bg)' : item.id === 'triage' ? 'rgba(217,119,6,0.10)' : 'var(--act-bg)',
                   color: item.id === 'escalations' ? 'var(--esc-t)' : item.id === 'triage' ? 'var(--warn)' : 'var(--act-t)',
                   border: `1px solid ${item.id === 'escalations' ? 'var(--esc-bd)' : item.id === 'triage' ? 'rgba(217,119,6,0.28)' : 'var(--act-bd)'}`,

@@ -34,7 +34,7 @@ export function VelocityChart() {
           return (
             <g key={r}>
               <line x1={PAD.l} y1={y} x2={PAD.l + chartW} y2={y} stroke="var(--border)" strokeWidth={1} strokeDasharray={r === 0 ? undefined : '3 3'} />
-              <text x={PAD.l - 4} y={y + 3.5} textAnchor="end" fontSize={8} fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace">
+              <text x={PAD.l - 4} y={y + 3.5} textAnchor="end" fontSize={8} fill="var(--muted-foreground)" style={{ fontFamily: "var(--font-mono), monospace" }}>
                 {Math.round(maxVelocity * r)}
               </text>
             </g>
@@ -57,7 +57,7 @@ export function VelocityChart() {
                 fill={isCurrentSprint ? 'var(--act)' : 'var(--ok)'} rx={2} opacity={isCurrentSprint ? 0.8 : 1} />
               {/* Sprint label */}
               <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize={7} fill="var(--muted-foreground)"
-                fontFamily="JetBrains Mono, monospace">
+                style={{ fontFamily: "var(--font-mono), monospace" }}>
                 {s.name.replace('Sprint ', 'S')}
               </text>
             </g>

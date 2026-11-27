@@ -56,7 +56,7 @@ function LogRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
       {/* Event type tag — fixed width, monospace */}
       <span style={{
         fontSize: 8, fontWeight: 900, letterSpacing: '0.08em',
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'var(--font-mono), monospace',
         color: tag.color,
         minWidth: 44, flexShrink: 0,
         textTransform: 'uppercase',
@@ -77,7 +77,7 @@ function LogRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
       {/* Timestamp — right-aligned */}
       <span style={{
         fontSize: 9, color: 'var(--t3)', flexShrink: 0,
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'var(--font-mono), monospace',
         paddingTop: 1,
       }}>
         {formatTime(event.timestamp)}
@@ -104,17 +104,17 @@ export function StatusFeed() {
               <span style={{
                 fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
                 background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
-                color: 'var(--esc-t)', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em',
+                color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.06em',
               }}>{escCount} ESC</span>
             )}
             {feed.length > 0 && (
               <motion.span key={feed.length} initial={{ scale: 1.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}
+                style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}
               >{feed.length}</motion.span>
             )}
           </div>
         </div>
-        <p style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+        <p style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
           live decision log
         </p>
       </div>

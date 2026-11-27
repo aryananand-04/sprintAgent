@@ -69,18 +69,18 @@ export function TeamUtilization() {
                     <div style={{ fontWeight: 600, fontSize: 11, letterSpacing: '-0.01em' }}>{member.name.split(' ')[0]}</div>
                     <div style={{ fontSize: 9, color: 'var(--muted-foreground)', marginTop: 1 }}>{member.role}</div>
                   </div>
-                  <span style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--ok)' }}>{done}</span>
-                  <span style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', color: 'var(--foreground)' }}>{inProgress}</span>
-                  <span style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', color: blocked > 0 ? 'var(--crit)' : 'var(--muted-foreground)' }}>{blocked}</span>
-                  <span style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: 'var(--act)' }}>{ptsShipped}pt</span>
-                  <span style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', color: avgConf ? (avgConf >= 75 ? 'var(--ok)' : avgConf >= 55 ? 'var(--warn)' : 'var(--crit)') : 'var(--muted-foreground)' }}>
+                  <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--ok)' }}>{done}</span>
+                  <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono), monospace', color: 'var(--foreground)' }}>{inProgress}</span>
+                  <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono), monospace', color: blocked > 0 ? 'var(--crit)' : 'var(--muted-foreground)' }}>{blocked}</span>
+                  <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono), monospace', fontWeight: 600, color: 'var(--act)' }}>{ptsShipped}pt</span>
+                  <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono), monospace', color: avgConf ? (avgConf >= 75 ? 'var(--ok)' : avgConf >= 55 ? 'var(--warn)' : 'var(--crit)') : 'var(--muted-foreground)' }}>
                     {avgConf !== null ? `${avgConf}%` : '—'}
                   </span>
                   <div>
                     <div style={{ height: 3, borderRadius: 3, background: 'var(--muted)', overflow: 'hidden' }}>
                       <div style={{ height: '100%', borderRadius: 3, background: lc, width: `${member.currentLoad}%` }} />
                     </div>
-                    <div style={{ fontSize: 8, color: lc, fontFamily: 'JetBrains Mono, monospace', marginTop: 2, textAlign: 'center' }}>
+                    <div style={{ fontSize: 8, color: lc, fontFamily: 'var(--font-mono), monospace', marginTop: 2, textAlign: 'center' }}>
                       {member.currentLoad}%
                     </div>
                   </div>
@@ -109,10 +109,10 @@ export function TeamUtilization() {
               const color = type === 'act' ? 'var(--act)' : type === 'ask' ? 'var(--warn)' : 'var(--crit)'
               return (
                 <div key={type} style={{ flex: 1, padding: '8px 10px', borderRadius: 5, background: 'var(--card)', border: '1px solid var(--border)', textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color, marginBottom: 4, fontFamily: 'var(--font-mono), monospace' }}>
                     {type === 'escalate' ? 'ESC' : type.toUpperCase()}
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color, fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color, fontFamily: 'var(--font-mono), monospace', lineHeight: 1 }}>
                     {pct !== null ? `${pct}%` : '—'}
                   </div>
                   <div style={{ fontSize: 9, color: 'var(--muted-foreground)', marginTop: 3 }}>{data.total} decisions</div>

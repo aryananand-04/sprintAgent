@@ -21,10 +21,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run lint
       - run: npm test
       - run: npm run build
       - name: Assert no LLM SDK or secrets in client bundle
         run: |
-          if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com" dist/; then
+          if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com" .next/static/; then
             echo "::error::Server-only code leaked into the client bundle"; exit 1
           fi

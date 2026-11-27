@@ -43,7 +43,7 @@ export function ShimmerButton({
         color: '#fff',
         fontSize: 12,
         fontWeight: 700,
-        fontFamily: 'Outfit, sans-serif',
+        fontFamily: 'var(--font-sans), sans-serif',
         letterSpacing: '-0.01em',
         opacity: disabled ? 0.38 : 1,
         boxShadow: '0 1px 4px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10)',

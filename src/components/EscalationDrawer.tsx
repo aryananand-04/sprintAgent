@@ -85,13 +85,13 @@ function EscCard({ esc, onResolve }: { esc: EscalationItem; onResolve: (id: stri
               <span style={{
                 fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 3,
                 letterSpacing: '0.08em', background: 'var(--ok)', color: '#fff',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'var(--font-mono), monospace',
               }}>RESOLVED</span>
             ) : (
               <span style={{
                 fontSize: 9, fontWeight: 900, letterSpacing: '0.10em',
                 padding: '2px 6px', borderRadius: 3, lineHeight: 1,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'var(--font-mono), monospace',
                 ...u.badgeStyle,
               }}>{u.badgeLabel}</span>
             )}
@@ -190,7 +190,7 @@ export function EscalationPanel() {
               style={{
                 fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 3,
                 background: 'var(--crit)', color: '#fff',
-                fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em',
+                fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.06em',
               }}
             >{open.length} OPEN</motion.span>
           )}

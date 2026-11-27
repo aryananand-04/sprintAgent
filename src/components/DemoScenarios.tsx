@@ -43,7 +43,7 @@ export function DemoScenarios() {
           fontSize: 12, fontWeight: 700,
           border: '1px solid rgba(255,255,255,0.12)',
           boxShadow: '0 2px 8px rgba(12,102,228,0.28)',
-          cursor: 'pointer', fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.01em',
+          cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif', letterSpacing: '-0.01em',
           transition: 'background 0.12s, box-shadow 0.12s',
         }}
         onMouseEnter={e => { e.currentTarget.style.background = '#0052CC' }}
@@ -51,7 +51,7 @@ export function DemoScenarios() {
       >
         <Zap size={11} /> Simulate
         {fired.size > 0 && (
-          <span style={{ fontSize: 9, fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', background: 'rgba(255,255,255,0.20)', borderRadius: 3, padding: '0 4px', marginLeft: 2 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, fontFamily: 'var(--font-mono), monospace', background: 'rgba(255,255,255,0.20)', borderRadius: 3, padding: '0 4px', marginLeft: 2 }}>
             {fired.size}/{SCENARIOS.length}
           </span>
         )}

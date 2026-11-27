@@ -119,11 +119,11 @@ export function CommandPalette() {
                   /* #6 — visible focus ring */
                   outline: 'none',
                   fontSize: 14, color: 'var(--t1)',
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                 }}
               />
               <kbd style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 10, padding: '2px 6px',
+                fontFamily: 'var(--font-mono), monospace', fontSize: 10, padding: '2px 6px',
                 borderRadius: 4, background: 'var(--s2)', border: '1px solid var(--b2)', color: 'var(--t3)', flexShrink: 0,
               }}>esc</kbd>
             </div>

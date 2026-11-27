@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { BookOpen, Zap, HelpCircle, AlertTriangle, ArrowRight, Cpu, Target, Layers } from 'lucide-react'
 
 const H = (text: string) => <strong style={{ color: 'var(--t1)', fontWeight: 700 }}>{text}</strong>
-const N = (text: string) => <strong style={{ color: 'var(--act-t)', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}>{text}</strong>
+const N = (text: string) => <strong style={{ color: 'var(--act-t)', fontWeight: 700, fontFamily: 'var(--font-mono), monospace' }}>{text}</strong>
 const E = (text: string) => <strong style={{ color: 'var(--crit)', fontWeight: 700 }}>{text}</strong>
 
 const WRITEUP_PARAGRAPHS: { heading?: string; jsx: React.ReactNode }[] = [
@@ -102,7 +102,7 @@ const SECTIONS = [
           <div key={d} style={{ borderRadius: 5, border: `1px solid ${bd}`, background: bg, padding: '12px 13px', borderLeft: `3px solid ${color}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
               <Icon size={12} style={{ color }} />
-              <span style={{ fontSize: 13, fontWeight: 800, color: textColor, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.02em' }}>{d}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: textColor, fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.02em' }}>{d}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11 }}>
               <div><span style={{ color: 'var(--t3)', fontWeight: 600 }}>When: </span><span style={{ color: 'var(--t2)' }}>{when}</span></div>
@@ -151,7 +151,7 @@ const SECTIONS = [
           { n: '3', title: 'UX designed for agent-human collaboration', body: 'The three-panel layout (board + feed + detail) surfaces what the agent is doing in real time. The escalation drawer is a decision queue, not a notification list. The policy panel makes the agent\'s ruleset a legible social contract.' },
         ].map(({ n, title, body }) => (
           <div key={n} style={{ display: 'flex', gap: 11 }}>
-            <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--act-t)', marginTop: 2, fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--act-t)', marginTop: 2, fontFamily: 'var(--font-mono), monospace' }}>
               {n}
             </div>
             <div>

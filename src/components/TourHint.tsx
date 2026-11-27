@@ -162,7 +162,7 @@ export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) 
       }}>
         <span style={{
           fontSize: 9, fontWeight: 900, letterSpacing: '0.09em', textTransform: 'uppercase',
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'var(--font-mono), monospace',
           padding: '2px 6px', borderRadius: 4,
           background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)',
           lineHeight: 1.5,

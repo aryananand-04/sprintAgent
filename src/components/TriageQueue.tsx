@@ -75,7 +75,7 @@ export function TriageQueue() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
           <Activity size={13} style={{ color: 'var(--act)' }} />
           <span data-tour-step="5" style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.015em' }}>Triage Queue</span>
-          <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{total} tasks</span>
+          <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{total} tasks</span>
         </div>
         <p style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 11 }}>
           Every active task classified by AI. Click any row to open the full scoring breakdown.
@@ -95,7 +95,7 @@ export function TriageQueue() {
                 fontSize: 11, fontWeight: 600, color: cfg.textColor,
               }}>
                 <Icon size={10} style={{ color: cfg.solidColor }} />
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontVariantNumeric: 'tabular-nums' }}>{count}</span>
                 <span>{cfg.label}</span>
               </div>
             )
@@ -132,7 +132,7 @@ export function TriageQueue() {
                 <Icon size={11} style={{ color: cfg.solidColor, flexShrink: 0 }} />
                 <span style={{ fontSize: 11, fontWeight: 700, color: cfg.textColor, letterSpacing: '-0.01em' }}>{cfg.label}</span>
                 <span style={{ fontSize: 10, color: 'var(--t3)' }}>— {cfg.description}</span>
-                <span style={{ marginLeft: 'auto', fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: 'var(--t3)', fontWeight: 600 }}>{group.length}</span>
+                <span style={{ marginLeft: 'auto', fontSize: 10, fontFamily: 'var(--font-mono), monospace', color: 'var(--t3)', fontWeight: 600 }}>{group.length}</span>
                 {canBulkAssign && (
                   <button
                     data-feature-id="bulk-assign-btn"
@@ -142,7 +142,7 @@ export function TriageQueue() {
                       padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
                       background: 'var(--act-bg)', border: '1px solid var(--act-bd)',
                       fontSize: 10, fontWeight: 700, color: 'var(--act-t)',
-                      fontFamily: 'Outfit, sans-serif', transition: 'background 0.1s',
+                      fontFamily: 'var(--font-sans), sans-serif', transition: 'background 0.1s',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'var(--act)'; e.currentTarget.style.color = '#fff' }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'var(--act-bg)'; e.currentTarget.style.color = 'var(--act-t)' }}
@@ -211,7 +211,7 @@ export function TriageQueue() {
                           {task.storyPoints && (
                             <>
                               <span style={{ color: 'var(--b3)', fontSize: 10 }}>·</span>
-                              <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{task.storyPoints}pt</span>
+                              <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{task.storyPoints}pt</span>
                             </>
                           )}
                           {/* Fix #2: goal alignment badge */}
@@ -260,7 +260,7 @@ export function TriageQueue() {
                                 size={22} strokeWidth={2.5}
                                 color={lc} trackColor="var(--border)" showValue={false}
                               />
-                              <span style={{ fontSize: 9, color: lc, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }}>
+                              <span style={{ fontSize: 9, color: lc, fontFamily: 'var(--font-mono), monospace', fontWeight: 700 }}>
                                 {assignedMember.currentLoad}%
                               </span>
                             </div>
@@ -281,7 +281,7 @@ export function TriageQueue() {
                                 size={22} strokeWidth={2.5}
                                 color={cfg.solidColor} trackColor="var(--border)" showValue={false}
                               />
-                              <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{best?.confidence}%</span>
+                              <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{best?.confidence}%</span>
                             </div>
                           )
                         }

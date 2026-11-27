@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, Settings, CheckCircle, Slack, RefreshCw } from 'lucide-react'
+import { X, Settings, CheckCircle, RefreshCw } from 'lucide-react'
+import { SlackIcon } from './ui/brand-icons'
 import { useSprintStore } from '../store/useSprintStore'
 import type { TaskType } from '../types'
 
@@ -96,7 +97,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
           {/* Slack webhook */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
-              <Slack size={13} style={{ color: '#4A154B' }} strokeWidth={1.5} />
+              <SlackIcon size={13} style={{ color: '#4A154B' }} strokeWidth={1.5} />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--foreground)' }}>Slack Escalation Webhook</span>
             </div>
             <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 10, lineHeight: 1.6 }}>
@@ -113,7 +114,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                   background: 'var(--muted)', border: '1px solid var(--border)',
                   borderRadius: 5, padding: '8px 11px',
                   fontSize: 11, color: 'var(--foreground)',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   transition: 'border-color 0.12s',
                 }}
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
@@ -146,7 +147,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                 value={outboundUrl}
                 onChange={e => setOutboundUrl(e.target.value.trim())}
                 placeholder="https://your-endpoint.com/webhook"
-                style={{ flex: 1, outline: 'none', background: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 5, padding: '7px 10px', fontSize: 11, color: 'var(--foreground)', fontFamily: 'JetBrains Mono, monospace', transition: 'border-color 0.12s' }}
+                style={{ flex: 1, outline: 'none', background: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 5, padding: '7px 10px', fontSize: 11, color: 'var(--foreground)', fontFamily: 'var(--font-mono), monospace', transition: 'border-color 0.12s' }}
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
                 onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
               />
@@ -172,7 +173,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                   <span style={{ fontSize: 11, color: 'var(--foreground)', fontWeight: 500 }}>ACT minimum clarity</span>
-                  <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--act)' }}>
+                  <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--act)' }}>
                     {autonomyConfig.actMinClarity}/5
                   </span>
                 </div>
@@ -188,7 +189,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                   <span style={{ fontSize: 11, color: 'var(--foreground)', fontWeight: 500 }}>ASK maximum clarity</span>
-                  <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--warn)' }}>
+                  <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--warn)' }}>
                     {autonomyConfig.askMaxClarity}/5
                   </span>
                 </div>
@@ -204,7 +205,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                   <span style={{ fontSize: 11, color: 'var(--foreground)', fontWeight: 500 }}>Escalate critical after</span>
-                  <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: 'var(--crit)' }}>
+                  <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: 'var(--crit)' }}>
                     {autonomyConfig.escalateIfCriticalUnassignedHours}h
                   </span>
                 </div>
@@ -232,7 +233,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                 <div key={key}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                     <span style={{ fontSize: 11, color: 'var(--foreground)', fontWeight: 500 }}>{label}</span>
-                    <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color }}>{(autonomyConfig as any)[key]}{suffix}</span>
+                    <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color }}>{(autonomyConfig as any)[key]}{suffix}</span>
                   </div>
                   <input type="range" min={min} max={max} value={(autonomyConfig as any)[key]}
                     onChange={e => setAutonomyConfig({ [key]: Number(e.target.value) } as any)}
@@ -263,7 +264,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                     }}
                     style={{
                       padding: '4px 10px', borderRadius: 4, cursor: 'pointer',
-                      fontSize: 11, fontWeight: 600, fontFamily: 'Outfit, sans-serif',
+                      fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-sans), sans-serif',
                       background: active ? 'var(--act-bg)' : 'var(--muted)',
                       border: `1px solid ${active ? 'var(--act-bd)' : 'var(--border)'}`,
                       color: active ? 'var(--act-t)' : 'var(--muted-foreground)',

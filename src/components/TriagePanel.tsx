@@ -155,7 +155,7 @@ export function TriagePanel() {
                           </div>
                         ) : (
                           <motion.div key={meta.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-                            <div style={{ fontSize: 40, fontWeight: 900, color: meta.solid, letterSpacing: '-0.04em', lineHeight: 1, fontFamily: 'Outfit, sans-serif' }}>
+                            <div style={{ fontSize: 40, fontWeight: 900, color: meta.solid, letterSpacing: '-0.04em', lineHeight: 1, fontFamily: 'var(--font-sans), sans-serif' }}>
                               {meta.label}
                             </div>
                             <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 5 }}>{meta.subtitle}</div>
@@ -164,7 +164,7 @@ export function TriagePanel() {
                       </div>
                       {!isLoading && (
                         <div style={{ textAlign: 'right', flexShrink: 0, paddingBottom: 2 }}>
-                          <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1, fontFamily: 'JetBrains Mono, monospace', fontVariantNumeric: 'tabular-nums', color: meta.solid, letterSpacing: '-0.03em' }}>
+                          <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1, fontFamily: 'var(--font-mono), monospace', fontVariantNumeric: 'tabular-nums', color: meta.solid, letterSpacing: '-0.03em' }}>
                             <NumberTicker value={score} duration={0.7} />
                           </div>
                           <div style={{ fontSize: 9, color: 'var(--t3)', marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>/ 100</div>
@@ -269,7 +269,7 @@ export function TriagePanel() {
                               transition={{ duration: 0.4, ease: 'easeOut' }}
                             />
                           </div>
-                          <span style={{ fontSize: 10, color: 'var(--t3)', width: 22, textAlign: 'right', flexShrink: 0, fontFamily: 'JetBrains Mono, monospace' }}>{val}/5</span>
+                          <span style={{ fontSize: 10, color: 'var(--t3)', width: 22, textAlign: 'right', flexShrink: 0, fontFamily: 'var(--font-mono), monospace' }}>{val}/5</span>
                         </div>
                       )
                     })}

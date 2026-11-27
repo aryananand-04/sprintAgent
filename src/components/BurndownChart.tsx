@@ -71,7 +71,7 @@ export function BurndownChart() {
           return (
             <g key={v}>
               <line x1={PAD.l - 4} y1={y} x2={PAD.l} y2={y} stroke="var(--border)" strokeWidth={1} />
-              <text x={PAD.l - 6} y={y + 3.5} textAnchor="end" fontSize={8} fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace">
+              <text x={PAD.l - 6} y={y + 3.5} textAnchor="end" fontSize={8} fill="var(--muted-foreground)" style={{ fontFamily: "var(--font-mono), monospace" }}>
                 {v}
               </text>
             </g>
@@ -81,7 +81,7 @@ export function BurndownChart() {
         {/* Day labels */}
         {[0, 7, 14].map(d => (
           <text key={d} x={PAD.l + (d / days) * chartW} y={H - 4}
-            textAnchor="middle" fontSize={8} fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace">
+            textAnchor="middle" fontSize={8} fill="var(--muted-foreground)" style={{ fontFamily: "var(--font-mono), monospace" }}>
             d{d}
           </text>
         ))}
@@ -112,7 +112,7 @@ export function BurndownChart() {
         ))}
       </svg>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'JetBrains Mono, monospace' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: 'var(--muted-foreground)', fontFamily: 'var(--font-mono), monospace' }}>
         <span>{sprint.completedPoints}pt completed</span>
         <span>{sprint.committedPoints - sprint.completedPoints}pt remaining</span>
       </div>

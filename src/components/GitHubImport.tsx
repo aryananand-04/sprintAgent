@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Github, Download, Sparkles, CheckCircle, AlertTriangle } from 'lucide-react'
+import { GithubIcon } from './ui/brand-icons'
+import { Download, Sparkles, CheckCircle, AlertTriangle } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import type { Task, UrgencyLevel, TaskType } from '../types'
 
@@ -111,7 +112,7 @@ export function GitHubImport() {
   return (
     <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 2 }}>
-        <Github size={13} style={{ color: 'var(--foreground)' }} strokeWidth={1.5} />
+        <GithubIcon size={13} style={{ color: 'var(--foreground)' }} strokeWidth={1.5} />
         <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--foreground)' }}>Import from GitHub</span>
       </div>
       <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: -8 }}>
@@ -128,7 +129,7 @@ export function GitHubImport() {
             flex: 1, outline: 'none',
             background: 'var(--card)', border: '1px solid var(--border)',
             borderRadius: 5, padding: '6px 10px',
-            fontSize: 12, color: 'var(--foreground)', fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 12, color: 'var(--foreground)', fontFamily: 'var(--font-mono), monospace',
             transition: 'border-color 0.12s',
           }}
           onFocus={e => (e.currentTarget.style.borderColor = 'var(--act)')}
@@ -166,7 +167,7 @@ export function GitHubImport() {
             </div>
               <button
                 onClick={() => setSelected(selected.size === issues.length ? new Set() : new Set(issues.map(i => i.number)))}
-                style={{ fontSize: 10, color: 'var(--act)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}
+                style={{ fontSize: 10, color: 'var(--act)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif', fontWeight: 600 }}
               >
                 {selected.size === issues.length ? 'Deselect all' : 'Select all'}
               </button>
@@ -181,7 +182,8 @@ export function GitHubImport() {
                     key={issue.number}
                     onClick={() => {
                       const next = new Set(selected)
-                      isSelected ? next.delete(issue.number) : next.add(issue.number)
+                      if (isSelected) next.delete(issue.number)
+                      else next.add(issue.number)
                       setSelected(next)
                     }}
                     style={{

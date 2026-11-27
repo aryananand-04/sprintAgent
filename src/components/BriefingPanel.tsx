@@ -105,7 +105,7 @@ function StandupTab() {
       <div style={{
         borderRadius: 7, background: 'var(--s2)', border: '1px solid var(--b1)',
         padding: '14px 16px',
-        fontFamily: 'JetBrains Mono, monospace', fontSize: 11, lineHeight: 1.7,
+        fontFamily: 'var(--font-mono), monospace', fontSize: 11, lineHeight: 1.7,
       }}>
         {lines.map((line, i) => {
           const isHeader = line.startsWith('*Sprint Agent') || line.startsWith('*Per-engineer') || line.startsWith('*Sprint health') || line.startsWith('*Decisions')

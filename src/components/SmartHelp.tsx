@@ -224,7 +224,7 @@ export function SmartHelp({ onClose }: { onClose: () => void }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--t1)' }}>{cat.label}</div>
                   </div>
-                  <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>
+                  <span style={{ fontSize: 9, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace', fontWeight: 600 }}>
                     {cat.steps.length}
                   </span>
                   <ArrowRight size={9} style={{ color: 'var(--t3)', flexShrink: 0 }} />

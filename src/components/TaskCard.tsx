@@ -122,7 +122,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                   {task.title}
                 </p>
                 {task.goalAlignment !== undefined && task.goalAlignment <= 3 && (
-                  <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'rgba(220,38,38,0.10)', border: '1px solid rgba(220,38,38,0.26)', color: 'var(--crit)', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em', flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'rgba(220,38,38,0.10)', border: '1px solid rgba(220,38,38,0.26)', color: 'var(--crit)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.05em', flexShrink: 0, marginTop: 1 }}>
                     OFF-GOAL
                   </span>
                 )}
@@ -139,7 +139,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                       {task.urgency}
                     </span>
                   )}
-                  <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace', marginLeft: 'auto' }}>
+                  <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace', marginLeft: 'auto' }}>
                     {task.storyPoints}pt
                   </span>
                 </div>
@@ -204,11 +204,11 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   {task.storyPoints && (
-                    <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'JetBrains Mono, monospace' }}>{task.storyPoints}pt</span>
+                    <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono), monospace' }}>{task.storyPoints}pt</span>
                   )}
                   {task.confidence !== undefined && (
                     <span style={{
-                      fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700,
+                      fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 700,
                       color: task.confidence >= 75 ? 'var(--ok)' : task.confidence >= 55 ? 'var(--warn)' : 'var(--crit)',
                     }}>{task.confidence}%</span>
                   )}
@@ -313,14 +313,14 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                             <span style={{
                               fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3,
                               background: 'var(--act-bg)', border: '1px solid var(--act-bd)',
-                              color: 'var(--act-t)', fontFamily: 'JetBrains Mono, monospace',
+                              color: 'var(--act-t)', fontFamily: 'var(--font-mono), monospace',
                               display: 'flex', alignItems: 'center', gap: 3,
                             }}>
                               <Star size={6} strokeWidth={2} style={{ color: 'var(--act)' }} /> Best fit
                             </span>
                           )}
                           {isAssigned && (
-                            <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>
+                            <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: 'var(--act)', color: '#fff', fontFamily: 'var(--font-mono), monospace' }}>
                               Assigned
                             </span>
                           )}
@@ -331,7 +331,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                       {/* Load gauge */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                         <GaugeCircle value={m.currentLoad} size={22} strokeWidth={2.5} color={lc} trackColor="var(--border)" showValue={false} />
-                        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: lc }}>{m.currentLoad}%</span>
+                        <span style={{ fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: lc }}>{m.currentLoad}%</span>
                       </div>
                     </button>
                   )

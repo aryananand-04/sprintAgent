@@ -59,7 +59,7 @@ export function IntakeInbox() {
               <motion.span key={backlogTasks.length}
                 initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 8, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'JetBrains Mono, monospace' }}
+                style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 8, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', color: 'var(--act-t)', fontFamily: 'var(--font-mono), monospace' }}
               >{backlogTasks.length}</motion.span>
             )}
           </AnimatePresence>
@@ -83,7 +83,7 @@ export function IntakeInbox() {
             style={{
               width: '100%', background: 'var(--card)', border: '1px solid var(--border)',
               borderRadius: 6, fontSize: 12, color: 'var(--foreground)', padding: '10px 12px',
-              resize: 'none', outline: 'none', fontFamily: 'Outfit, sans-serif', lineHeight: 1.6,
+              resize: 'none', outline: 'none', fontFamily: 'var(--font-sans), sans-serif', lineHeight: 1.6,
               transition: 'border-color 0.12s, box-shadow 0.12s',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'var(--act)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--act-bg)' }}
@@ -101,7 +101,7 @@ export function IntakeInbox() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
             <select value={urgency} onChange={e => setUrgency(e.target.value as UrgencyLevel)}
-              style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, color: currentUrgencyColor, padding: '5px 8px', outline: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}
+              style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, color: currentUrgencyColor, padding: '5px 8px', outline: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif', fontWeight: 600 }}
             >
               {URGENCY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -154,7 +154,7 @@ export function IntakeInbox() {
                   <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 5, background: 'var(--muted)', border: '1px solid var(--border)' }}>
                     <p style={{ fontSize: 12, color: 'var(--foreground)', fontWeight: 500, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{task.title}</p>
                     {dc && task.decision && (
-                      <span style={{ fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: dc.bg, border: `1px solid ${dc.bd}`, color: dc.color, fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 3, background: dc.bg, border: `1px solid ${dc.bd}`, color: dc.color, fontFamily: 'var(--font-mono), monospace', flexShrink: 0 }}>
                         {task.decision === 'ESCALATE' ? 'ESC' : task.decision}
                       </span>
                     )}

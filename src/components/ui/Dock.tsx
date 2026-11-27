@@ -111,7 +111,7 @@ export function Dock({ items }: DockProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '0 3px',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'var(--font-mono), monospace',
                 border: '1.5px solid var(--bg)',
                 pointerEvents: 'none',
               }}

@@ -1,4 +1,4 @@
-import { handleChat } from '../server/llm'
+import { handleChat } from '../../../../server/llm'
 
 export async function POST(req: Request): Promise<Response> {
   const body = await req.json().catch(() => null)
