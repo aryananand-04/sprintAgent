@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { siteOrigin } from '@/lib/origin'
 import { OutboxEvent, enqueue, deliverDue } from '@/server/outbox'
 import { createRateLimiter } from '@/server/rateLimit'
+import { inngest, jobsEnabled } from '@/server/inngest/client'
 
 const limit = createRateLimiter({ limit: 60, windowMs: 60_000 })
 
@@ -33,6 +34,10 @@ export async function POST(req: Request): Promise<Response> {
 
   const queued = await enqueue(db, ws, parsed.data, `${await siteOrigin()}/app`).catch(() => -1)
   if (queued < 0) return Response.json({ error: 'WRITE_FAILED' }, { status: 500 })
-  if (queued) after(() => deliverDue(db, { workspaceId: ws }).catch((e) => console.error('[outbox] deliver', e)))
+  if (queued) {
+    // With a job runner, delivery is durable and retried there; without one, try once after responding.
+    if (jobsEnabled()) await inngest.send({ name: 'outbox/enqueued', data: { workspaceId: ws } }).catch((e) => console.error('[outbox] event', e))
+    else after(() => deliverDue(db, { workspaceId: ws }).catch((e) => console.error('[outbox] deliver', e)))
+  }
   return Response.json({ queued })
 }
