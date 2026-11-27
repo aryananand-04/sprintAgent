@@ -78,6 +78,13 @@
       "when": 1795807345674,
       "tag": "20261127192226_github_installations_security",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795807799547,
+      "tag": "20261127192959_github_write_back",
+      "breakpoints": true
     }
   ]
 }

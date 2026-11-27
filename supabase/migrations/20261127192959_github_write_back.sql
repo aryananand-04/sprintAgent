@@ -1,0 +1,1 @@
+ALTER TABLE "github_installations" ADD COLUMN "write_back" boolean DEFAULT false NOT NULL;

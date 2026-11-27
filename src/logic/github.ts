@@ -67,3 +67,20 @@ export function issueToTask(issue: GhIssue, repoFullName: string, id: string): T
 }
 
 export const isPullRequest = (i: GhIssue) => i.pull_request !== undefined
+
+/** owner/repo/number from an issue URL we stored as external_ref; null for anything else. */
+export function parseIssueUrl(url: string | undefined | null): { owner: string; repo: string; number: number } | null {
+  const m = url?.match(/^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+)\/issues\/(\d+)$/)
+  return m ? { owner: m[1], repo: m[2], number: Number(m[3]) } : null
+}
+
+export const DECISION_LABELS = {
+  ACT: { name: 'sprint-agent: ACT', color: 'd7ea3a', description: 'Clear enough to pick up' },
+  ASK: { name: 'sprint-agent: ASK', color: 'ff9a3c', description: 'Needs one answer before work starts' },
+  ESCALATE: { name: 'sprint-agent: ESCALATE', color: 'ff6b57', description: 'Needs a human decision' },
+} as const
+
+/** The comment posted on an ASK issue. Plain, specific, and says who is asking. */
+export function askComment(question: string): string {
+  return `${question}\n\n<sub>Asked by Sprint Agent while triaging this issue. An answer here helps whoever picks it up.</sub>`
+}

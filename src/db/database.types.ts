@@ -169,14 +169,14 @@ isOneToOne: false
                   ]
                 },"github_installations": {
                   Row: {
-                    "account_login": string,"connected_by": string | null,"created_at": string,"id": string,"installation_id": number,"workspace_id": string
+                    "account_login": string,"connected_by": string | null,"created_at": string,"id": string,"installation_id": number,"workspace_id": string,"write_back": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "account_login": string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id": number,"workspace_id": string
+                    "account_login": string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id": number,"workspace_id": string,"write_back"?: boolean
                   }
                   Update: {
-                    "account_login"?: string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id"?: number,"workspace_id"?: string
+                    "account_login"?: string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id"?: number,"workspace_id"?: string,"write_back"?: boolean
                   }
                   Relationships: [
                     {

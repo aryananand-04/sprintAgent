@@ -272,5 +272,7 @@ export const githubInstallations = pgTable('github_installations', {
   installationId: bigint('installation_id', { mode: 'number' }).notNull(),
   accountLogin: text('account_login').notNull(),
   connectedBy: uuid('connected_by').references(() => authUsers.id, { onDelete: 'set null' }),
+  /** Post triage labels and ASK questions back to GitHub. Public action, so off until an admin turns it on. */
+  writeBack: boolean('write_back').notNull().default(false),
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('github_installations_installation_key').on(t.installationId)])

@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { activeWorkspaceIds, runAgentTick } from '@/server/agent/runTick'
 import { deliverDue } from '@/server/outbox'
 import { importInstallation } from '@/server/github/sync'
+import { writeBack } from '@/server/github/writeback'
 
 /** Every 5 minutes: one agent tick per active workspace, fanned out as events. */
 export const scheduleAgentTicks = inngest.createFunction(
@@ -52,4 +53,19 @@ export const githubImport = inngest.createFunction(
   },
 )
 
-export const functions = [scheduleAgentTicks, agentTick, deliverOutbox, githubImport]
+/** Labels/comments on GitHub. Serialised per workspace and throttled to stay well inside GitHub's limits. */
+export const githubWriteBack = inngest.createFunction(
+  {
+    id: 'github-writeback',
+    triggers: [{ event: 'github/writeback.requested' }],
+    concurrency: { key: 'event.data.workspaceId', limit: 1 },
+    throttle: { key: 'event.data.workspaceId', limit: 60, period: '1m' },
+    retries: 4,
+  },
+  async ({ event, step }) => {
+    const { workspaceId, taskId } = event.data as { workspaceId: string; taskId: string }
+    return step.run('write-back', () => writeBack(createAdminClient(), workspaceId, taskId))
+  },
+)
+
+export const functions = [scheduleAgentTicks, agentTick, deliverOutbox, githubImport, githubWriteBack]

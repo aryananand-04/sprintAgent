@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhook } from '@/server/github/app'
 import { syncIssue, workspaceForInstallation } from '@/server/github/sync'
 import type { GhIssue } from '@/logic/github'
+import { requestWriteBack } from '@/server/github/jobs'
 
 interface Payload {
   action?: string
@@ -35,7 +36,12 @@ export async function POST(req: Request): Promise<Response> {
   if (!ws) return Response.json({ ok: true, ignored: 'not linked' })
 
   if (event === 'issues' && p.issue && p.repository && ISSUE_ACTIONS.has(p.action ?? '')) {
-    return Response.json({ ok: true, result: await syncIssue(db, ws, p.repository.full_name, p.issue) })
+    const result = await syncIssue(db, ws, p.repository.full_name, p.issue)
+    if (result === 'created') {
+      const { data } = await db.from('tasks').select('id').eq('workspace_id', ws).eq('external_ref', p.issue.html_url).maybeSingle()
+      if (data) await requestWriteBack(ws, [data.id])
+    }
+    return Response.json({ ok: true, result })
   }
   return Response.json({ ok: true, ignored: event })
 }

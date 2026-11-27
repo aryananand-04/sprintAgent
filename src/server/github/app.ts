@@ -34,8 +34,9 @@ export class GitHubError extends Error {
 }
 
 async function call<T>(url: string, token: string, init: RequestInit = {}): Promise<{ data: T; res: Response }> {
-  const res = await fetch(url.startsWith('http') ? url : `${API}${url}`, { ...init, headers: { ...headers(token), ...init.headers }, signal: AbortSignal.timeout(15_000) })
-  if (!res.ok) throw new GitHubError(res.status, `GitHub ${res.status} on ${new URL(res.url).pathname}`)
+  const full = url.startsWith('http') ? url : `${API}${url}`
+  const res = await fetch(full, { ...init, headers: { ...headers(token), ...init.headers }, signal: AbortSignal.timeout(15_000) })
+  if (!res.ok) throw new GitHubError(res.status, `GitHub ${res.status} on ${new URL(full).pathname}`)
   return { data: (res.status === 204 ? null : await res.json()) as T, res }
 }
 
