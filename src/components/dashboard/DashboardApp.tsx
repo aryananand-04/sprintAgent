@@ -21,7 +21,6 @@ import { ROLE_LABEL } from '../../lib/permissions'
 import { AgentSettings } from './AgentSettings'
 import { SmartHelp } from './SmartHelp'
 import { useAgentBootstrap } from '../../hooks/useAgentBootstrap'
-import { useAgentLoop } from '../../hooks/useAgentLoop'
 import { useScheduledStandup } from '../../hooks/useScheduledStandup'
 
 const VIEW_LABELS: Record<string, string> = {
@@ -272,7 +271,6 @@ function ArchiveBanner() {
 export default function App() {
   const agentEnabled = useCan('task:manage')
   useAgentBootstrap(agentEnabled)
-  useAgentLoop(agentEnabled)
   useScheduledStandup(agentEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)

@@ -3,7 +3,7 @@
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(44);
 
 -- Fixtures: a second workspace + outsider user
 insert into auth.users (id, email, aud, role) values
@@ -164,6 +164,12 @@ select pg_temp.logout();
 select pg_temp.login('dev@demo.sprintagent.dev');
 select is((select count(*)::int from public.outbox), 0, 'contributor cannot read the outbox');
 select is((select count(*)::int from public.integrations), 0, 'contributor cannot read integrations');
+select pg_temp.logout();
+
+-- ── agent cooldowns are server-only ─────────────────────────────────
+select pg_temp.login('admin@demo.sprintagent.dev');
+select throws_ok('select count(*) from public.agent_cooldowns', '42501', null, 'users cannot read agent cooldowns');
+select throws_ok($q$select public.claim_agent_cooldown(md5('demo-workspace')::uuid, 'x', 60)$q$, '42501', null, 'users cannot claim agent cooldowns');
 select pg_temp.logout();
 
 select * from finish();

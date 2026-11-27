@@ -10,6 +10,7 @@ export default defineConfig({
     include: ['src/**/*.test.ts'],
     // *.db.test.ts need a running local Supabase: npm run test:db
     exclude: ['**/node_modules/**', ...(process.env.VITEST_DB ? [] : ['**/*.db.test.ts'])],
+    setupFiles: process.env.VITEST_DB ? ['./src/test/loadEnv.ts'] : [],
     environment: 'node',
     coverage: {
       provider: 'v8',

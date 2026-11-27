@@ -50,6 +50,20 @@
       "when": 1795803687186,
       "tag": "20261127182127_integrations_security",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795804976899,
+      "tag": "20261127184256_agent_cooldowns",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795804977195,
+      "tag": "20261127184257_agent_cooldowns_security",
+      "breakpoints": true
     }
   ]
 }

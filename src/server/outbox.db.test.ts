@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Runs against the local Supabase (npm run test:db). Uses the service key, like the server does.
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/db/database.types'
-import { existsSync } from 'node:fs'
 import { enqueue, deliverDue } from './outbox'
 
-if (!process.env.SUPABASE_SECRET_KEY && existsSync('.env.local')) process.loadEnvFile('.env.local')
 
 const db = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!, { auth: { persistSession: false } })
 
@@ -21,6 +19,8 @@ beforeEach(async () => {
   await db.from('integrations').delete().eq('workspace_id', ws)
   await db.from('integrations').insert({ workspace_id: ws, kind: 'slack_webhook', url: 'https://hooks.slack.com/services/T/B/test' })
 })
+
+afterAll(async () => { await db.from('integrations').delete().eq('workspace_id', ws) })
 
 describe('outbox (database)', () => {
   it('queues, delivers once, and marks sent', async () => {

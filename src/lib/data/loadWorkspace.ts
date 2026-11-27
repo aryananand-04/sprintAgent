@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import 'server-only'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+import type { Database } from '@/db/database.types'
 import type { WorkspaceSnapshot } from '@/store/useSprintStore'
 import {
   taskFromRow, teamFromRow, sprintFromRow, archiveFromRow, escalationFromRow, feedFromRow,
@@ -13,8 +15,9 @@ import { DEFAULT_AUTONOMY_CONFIG } from '@/logic/constants'
 const FEED_LIMIT = 100
 
 /** Loads one workspace's live state through RLS (the caller's own permissions apply). */
-export async function loadWorkspace(workspaceId: string): Promise<WorkspaceSnapshot | null> {
-  const supabase = await createClient()
+/** Pass a service client to load without RLS (server agent only, after its own checks). */
+export async function loadWorkspace(workspaceId: string, client?: SupabaseClient<Database>): Promise<WorkspaceSnapshot | null> {
+  const supabase = client ?? await createClient()
 
   const { data: active, error: sprintErr } = await supabase
     .from('sprints').select('*').eq('workspace_id', workspaceId).eq('status', 'active').maybeSingle()

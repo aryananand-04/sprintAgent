@@ -15,7 +15,8 @@ import { triageWithAI } from '../services/triageAI'
 import { sendEvent } from '../services/outbox'
 import { findBestAssignee } from '../logic/assign'
 import { resolveAdHoc } from '../logic/adHoc'
-import { LOAD_ELIGIBILITY_THRESHOLD, LOAD_MAX, LOAD_BASELINE } from '../logic/constants'
+import { LOAD_ELIGIBILITY_THRESHOLD, LOAD_MAX } from '../logic/constants'
+import { computeLoadsFromTasks } from '../logic/load'
 import { computeSprintRisk } from '../logic/scoring'
 import { scoreGoalAlignment } from '../services/goalAlignment'
 
@@ -113,14 +114,7 @@ function now() {
 // Seeded loads represent mid-sprint reality (including meetings, code review, overhead) —
 // we add/subtract the task's proportional share rather than recomputing from scratch.
 
-export function computeLoadsFromTasks(tasks: Task[], team: TeamMember[]): TeamMember[] {
-  return team.map(m => {
-    const activePts = tasks
-      .filter(t => t.assigneeId === m.id && ['in-progress', 'assigned', 'blocked'].includes(t.status))
-      .reduce((sum, t) => sum + (t.storyPoints ?? 2), 0)
-    return { ...m, currentLoad: Math.min(LOAD_MAX, LOAD_BASELINE + Math.round((activePts / Math.max(m.capacity, 1)) * 45)) }
-  })
-}
+export { computeLoadsFromTasks }
 
 // Recomputes sprint health from live state and patches it in one set() call.
 // Call this after any change to tasks, escalations, or sprint points.

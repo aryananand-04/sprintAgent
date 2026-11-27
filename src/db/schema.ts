@@ -257,3 +257,10 @@ export const outbox = pgTable('outbox', {
   sentAt: timestamp('sent_at', { withTimezone: true }),
   createdAt: createdAt(),
 }, (t) => [index('outbox_due_idx').on(t.status, t.nextAttemptAt)])
+
+/** Agent check cooldowns, shared by every runner so a check fires once per workspace, not once per browser. */
+export const agentCooldowns = pgTable('agent_cooldowns', {
+  workspaceId: workspaceId(),
+  key: text('key').notNull(),
+  firedAt: timestamp('fired_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.workspaceId, t.key] })])

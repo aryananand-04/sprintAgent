@@ -23,7 +23,27 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "autonomy_policies": {
+            "agent_cooldowns": {
+                  Row: {
+                    "fired_at": string,"key": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "fired_at"?: string,"key": string,"workspace_id": string
+                  }
+                  Update: {
+                    "fired_at"?: string,"key"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "agent_cooldowns_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"autonomy_policies": {
                   Row: {
                     "act_min_clarity": number,"ask_max_clarity": number,"blocked_hours_threshold": number,"capacity_breach_threshold": number,"esc_nudge_hours": number,"escalate_if_critical_unassigned_hours": number,"never_auto_assign_types": (Database["public"]['Enums']["task_type"])[],"updated_at": string,"updated_by": string | null,"velocity_deficit_pts": number,"workspace_id": string
                   }
@@ -363,7 +383,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "create_workspace":
+            "claim_agent_cooldown":
+{ Args: { "check_key": string,"cooldown_seconds": number,"ws": string }; Returns: boolean
+                           },
+"create_workspace":
 { Args: { "p_name": string,"p_slug": string }; Returns: string
                            },
 "start_new_sprint":
