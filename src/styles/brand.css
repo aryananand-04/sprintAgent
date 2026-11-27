@@ -5,41 +5,24 @@
 ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  --paper: #fdfcf9;
-  --paper-2: #f4f2ec;
-  --paper-3: #ebe8e0;
-  --ink: #141311;
-  --ink-2: #3a3833;
-  --mute: #6e6b64;
-  --line: #dedad1;
-  --line-soft: #ece9e2;
+  /* Direction B "Saturday Morning" (brand + marketing). Deliberately light-only: a bright cartoon world.
+     Names are kept from P2a so components re-skin through tokens. */
+  --paper: #dff3ff;        /* page: pale sky */
+  --paper-2: #ffffff;      /* cards, inputs */
+  --paper-3: #c8e9ff;      /* deeper sky wells */
+  --ink: #1b1b1b;
+  --ink-2: #2f2f2f;
+  --mute: #4a5560;
+  --line: #1b1b1b;         /* outlines are ink */
+  --line-soft: #9fcbe6;
 
-  --act-tint: #f6f9dc;  --act-ink: #1d2a05;  --act-accent: #5f7100;  --act-pop: #d7ea3a;
-  --ask-tint: #fdf1e1;  --ask-ink: #3b1d02;  --ask-accent: #9a4d00;  --ask-pop: #ff9a3c;
-  --esc-tint: #fdebe8;  --esc-ink: #3f0b06;  --esc-accent: #c2331f;  --esc-pop: #ff6b57;
-  --agent-tint: #e4f3ef; --agent-ink: #05241f; --agent-accent: #0b6e64; --agent-pop: #2bb3a3;
+  --act-tint: #d8f8e9;  --act-ink: #0f3d27;  --act-accent: #11744a;  --act-pop: #3ddc97;
+  --ask-tint: #fff1c2;  --ask-ink: #3d2a00;  --ask-accent: #8a5a00;  --ask-pop: #ffc928;
+  --esc-tint: #ffe1d9;  --esc-ink: #4a1004;  --esc-accent: #b02f14;  --esc-pop: #ff5a36;
+  --agent-tint: #d6efff; --agent-ink: #062a44; --agent-accent: #0b5f99; --agent-pop: #3db5ff;
 
-  --shadow-soft: 0 1px 2px rgb(20 19 17 / 0.04), 0 8px 24px -8px rgb(20 19 17 / 0.10);
-  --shadow-lift: 0 2px 4px rgb(20 19 17 / 0.05), 0 24px 48px -16px rgb(20 19 17 / 0.18);
-}
-
-.dark {
-  --paper: #121110;
-  --paper-2: #1a1917;
-  --paper-3: #24221f;
-  --ink: #f5f3ee;
-  --ink-2: #d6d2c8;
-  --mute: #9c978c;
-  --line: #34312c;
-  --line-soft: #2a2825;
-
-  --act-tint: #1a1f0b;  --act-ink: #eef7c4;  --act-accent: #c6dc3c;  --act-pop: #d7ea3a;
-  --ask-tint: #241708;  --ask-ink: #ffe6c7;  --ask-accent: #ffae5c;  --ask-pop: #ff9a3c;
-  --esc-tint: #26100c;  --esc-ink: #ffdcd5;  --esc-accent: #ff8a76;  --esc-pop: #ff6b57;
-  --agent-tint: #0a1f1c; --agent-ink: #d3f1eb; --agent-accent: #5fd3c2; --agent-pop: #2bb3a3;
-
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.6);
+  --shadow-soft: 4px 4px 0 #1b1b1b;
+  --shadow-lift: 6px 6px 0 #1b1b1b;
 }
 
 @theme inline {
@@ -57,18 +40,19 @@
   --color-esc-tint: var(--esc-tint);   --color-esc-ink: var(--esc-ink);   --color-esc-accent: var(--esc-accent);   --color-esc-pop: var(--esc-pop);
   --color-agent-tint: var(--agent-tint); --color-agent-ink: var(--agent-ink); --color-agent-accent: var(--agent-accent); --color-agent-pop: var(--agent-pop);
 
-  --font-display: var(--font-sans), system-ui, sans-serif;
+  --font-display: var(--font-toon), system-ui, sans-serif;
+  --font-body: var(--font-rubik), system-ui, sans-serif;
   --font-hand: var(--font-hand-family), 'Comic Sans MS', cursive;
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
-  --radius-panel: 2.5rem;
+  --radius-panel: 1.75rem;
 }
 
 /* Display type: tight tracking that loosens as size drops. */
-@utility display-xl { font-family: var(--font-display); font-weight: 560; font-size: clamp(2.75rem, 7vw, 5.5rem); line-height: 0.98; letter-spacing: -0.045em; }
-@utility display-lg { font-family: var(--font-display); font-weight: 540; font-size: clamp(2.25rem, 5vw, 4rem); line-height: 1.02; letter-spacing: -0.035em; }
-@utility display-md { font-family: var(--font-display); font-weight: 540; font-size: clamp(1.875rem, 3.6vw, 3rem); line-height: 1.04; letter-spacing: -0.03em; }
-@utility display-sm { font-family: var(--font-display); font-weight: 560; font-size: 1.375rem; line-height: 1.2; letter-spacing: -0.02em; }
+@utility display-xl { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.75rem, 7vw, 5.25rem); line-height: 0.98; letter-spacing: -0.005em; }
+@utility display-lg { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.25rem, 5vw, 3.75rem); line-height: 1; letter-spacing: -0.003em; }
+@utility display-md { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.875rem, 3.6vw, 2.75rem); line-height: 1.04; }
+@utility display-sm { font-family: var(--font-display); font-weight: 400; font-size: 1.45rem; line-height: 1.2; }
 
 /* Film grain for large tinted surfaces (pure CSS, no asset). */
 @utility grain {
@@ -105,3 +89,11 @@
 
 /* SVG parts animate around their own box. */
 .clay-part { transform-box: fill-box; transform-origin: center; }
+
+/* ── Saturday Morning helpers ── */
+@utility ink-box { border: 3px solid var(--ink); box-shadow: var(--shadow-soft); }
+@utility ink-box-lg { border: 3px solid var(--ink); box-shadow: var(--shadow-lift); }
+/* Big outlined cartoon headline: white fill, ink stroke, hard drop. Use once per page. */
+@utility toon-title { color: #ffffff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 5px 5px 0 var(--ink); }
+/* Sunburst behind heroes. */
+@utility sunburst { background: repeating-conic-gradient(from 0deg, #ffc928 0 9deg, transparent 9deg 18deg); }

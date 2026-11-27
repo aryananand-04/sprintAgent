@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { ButtonLink, Container, Panel, Tag, TONE, type Tone } from '@/components/marketing/primitives'
 import { ClayBell, ClayDial, ClayFunnel, ClayLedger, ClayQuestion, ClayStamp } from '@/components/marketing/clay'
-import { TriageDemo } from '@/components/marketing/TriageDemo'
+import { HeroDemo } from '@/components/marketing/HeroDemo'
 import { LoopTabs } from '@/components/marketing/LoopTabs'
 import { AutonomyLicense } from '@/components/marketing/AutonomyLicense'
 import { Reveal, RiseWords } from '@/components/marketing/Reveal'
@@ -69,7 +69,7 @@ export default function LandingPage() {
           <Scribble arrow="down-right" className="absolute -top-16 right-10 hidden items-end gap-1 xl:flex" arrowClassName="-mb-6 rotate-12">
             the VP one is based on a true story
           </Scribble>
-          <Reveal delay={0.25}><TriageDemo /></Reveal>
+          <Reveal delay={0.25}><HeroDemo /></Reveal>
         </div>
       </Container>
 
