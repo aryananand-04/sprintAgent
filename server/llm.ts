@@ -30,9 +30,9 @@ export interface ChatResponse {
   body: { text: string } | { error: string }
 }
 
-type Completer = (req: ChatRequest, apiKey: string) => Promise<string>
+export type Completer = (req: ChatRequest, apiKey: string) => Promise<string>
 
-const groqCompleter: Completer = async (req, apiKey) => {
+export const groqCompleter: Completer = async (req, apiKey) => {
   const client = new Groq({ apiKey })
   const res = await client.chat.completions.create({
     model: MODELS[req.tier],
