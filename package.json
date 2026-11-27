@@ -65,7 +65,7 @@
     "supabase": "^3.4.0",
     "tailwindcss": "^4.3.5",
     "tsx": "^4.23.15",
-    "typescript": "^5.2.2",
+    "typescript": "^7.0.2",
     "vitest": "^3.2.7"
   },
   "engines": {
