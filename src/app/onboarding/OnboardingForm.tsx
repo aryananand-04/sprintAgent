@@ -16,20 +16,20 @@ export function OnboardingForm() {
   return (
     <form action={action} className="space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Team or company name</span>
+        <span className="mb-1.5 block text-xs font-medium text-mute">Team or company name</span>
         <input name="name" required maxLength={60} placeholder="Acme Payments" className={inputClass} value={name}
           onChange={(e) => { setName(e.target.value); if (!slugTouched) setSlug(slugify(e.target.value)) }} />
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Workspace URL</span>
-        <div className="flex items-center rounded-lg border border-input bg-card focus-within:ring-2 focus-within:ring-ring/30">
-          <span className="pl-3 text-sm text-muted-foreground">sprintagent.app/</span>
+        <span className="mb-1.5 block text-xs font-medium text-mute">Workspace URL</span>
+        <div className="flex items-center rounded-xl bg-paper-2 ring-1 ring-inset ring-line focus-within:ring-2 focus-within:ring-agent-accent">
+          <span className="pl-3.5 text-[15px] text-mute">sprintagent.app/</span>
           <input name="slug" required pattern="[a-z0-9][a-z0-9-]{1,47}" value={slug}
             onChange={(e) => { setSlugTouched(true); setSlug(slugify(e.target.value)) }}
-            className="w-full bg-transparent py-2 pr-3 text-sm text-foreground focus:outline-none" aria-label="Workspace URL" />
+            className="w-full bg-transparent py-2.5 pr-3.5 text-[15px] text-ink focus:outline-hidden" aria-label="Workspace URL" />
         </div>
       </label>
-      {state.error && <p role="alert" className="text-xs text-destructive">{state.error}</p>}
+      {state.error && <p role="alert" className="text-xs text-esc-accent">{state.error}</p>}
       <button type="submit" className={primaryButtonClass} disabled={pending}>
         {pending ? 'Creating…' : 'Create workspace'}
       </button>

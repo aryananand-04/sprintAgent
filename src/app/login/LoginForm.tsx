@@ -50,7 +50,7 @@ export function LoginForm({ next, providers, passwordEnabled }: {
       <form action={sendLink} className="space-y-3">
         <input type="hidden" name="next" value={next} />
         <label className="block">
-          <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Work email</span>
+          <span className="mb-1.5 block text-xs font-medium text-mute">Work email</span>
           <input name="email" type="email" required autoComplete="email" placeholder="you@company.com"
             className={inputClass} disabled={sending || magic.status === 'sent'} />
         </label>
@@ -61,8 +61,8 @@ export function LoginForm({ next, providers, passwordEnabled }: {
       </form>
 
       {passwordEnabled && (
-        <details className="group rounded-lg border border-dashed border-border px-3 py-2">
-          <summary className="cursor-pointer select-none text-xs font-medium text-muted-foreground">
+        <details className="group rounded-xl border border-dashed border-line px-3 py-2">
+          <summary className="cursor-pointer select-none text-xs font-medium text-mute">
             Demo accounts (development only)
           </summary>
           <form action={signIn} className="mt-3 space-y-2">
@@ -72,7 +72,7 @@ export function LoginForm({ next, providers, passwordEnabled }: {
             <button type="submit" className={secondaryButtonClass} disabled={signingIn}>
               {signingIn ? 'Signing in…' : 'Sign in with password'}
             </button>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
+            <p className="text-[11px] leading-relaxed text-mute">
               admin@ · pm@ · dev@ · viewer@demo.sprintagent.dev — password123
             </p>
             <Status state={pw} />
@@ -85,10 +85,10 @@ export function LoginForm({ next, providers, passwordEnabled }: {
 
 function Divider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-      <span className="h-px flex-1 bg-border" />
+    <div className="flex items-center gap-3 text-xs text-mute">
+      <span className="h-px flex-1 bg-line" />
       {label}
-      <span className="h-px flex-1 bg-border" />
+      <span className="h-px flex-1 bg-line" />
     </div>
   )
 }
@@ -97,7 +97,7 @@ function Status({ state }: { state: AuthState }) {
   if (state.status === 'idle' || !state.message) return null
   return (
     <p role={state.status === 'error' ? 'alert' : 'status'}
-      className={`text-xs ${state.status === 'error' ? 'text-destructive' : 'text-muted-foreground'}`}>
+      className={`text-xs ${state.status === 'error' ? 'text-esc-accent' : 'text-mute'}`}>
       {state.message}
     </p>
   )

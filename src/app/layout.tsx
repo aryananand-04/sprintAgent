@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, JetBrains_Mono } from 'next/font/google'
+import { Outfit, JetBrains_Mono, Instrument_Sans } from 'next/font/google'
 import '../index.css'
 
 const sans = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' })
+const display = Instrument_Sans({ subsets: ['latin'], variable: '--font-display-family', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'Sprint Agent — AI-Native Sprint Operator',
@@ -15,7 +16,7 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${mono.variable} ${display.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   )

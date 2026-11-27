@@ -20,7 +20,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <AuthCard title="Sign in" subtitle="Your agent has been keeping an eye on the sprint.">
       {params.error && ERRORS[params.error] && (
-        <p role="alert" className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+        <p role="alert" className="mb-6 rounded-lg border border-esc-accent/30 bg-esc-tint px-3 py-2 text-xs text-esc-accent">
           {ERRORS[params.error]}
         </p>
       )}
