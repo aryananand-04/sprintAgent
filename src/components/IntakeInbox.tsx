@@ -4,7 +4,6 @@ import { Inbox, CheckCircle, Zap, AlertTriangle } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import { TaskCard } from './TaskCard'
 import { GitHubImport } from './GitHubImport'
-import { TourHint } from './TourHint'
 import { checkForDuplicate, type DuplicateResult } from '../logic/duplicateDetection'
 import type { UrgencyLevel } from '../types'
 
@@ -16,7 +15,7 @@ const URGENCY_OPTIONS: { value: UrgencyLevel; label: string; color: string }[] =
 ]
 
 export function IntakeInbox() {
-  const { tasks, addAdHocTask, assignTaskById } = useSprintStore()
+  const { tasks, addAdHocTask } = useSprintStore()
   const [input, setInput] = useState('')
   const [urgency, setUrgency] = useState<UrgencyLevel>('medium')
   const [submitting, setSubmitting] = useState(false)
@@ -29,10 +28,9 @@ export function IntakeInbox() {
   const currentUrgencyColor = URGENCY_OPTIONS.find(o => o.value === urgency)?.color ?? 'var(--muted-foreground)'
 
   const handleCheckDuplicate = async (text: string) => {
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY
-    if (!apiKey || !text.trim() || checkingDup) return
+    if (!text.trim() || checkingDup) return
     setCheckingDup(true)
-    const result = await checkForDuplicate(text, tasks, apiKey)
+    const result = await checkForDuplicate(text, tasks)
     setDuplicate(result)
     setCheckingDup(false)
   }

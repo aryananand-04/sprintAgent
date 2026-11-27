@@ -1,9 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Target, TrendingUp, AlertTriangle, CheckCircle, Users, Plus, MessageCircle, GripVertical, X, Send, GitBranch, ChevronDown, Sparkles, Star } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
-import { TaskCard } from './TaskCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -12,7 +11,6 @@ import { loadColor } from '../utils/loadColor'
 import { findBestAssignee } from '../logic/assign'
 import { LOAD_ELIGIBILITY_THRESHOLD } from '../logic/constants'
 import type { TaskStatus, Task } from '../types'
-import { TourHint } from './TourHint'
 
 /* ── Column definitions ── */
 const COLUMNS: { id: TaskStatus; label: string; accent: string; tint?: string; headerBg?: string }[] = [

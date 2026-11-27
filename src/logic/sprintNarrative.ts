@@ -1,5 +1,5 @@
-import Groq from 'groq-sdk'
-import type { Task, TeamMember, Sprint, EscalationItem } from '../types'
+import type { Task, Sprint, EscalationItem } from '../types'
+import { prompt as ask } from '../lib/llm'
 
 /**
  * Generates a single, sharp sentence summarizing sprint health.
@@ -9,9 +9,7 @@ import type { Task, TeamMember, Sprint, EscalationItem } from '../types'
 export async function generateSprintNarrative(
   sprint: Sprint,
   tasks: Task[],
-  team: TeamMember[],
   escalations: EscalationItem[],
-  apiKey: string,
 ): Promise<string> {
   const blocked  = tasks.filter(t => t.status === 'blocked')
   const backlog  = tasks.filter(t => t.status === 'backlog' || t.status === 'triaged')
@@ -39,14 +37,7 @@ Data:
 Write the sentence from the agent's perspective. Be concrete about what's at risk and what the critical path is. Don't start with "I". Don't use filler words. No period at the end.`
 
   try {
-    const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-    const res = await client.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
-      max_tokens: 60,
-    })
-    return res.choices[0].message.content?.trim() ?? ''
+    return await ask(prompt, { temperature: 0.3, maxTokens: 60 })
   } catch {
     // Deterministic fallback
     if (deficit > 10) {

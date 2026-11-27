@@ -1,5 +1,8 @@
-import Groq from 'groq-sdk'
+import { z } from 'zod'
 import type { Task } from '../types'
+import { prompt as ask } from '../lib/llm'
+
+const CriteriaSchema = z.array(z.string().min(1).max(500)).min(1).max(8)
 
 /**
  * When the agent issues an ASK decision (low clarity), propose concrete
@@ -9,17 +12,10 @@ import type { Task } from '../types'
 export async function generateAcceptanceCriteria(
   task: Task,
   blockingQuestion: string,
-  apiKey: string,
 ): Promise<string[]> {
-  if (!apiKey || apiKey === 'paste_your_key_here') return []
-
-  const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-
-  const res = await client.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [{
-      role: 'user',
-      content: `Task: "${task.title}"
+  let text: string
+  try {
+    text = await ask(`Task: "${task.title}"
 Description: ${task.description}
 Blocking question: ${blockingQuestion}
 
@@ -29,17 +25,16 @@ Format: "Given [context], when [action], then [outcome]" OR simple bullet statem
 
 Return ONLY a JSON array of strings. No markdown.
 ["criterion 1", "criterion 2", "criterion 3"]`,
-    }],
-    temperature: 0.3,
-    max_tokens: 300,
-  })
-
-  const text = res.choices[0].message.content?.trim() ?? ''
+      { temperature: 0.3, maxTokens: 300 },
+    )
+  } catch {
+    return []
+  }
   const match = text.match(/\[[\s\S]*\]/)
   if (!match) return []
 
   try {
-    return JSON.parse(match[0]) as string[]
+    return CriteriaSchema.parse(JSON.parse(match[0]))
   } catch {
     return []
   }

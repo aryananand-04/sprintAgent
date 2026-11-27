@@ -60,21 +60,15 @@ export function TriagePanel() {
   if (!task) return null
 
   const meta = DEC[dec]
-  const DecIcon = meta.icon
   const bestAssignee = dec !== 'ESCALATE' ? findBestAssignee(task, team, tasks) : null
   const close = () => { setTriagePanelOpen(false); selectTask(null); setCriteria([]) }
 
   const handleGenerateCriteria = async () => {
     if (loadingCriteria) return
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY
-    if (!apiKey || apiKey === 'paste_your_key_here') {
-      setCriteria(['⚠ No Groq API key configured — add VITE_GROQ_API_KEY to your .env.local to generate criteria.'])
-      return
-    }
     setLoadingCriteria(true)
     const blockingQ = reason.includes('Blocking question:') ? reason.split('Blocking question:')[1]?.split('.')[0] ?? reason : reason
-    const result = await generateAcceptanceCriteria(task, blockingQ, apiKey)
-    setCriteria(result.length > 0 ? result : ['Generation failed — check your API key and try again.'])
+    const result = await generateAcceptanceCriteria(task, blockingQ)
+    setCriteria(result.length > 0 ? result : ['AI unavailable — criteria could not be generated. Try again later.'])
     setLoadingCriteria(false)
   }
 

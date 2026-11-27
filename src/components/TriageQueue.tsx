@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Activity, Zap, HelpCircle, AlertTriangle, ChevronRight, CheckCircle } from 'lucide-react'
 import { GaugeCircle } from './ui/GaugeCircle'
 import { useSprintStore } from '../store/useSprintStore'

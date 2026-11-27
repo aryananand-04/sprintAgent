@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
   Task, TeamMember, Sprint, FeedEvent, EscalationItem,
-  TaskStatus, AgentDecision, UrgencyLevel,
+  TaskStatus, UrgencyLevel,
   AutonomyConfig, SprintArchive, BurndownSnapshot,
   CalibrationData, AgentActionSnapshot,
 } from '../types'
@@ -181,7 +181,7 @@ export const useSprintStore = create<SprintStore>()(
     } catch (err) {
       result = triageTask(task, autonomyConfig)
       const msg = err instanceof Error ? err.message : String(err)
-      if (msg !== 'NO_API_KEY') {
+      if (msg !== 'AI_DISABLED') {
         set({ triageError: 'AI unavailable — using offline analysis' })
       }
     }
@@ -216,12 +216,9 @@ export const useSprintStore = create<SprintStore>()(
     // Score goal alignment if not yet scored — runs in background, no blocking
     const freshTask = get().tasks.find(t => t.id === taskId)
     if (freshTask && freshTask.goalAlignment === undefined) {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (apiKey && apiKey !== 'paste_your_key_here') {
-        scoreGoalAlignment(freshTask, get().sprint.goal, apiKey).then(score => {
-          get().setGoalAlignment(taskId, score)
-        }).catch(() => {})
-      }
+      scoreGoalAlignment(freshTask, get().sprint.goal).then(score => {
+        get().setGoalAlignment(taskId, score)
+      }).catch(() => {})
     }
 
     // Track total triage decisions for calibration (correct completions tracked at done-time)
@@ -267,7 +264,6 @@ export const useSprintStore = create<SprintStore>()(
       rationale = result.rationale
     }
 
-    const previousAssigneeId = task.assigneeId
 
     // Snapshot for undo
     const snapshot: AgentActionSnapshot = {
@@ -435,8 +431,7 @@ export const useSprintStore = create<SprintStore>()(
   },
 
   addTaskToColumn: (title, status, assigneeId) => {
-    const { team, tasks, addFeedEvent } = get()
-    const member = assigneeId ? team.find(m => m.id === assigneeId) : undefined
+    const { addFeedEvent } = get()
 
     const newTask: Task = {
       id: `task-manual-${Date.now()}`,
@@ -727,7 +722,7 @@ export const useSprintStore = create<SprintStore>()(
   startNewSprint: ({ name, goal, startDate, endDate, committedPoints }) => {
     // Archive current sprint with full snapshot before clearing state
     get().archiveSprint()
-    const { sprint, tasks, addFeedEvent } = get()
+    const { sprint, tasks } = get()
     const newSprint: Sprint = {
       id: `sprint-${Date.now()}`,
       name, goal, startDate, endDate,
@@ -832,7 +827,7 @@ export const useSprintStore = create<SprintStore>()(
   },
 
   triggerScenario: (scenarioId) => {
-    const { addAdHocTask, triageTaskById, updateTaskStatus, addFeedEvent } = get()
+    const { addAdHocTask, addFeedEvent } = get()
 
     switch (scenarioId) {
       case 'urgent-bug': {

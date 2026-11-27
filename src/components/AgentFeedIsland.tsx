@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import { motion, AnimatePresence, type Transition } from 'framer-motion'
 import { X, Bot, Zap, AlertTriangle, Activity, TrendingUp, Plus, CheckCircle, ArrowRight } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
@@ -57,7 +57,6 @@ function formatTime(iso: string): string {
 /* ── Feed item row (expanded state) ── */
 function FeedRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
   const meta = EVENT_META[event.type]
-  const Icon = meta.icon
   const isEsc = event.type === 'escalate'
   const isResolve = event.type === 'resolve'
   const isAssign = event.type === 'assign'

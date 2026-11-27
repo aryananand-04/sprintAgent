@@ -93,7 +93,6 @@ export function PolicyPanel() {
   const actRules      = AUTONOMY_RULES.filter(r => r.category === 'ACT')
   const askRules      = AUTONOMY_RULES.filter(r => r.category === 'ASK')
   const escalateRules = AUTONOMY_RULES.filter(r => r.category === 'ESCALATE')
-  const total = actRules.length + askRules.length + escalateRules.length
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>

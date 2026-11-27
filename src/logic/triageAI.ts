@@ -1,15 +1,15 @@
-import Groq from 'groq-sdk'
+import { z } from 'zod'
 import type { Task, TriageResult, AutonomyConfig } from '../types'
+import { DEFAULT_AUTONOMY_CONFIG } from './constants'
+import { chat } from '../lib/llm'
 
-/* Puter.js — CDN fallback, no API key needed */
-declare const puter: {
-  ai: {
-    chat: (
-      messages: Array<{ role: string; content: string }>,
-      options?: { model?: string }
-    ) => Promise<{ message: { content: string } }>
-  }
-}
+const Dim = z.number().int().min(1).max(5)
+const TriageResultSchema = z.object({
+  decision: z.enum(['ACT', 'ASK', 'ESCALATE']),
+  score: z.number().int().min(0).max(100),
+  reason: z.string().min(1).max(1_000),
+  dimensions: z.object({ urgency: Dim, impact: Dim, effort: Dim, risk: Dim, clarity: Dim }),
+})
 
 function buildSystemPrompt(config: AutonomyConfig): string {
   return `You are a senior engineering PM agent operating an AI-native sprint management system.
@@ -42,8 +42,6 @@ Return ONLY valid JSON, no markdown:
 }`
 }
 
-const DEFAULT_CONFIG: AutonomyConfig = { actMinClarity: 3, askMaxClarity: 2, escalateIfCriticalUnassignedHours: 1, neverAutoAssignTypes: [], capacityBreachThreshold: 90, blockedHoursThreshold: 2, escNudgeHours: 4, velocityDeficitPts: 6 }
-
 function buildUserContent(task: Task): string {
   const urgencyMap = { critical: 5, high: 4, medium: 3, low: 1 }
   return `Triage this sprint task:
@@ -64,65 +62,22 @@ Story Points: ${task.storyPoints ?? 'unestimated'}
 Return only the JSON.`
 }
 
-function parseResult(text: string): TriageResult {
+/** Extracts and strictly validates the first JSON object in an LLM response. Throws on any mismatch. */
+export function parseResult(text: string): TriageResult {
   const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error(`No JSON in response: ${text.slice(0, 100)}`)
-  const parsed = JSON.parse(match[0]) as TriageResult
-  if (!['ACT', 'ASK', 'ESCALATE'].includes(parsed.decision)) {
-    throw new Error(`Invalid decision: ${parsed.decision}`)
-  }
-  return parsed
+  if (!match) throw new Error('NO_JSON')
+  return TriageResultSchema.parse(JSON.parse(match[0]))
 }
 
-/* ── Try 1: Groq (fast, free tier, reliable) ── */
-async function tryGroq(task: Task, config: AutonomyConfig): Promise<TriageResult> {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY
-  if (!apiKey || apiKey === 'paste_your_key_here') throw new Error('NO_GROQ_KEY')
-
-  const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-  const response = await client.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
+/** Server-proxied AI triage. Throws on any failure; the store falls back to the rule engine. */
+export async function triageWithAI(task: Task, config: AutonomyConfig = DEFAULT_AUTONOMY_CONFIG): Promise<TriageResult> {
+  const text = await chat({
     messages: [
       { role: 'system', content: buildSystemPrompt(config) },
       { role: 'user', content: buildUserContent(task) },
     ],
     temperature: 0.3,
-    max_tokens: 400,
+    maxTokens: 400,
   })
-
-  return parseResult(response.choices[0].message.content ?? '')
-}
-
-/* ── Try 2: Puter.js (CDN, no account needed) ── */
-async function tryPuter(task: Task, config: AutonomyConfig): Promise<TriageResult> {
-  if (typeof puter === 'undefined') throw new Error('NO_PUTER')
-
-  const response = await puter.ai.chat(
-    [
-      { role: 'system', content: buildSystemPrompt(config) },
-      { role: 'user', content: buildUserContent(task) },
-    ],
-    { model: 'gpt-4o-mini' }
-  )
-
-  return parseResult(response.message.content.trim())
-}
-
-/* ── Main export: tries Groq → Puter → throws ── */
-export async function triageWithAI(task: Task, config: AutonomyConfig = DEFAULT_CONFIG): Promise<TriageResult> {
-  // Try Groq first (more reliable when key is set)
-  try {
-    return await tryGroq(task, config)
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    if (msg !== 'NO_GROQ_KEY') {
-      console.warn('Groq triage failed, trying Puter.js:', msg)
-    }
-  }
-
-  try {
-    return await tryPuter(task, config)
-  } catch {
-    throw new Error('NO_API_KEY')  // store handles this as silent fallback
-  }
+  return parseResult(text)
 }

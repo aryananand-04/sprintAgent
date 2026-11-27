@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, CheckCircle, Plus, Wand2, RotateCcw } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import type { Task, UrgencyLevel, TaskType } from '../types'
-import Groq from 'groq-sdk'
+import { prompt as ask } from '../lib/llm'
 
 const PLANNER_PROMPT = (brief: string, team: string, sprint: string) => `
 You are a senior PM generating a sprint backlog. Think carefully before generating tasks.
@@ -83,24 +83,18 @@ export function SprintPlanner() {
     const sprintContext = `Goal: ${sprint.goal}. ${sprint.daysRemaining} days left. ${sprint.committedPoints - sprint.completedPoints} pts capacity remaining.`
 
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (!apiKey || apiKey === 'paste_your_key_here') throw new Error('NO_KEY')
-
-      const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-      const res = await client.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',   // better reasoning for planning tasks
-        messages: [{ role: 'user', content: PLANNER_PROMPT(brief, teamContext, sprintContext) }],
+      const text = await ask(PLANNER_PROMPT(brief, teamContext, sprintContext), {
+        tier: 'smart',   // better reasoning for planning tasks
         temperature: 0.4,
-        max_tokens: 2000,
+        maxTokens: 2000,
       })
-
-      const text = res.choices[0].message.content ?? ''
       const match = text.match(/\[[\s\S]*\]/)
       if (!match) throw new Error('No JSON array in response')
       const tasks: GeneratedTask[] = JSON.parse(match[0])
       setGenerated(tasks)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Generation failed. Check your Groq API key.')
+      const msg = e instanceof Error ? e.message : ''
+      setError(msg === 'AI_DISABLED' ? 'AI is not configured on the server — using offline mode.' : 'Generation failed. Please try again.')
     } finally {
       setGenerating(false)
     }

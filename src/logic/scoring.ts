@@ -1,4 +1,4 @@
-import type { Task, TriageResult } from '../types'
+import type { Task } from '../types'
 import { LOAD_MODERATE_THRESHOLD, LOAD_ELIGIBILITY_THRESHOLD } from './constants'
 
 export function computeTriageScore(task: Task): number {

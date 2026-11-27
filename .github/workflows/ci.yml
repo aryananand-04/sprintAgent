@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Assert no LLM SDK or secrets in client bundle
+        run: |
+          if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com" dist/; then
+            echo "::error::Server-only code leaked into the client bundle"; exit 1
+          fi

@@ -1,5 +1,13 @@
-import Groq from 'groq-sdk'
+import { z } from 'zod'
 import type { Task } from '../types'
+import { prompt as ask } from '../lib/llm'
+
+const DupSchema = z.object({
+  isDuplicate: z.boolean(),
+  taskId: z.string().nullable(),
+  similarity: z.number().min(0).max(100),
+  reason: z.string().max(500),
+})
 
 export interface DuplicateResult {
   isDuplicate: boolean
@@ -11,16 +19,15 @@ export interface DuplicateResult {
 
 /**
  * Checks if an incoming request is semantically similar to an existing task.
- * Uses Groq to compare meaning, not just keywords.
+ * Uses the LLM to compare meaning, not just keywords.
  */
 export async function checkForDuplicate(
   incomingText: string,
   existingTasks: Task[],
-  apiKey: string,
 ): Promise<DuplicateResult> {
   const none: DuplicateResult = { isDuplicate: false, similarTaskId: null, similarTaskTitle: null, similarity: 0, reason: '' }
 
-  if (!apiKey || apiKey === 'paste_your_key_here' || existingTasks.length === 0) return none
+  if (existingTasks.length === 0) return none
 
   const candidates = existingTasks
     .filter(t => t.status !== 'done')
@@ -28,14 +35,8 @@ export async function checkForDuplicate(
     .slice(0, 30)  // don't send too many tokens
     .join('\n')
 
-  const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-
   try {
-    const res = await client.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [{
-        role: 'user',
-        content: `New request: "${incomingText}"
+    const text = await ask(`New request: "${incomingText}"
 
 Existing tasks:
 ${candidates}
@@ -45,16 +46,12 @@ Ignore minor wording differences — focus on whether they describe the same wor
 
 Return ONLY valid JSON:
 {"isDuplicate": true/false, "taskId": "task-id or null", "similarity": 0-100, "reason": "1 sentence"}`,
-      }],
-      temperature: 0.1,
-      max_tokens: 100,
-    })
-
-    const text = res.choices[0].message.content?.trim() ?? ''
+      { temperature: 0.1, maxTokens: 100 },
+    )
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) return none
 
-    const parsed = JSON.parse(match[0]) as { isDuplicate: boolean; taskId: string | null; similarity: number; reason: string }
+    const parsed = DupSchema.parse(JSON.parse(match[0]))
     const similar = existingTasks.find(t => t.id === parsed.taskId)
 
     return {

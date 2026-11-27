@@ -1,18 +1,9 @@
 import type { Task, TriageResult, AgentDecision, AutonomyConfig } from '../types'
 import { computeTriageScore } from './scoring'
+import { DEFAULT_AUTONOMY_CONFIG } from './constants'
 
-const DEFAULT_CONFIG: AutonomyConfig = {
-  actMinClarity: 3,
-  askMaxClarity: 2,
-  escalateIfCriticalUnassignedHours: 1,
-  neverAutoAssignTypes: [],
-  capacityBreachThreshold: 90,
-  blockedHoursThreshold: 2,
-  escNudgeHours: 4,
-  velocityDeficitPts: 6,
-}
 
-function decideAutonomy(task: Task, config: AutonomyConfig = DEFAULT_CONFIG): AgentDecision {
+export function decideAutonomy(task: Task, config: AutonomyConfig = DEFAULT_AUTONOMY_CONFIG): AgentDecision {
   // ESCALATE conditions — agent must defer
   if (task.clarity <= 1) return 'ESCALATE'
   if (task.risk >= 5 && task.effort >= 4) return 'ESCALATE'

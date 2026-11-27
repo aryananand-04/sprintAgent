@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, AlertTriangle, Activity, TrendingUp, Plus, CheckCircle, Bot, ArrowRight } from 'lucide-react'
+import { Bot } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import type { FeedEvent } from '../types'
 

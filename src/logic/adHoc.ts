@@ -1,7 +1,6 @@
 import type { Task, Sprint, TeamMember, AdHocResolution, AutonomyConfig } from '../types'
-import { LOAD_ELIGIBILITY_THRESHOLD } from './constants'
+import { LOAD_ELIGIBILITY_THRESHOLD, DEFAULT_AUTONOMY_CONFIG } from './constants'
 
-const DEFAULT_CONFIG: AutonomyConfig = { actMinClarity: 3, askMaxClarity: 2, escalateIfCriticalUnassignedHours: 1, neverAutoAssignTypes: [], capacityBreachThreshold: 90, blockedHoursThreshold: 2, escNudgeHours: 4, velocityDeficitPts: 6 }
 
 interface AdHocDecision {
   resolution: AdHocResolution
@@ -16,9 +15,8 @@ export function resolveAdHoc(
   sprint: Sprint,
   team: TeamMember[],
   currentTasks: Task[],
-  config: AutonomyConfig = DEFAULT_CONFIG,
+  config: AutonomyConfig = DEFAULT_AUTONOMY_CONFIG,
 ): AdHocDecision {
-  const remainingCapacity = sprint.committedPoints - sprint.completedPoints
   const sprintBuffer = sprint.totalPoints - sprint.committedPoints
 
   // ESCALATE: Scope-breaking or clarity below PM-configured ACT threshold

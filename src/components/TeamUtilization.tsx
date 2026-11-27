@@ -55,7 +55,7 @@ export function TeamUtilization() {
           </div>
           {/* Scrollable rows — fits ~5 rows, scroll for the rest */}
           <div style={{ maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {rows.map(({ member, done, inProgress, blocked, ptsShipped, escCount, avgConf }) => {
+            {rows.map(({ member, done, inProgress, blocked, ptsShipped, avgConf }) => {
               const lc = loadColor(member.currentLoad)
               return (
                 <div key={member.id} style={{

@@ -63,7 +63,6 @@ type CurtainPhase = 'idle' | 'falling' | 'rising'
 const EASING = 'cubic-bezier(0.76, 0, 0.24, 1)'
 
 export function ThemeToggle({
-  variant     = 'icon',
   defaultTheme = 'light',
   buttonSize  = 30,
   duration    = 500,

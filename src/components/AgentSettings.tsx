@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { X, Settings, CheckCircle, Slack, RefreshCw } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import type { TaskType } from '../types'

@@ -31,25 +31,21 @@ export function useAgentBootstrap() {
 
     // ── 2. Sprint narrative — always runs regardless of backlog state ──────
     setTimeout(async () => {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (!apiKey || apiKey === 'paste_your_key_here') return
-      const { tasks: t, sprint: s, team: tm, escalations: es } = useSprintStore.getState()
-      const narrative = await generateSprintNarrative(s, t, tm, es, apiKey)
+      const { tasks: t, sprint: s, escalations: es } = useSprintStore.getState()
+      const narrative = await generateSprintNarrative(s, t, es)
       if (narrative) setSprintNarrative(narrative)
     }, 3_000)
 
     // ── 3. Goal alignment scoring — always runs ───────────────────────────
     setTimeout(async () => {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (!apiKey || apiKey === 'paste_your_key_here') return
       const { tasks: allTasks, sprint: sprintState } = useSprintStore.getState()
       const unscored = allTasks.filter(t => t.goalAlignment === undefined)
       for (const t of unscored) {
         try {
-          const score = await scoreGoalAlignment(t, sprintState.goal, apiKey)
+          const score = await scoreGoalAlignment(t, sprintState.goal)
           setGoalAlignment(t.id, score)
           await new Promise(r => setTimeout(r, 400))
-        } catch { /* skip */ }
+        } catch { break /* AI unavailable — stop the loop */ }
       }
     }, 8_000)
 

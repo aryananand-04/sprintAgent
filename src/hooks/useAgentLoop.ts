@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
-import Groq from 'groq-sdk'
+import { prompt as ask } from '../lib/llm'
 
 const LOOP_MS                  = 60_000
 const COOLDOWN_MS              = 20 * 60_000
@@ -29,16 +29,7 @@ function canFire(key: string): boolean {
 
 async function narrate(prompt: string, fallback: string): Promise<string> {
   try {
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY
-    if (!apiKey || apiKey === 'paste_your_key_here') return fallback
-    const client = new Groq({ apiKey, dangerouslyAllowBrowser: true })
-    const res = await client.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.4,
-      max_tokens: 80,
-    })
-    return res.choices[0].message.content?.trim() ?? fallback
+    return (await ask(prompt, { temperature: 0.4, maxTokens: 80 })) || fallback
   } catch {
     return fallback
   }

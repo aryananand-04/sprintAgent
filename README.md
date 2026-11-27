@@ -14,7 +14,16 @@ The core product thesis: **the agent owns the operational middle, not the strate
 
 ```bash
 npm install
+cp .env.example .env.local   # optional: add GROQ_API_KEY to enable AI
 npm run dev
+```
+
+AI calls go through a server-side route (`/api/chat`); the key never reaches the browser. Without a key, the deterministic rule engine handles everything.
+
+**Quality checks:**
+```bash
+npm run typecheck
+npm test
 ```
 
 Open [http://localhost:5173](http://localhost:5173)
