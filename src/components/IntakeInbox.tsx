@@ -94,7 +94,7 @@ export function IntakeInbox() {
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 7, marginTop: 6, padding: '8px 11px', borderRadius: 5, background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.24)' }}>
               <AlertTriangle size={11} style={{ color: 'var(--warn)', flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
               <span style={{ fontSize: 11, color: 'var(--foreground)', lineHeight: 1.5 }}>
-                <strong style={{ color: 'var(--warn)' }}>Possible duplicate ({duplicate.similarity}%):</strong> "{duplicate.similarTaskTitle}" is already in the backlog. {duplicate.reason}
+                <strong style={{ color: 'var(--warn)' }}>Possible duplicate ({duplicate.similarity}%):</strong> &quot;{duplicate.similarTaskTitle}&quot; is already in the backlog. {duplicate.reason}
               </span>
             </div>
           )}
@@ -126,7 +126,7 @@ export function IntakeInbox() {
               >
                 <CheckCircle size={11} style={{ color: 'var(--ok)', flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                 <div style={{ fontSize: 11, color: 'var(--muted-foreground)', lineHeight: 1.5 }}>
-                  <span style={{ color: 'var(--act-t)', fontWeight: 600 }}>Agent received:</span> "{lastAdded}" — watch the feed for triage decision and assignment.
+                  <span style={{ color: 'var(--act-t)', fontWeight: 600 }}>Agent received:</span> &quot;{lastAdded}&quot; — watch the feed for triage decision and assignment.
                 </div>
               </motion.div>
             )}

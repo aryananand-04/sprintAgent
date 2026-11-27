@@ -34,7 +34,7 @@ export function NumberTicker({
       return controls.stop
     }, delay * 1000)
     return () => clearTimeout(timer)
-  }, [value, duration, delay])
+  }, [value, duration, delay, motionVal])
 
   useEffect(() => {
     return rounded.on('change', (v) => {

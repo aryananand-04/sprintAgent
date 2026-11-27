@@ -231,7 +231,7 @@ export function SprintPlanner() {
                       style={{
                         padding: '10px 12px', borderRadius: 6,
                         background: 'var(--card)', border: '1px solid var(--border)',
-                        boxShadow: '0 1px 3px rgba(9,9,11,0.06)',
+                        boxShadow: '0 1px 3px rgba(20, 19, 17,0.06)',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>

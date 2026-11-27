@@ -30,13 +30,13 @@ function LogRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
   const isRisk       = event.type === 'risk'
 
   const leftBorder =
-    isEscalation ? '2px solid rgba(174,42,25,0.55)' :
-    isResolved   ? '2px solid rgba(33,110,78,0.50)' :
-    isAssign     ? '2px solid rgba(12,102,228,0.40)' :
-    isRisk       ? '2px solid rgba(151,68,0,0.45)' :
+    isEscalation ? '2px solid color-mix(in srgb, var(--crit) 55%, transparent)' :
+    isResolved   ? '2px solid color-mix(in srgb, var(--ok) 50%, transparent)' :
+    isAssign     ? '2px solid color-mix(in srgb, var(--act) 40%, transparent)' :
+    isRisk       ? '2px solid color-mix(in srgb, var(--warn) 45%, transparent)' :
                    '2px solid transparent'
 
-  const rowBg = isEscalation ? 'rgba(174,42,25,0.04)' : isLatest ? 'rgba(12,102,228,0.03)' : 'transparent'
+  const rowBg = isEscalation ? 'color-mix(in srgb, var(--crit) 4%, transparent)' : isLatest ? 'color-mix(in srgb, var(--act) 3%, transparent)' : 'transparent'
 
   return (
     <motion.div
@@ -103,7 +103,7 @@ export function StatusFeed() {
             {escCount > 0 && (
               <span style={{
                 fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
-                background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
+                background: 'color-mix(in srgb, var(--crit) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 28%, transparent)',
                 color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.06em',
               }}>{escCount} ESC</span>
             )}

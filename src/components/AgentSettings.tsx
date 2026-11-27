@@ -59,7 +59,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(9,9,11,0.40)', zIndex: 9998, backdropFilter: 'blur(3px)' }}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(20, 19, 17,0.40)', zIndex: 9998, backdropFilter: 'blur(3px)' }}
       />
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -76,7 +76,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
           width: '100%', maxWidth: 440,
           maxHeight: 'calc(100vh - 80px)',
           background: 'var(--card)', border: '1px solid var(--border)',
-          borderRadius: 10, boxShadow: '0 8px 24px rgba(9,9,11,0.18)',
+          borderRadius: 10, boxShadow: '0 8px 24px rgba(20, 19, 17,0.18)',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
           pointerEvents: 'auto',
@@ -204,7 +204,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                 </div>
                 <input type="range" min={1} max={4} value={autonomyConfig.askMaxClarity}
                   onChange={e => setAutonomyConfig({ askMaxClarity: Number(e.target.value) })}
-                  style={{ width: '100%', accentColor: '#d97706' }}
+                  style={{ width: '100%', accentColor: 'var(--ask-t)' }}
                 />
                 <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3 }}>
                   Tasks at or below this clarity get ASK decision — agent pauses and asks you
@@ -220,7 +220,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                 </div>
                 <input type="range" min={1} max={8} value={autonomyConfig.escalateIfCriticalUnassignedHours}
                   onChange={e => setAutonomyConfig({ escalateIfCriticalUnassignedHours: Number(e.target.value) })}
-                  style={{ width: '100%', accentColor: '#dc2626' }}
+                  style={{ width: '100%', accentColor: 'var(--esc)' }}
                 />
                 <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3 }}>
                   If a CRITICAL task is unassigned this long, agent auto-escalates
@@ -242,10 +242,10 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
                 <div key={key}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                     <span style={{ fontSize: 11, color: 'var(--foreground)', fontWeight: 500 }}>{label}</span>
-                    <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color }}>{(autonomyConfig as any)[key]}{suffix}</span>
+                    <span style={{ fontSize: 11, fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color }}>{autonomyConfig[key]}{suffix}</span>
                   </div>
-                  <input type="range" min={min} max={max} value={(autonomyConfig as any)[key]}
-                    onChange={e => setAutonomyConfig({ [key]: Number(e.target.value) } as any)}
+                  <input type="range" min={min} max={max} value={autonomyConfig[key]}
+                    onChange={e => setAutonomyConfig({ [key]: Number(e.target.value) })}
                     style={{ width: '100%', accentColor: color }} />
                   <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3 }}>{description}</p>
                 </div>

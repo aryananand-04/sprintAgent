@@ -57,7 +57,7 @@
   --color-esc-tint: var(--esc-tint);   --color-esc-ink: var(--esc-ink);   --color-esc-accent: var(--esc-accent);   --color-esc-pop: var(--esc-pop);
   --color-agent-tint: var(--agent-tint); --color-agent-ink: var(--agent-ink); --color-agent-accent: var(--agent-accent); --color-agent-pop: var(--agent-pop);
 
-  --font-display: var(--font-display-family), var(--font-sans), system-ui, sans-serif;
+  --font-display: var(--font-sans), system-ui, sans-serif;
   --font-hand: var(--font-hand-family), 'Comic Sans MS', cursive;
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);

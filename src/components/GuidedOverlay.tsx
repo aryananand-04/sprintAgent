@@ -8,7 +8,8 @@ import {
   TrendingUp, CheckCircle, Wand2,
 } from 'lucide-react'
 import { SlackIcon } from './ui/brand-icons'
-import { useSprintStore } from '../store/useSprintStore'
+import { withAlpha } from '../lib/utils'
+import { useSprintStore, type View } from '../store/useSprintStore'
 import { useTour } from '../hooks/useTour'
 
 const SESSION_KEY = 'libra-guide-v2'
@@ -51,7 +52,7 @@ const SLIDES = [
     ],
     stat: { value: '3', label: 'possible verdicts, always explicit' },
     cta: { label: 'See decisions → Triage Queue', view: 'triage' },
-    accentColor: '#8B4300',
+    accentColor: 'var(--ask-t)',
   },
   {
     id: 'loop',
@@ -135,15 +136,18 @@ const slideVariants = {
 export function GuidedOverlay() {
   const { setView } = useSprintStore()
   const { start: startTour } = useTour()
-  const [visible, setVisible]   = useState(false)
+  // Client-only component: decide visibility from storage on first render (no effect-driven flash).
+  const [visible, setVisible]   = useState(() => {
+    try {
+      const forced = new URLSearchParams(window.location.search).get('guide') === 'true'
+      return forced || !localStorage.getItem(SESSION_KEY)
+    } catch { return false }
+  })
   const [page, setPage]         = useState(0)
   const [direction, setDirection] = useState(1)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const forced = params.get('guide') === 'true'
-    const seen   = localStorage.getItem(SESSION_KEY)
-
+    const forced = new URLSearchParams(window.location.search).get('guide') === 'true'
     if (forced) {
       // ?guide=true resets and shows — but strip the param from URL immediately
       // so a plain refresh doesn't re-trigger it
@@ -151,14 +155,12 @@ export function GuidedOverlay() {
       const clean = window.location.pathname + window.location.hash
       window.history.replaceState(null, '', clean)
     }
-
-    if (!seen || forced) setVisible(true)
   }, [])
 
   const dismiss = useCallback((goTo?: string) => {
     localStorage.setItem(SESSION_KEY, '1')
     setVisible(false)
-    if (goTo) setTimeout(() => setView(goTo as any), 300)
+    if (goTo) setTimeout(() => setView(goTo as View), 300)
   }, [setView])
 
   const goNext = useCallback(() => {
@@ -325,7 +327,7 @@ export function GuidedOverlay() {
 
                   {/* Stat callout */}
                   {slide.stat && (
-                    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '8px 12px', borderRadius: 7, background: `${slide.accentColor}12`, border: `1px solid ${slide.accentColor}30` }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '8px 12px', borderRadius: 7, background: `${withAlpha(slide.accentColor, 0.07)}`, border: `1px solid ${withAlpha(slide.accentColor, 0.19)}` }}>
                       <span style={{ fontSize: 22, fontWeight: 900, color: slide.accentColor, fontFamily: 'var(--font-mono), monospace', lineHeight: 1, letterSpacing: '-0.03em' }}>
                         {slide.stat.value}
                       </span>
@@ -370,7 +372,7 @@ export function GuidedOverlay() {
                     <button
                       onClick={() => {
                         dismiss()
-                        setTimeout(() => startTour((v) => setView(v as any)), 200)
+                        setTimeout(() => startTour((v) => setView(v as View)), 200)
                       }}
                       className="btn btn-secondary"
                       style={{ gap: 5 }}

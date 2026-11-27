@@ -21,7 +21,7 @@ function SprintRing({ pct }: { pct: number }) {
 
   return (
     <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(9,9,11,0.12)" strokeWidth={sw} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(20, 19, 17,0.12)" strokeWidth={sw} />
       <motion.circle
         cx={size / 2} cy={size / 2} r={r}
         fill="none" stroke="var(--act)" strokeWidth={sw}
@@ -63,10 +63,10 @@ function FeedRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
   const isRisk = event.type === 'risk'
 
   const leftBorder =
-    isEsc     ? '2px solid rgba(174,42,25,0.55)' :
-    isResolve ? '2px solid rgba(33,110,78,0.50)'  :
-    isAssign  ? '2px solid rgba(12,102,228,0.40)'  :
-    isRisk    ? '2px solid rgba(151,68,0,0.45)'    :
+    isEsc     ? '2px solid color-mix(in srgb, var(--crit) 55%, transparent)' :
+    isResolve ? '2px solid color-mix(in srgb, var(--ok) 50%, transparent)'  :
+    isAssign  ? '2px solid color-mix(in srgb, var(--act) 40%, transparent)'  :
+    isRisk    ? '2px solid color-mix(in srgb, var(--warn) 45%, transparent)'    :
                 '2px solid transparent'
 
   return (
@@ -79,8 +79,8 @@ function FeedRow({ event, isLatest }: { event: FeedEvent; isLatest: boolean }) {
       style={{
         display: 'flex', alignItems: 'baseline', gap: 8,
         padding: '6px 12px 6px 10px',
-        borderBottom: '1px solid rgba(9,9,11,0.05)',
-        background: isEsc ? 'rgba(174,42,25,0.04)' : isLatest ? 'rgba(12,102,228,0.03)' : 'transparent',
+        borderBottom: '1px solid rgba(20, 19, 17,0.05)',
+        background: isEsc ? 'color-mix(in srgb, var(--crit) 4%, transparent)' : isLatest ? 'color-mix(in srgb, var(--act) 3%, transparent)' : 'transparent',
         borderLeft: leftBorder,
       }}
     >
@@ -148,7 +148,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
             transition={islandTransition}
             style={{
               position: 'fixed', inset: 0, zIndex: 9998,
-              background: 'rgba(9,9,11,0.22)',
+              background: 'rgba(20, 19, 17,0.22)',
               backdropFilter: 'blur(4px)',
             }}
             onClick={() => { setIsExpanded(false); setFeedFilter('all') }}
@@ -179,7 +179,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
             cursor: isExpanded ? 'default' : 'pointer',
             background: 'var(--card)',
             border: '1px solid var(--b2)',
-            boxShadow: '0 8px 32px rgba(9,9,11,0.18), 0 2px 8px rgba(9,9,11,0.10)',
+            boxShadow: '0 8px 32px rgba(20, 19, 17,0.18), 0 2px 8px rgba(20, 19, 17,0.10)',
           }}
         >
 
@@ -233,7 +233,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 transition={{ type: 'spring', stiffness: 300, damping: 18 }}
                 style={{
                   fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
-                  background: 'rgba(174,42,25,0.12)', border: '1px solid rgba(174,42,25,0.28)',
+                  background: 'color-mix(in srgb, var(--crit) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 28%, transparent)',
                   color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace',
                   letterSpacing: '0.06em', flexShrink: 0,
                 }}
@@ -274,7 +274,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 {escCount > 0 && (
                   <span style={{
                     fontSize: 8, fontWeight: 900, padding: '2px 5px', borderRadius: 3,
-                    background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
+                    background: 'color-mix(in srgb, var(--crit) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 28%, transparent)',
                     color: 'var(--esc-t)', fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.06em',
                   }}>
                     {escCount} ESC
@@ -298,6 +298,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
                 )}
                 <button
                   onClick={e => { e.stopPropagation(); setIsExpanded(false); setFeedFilter('all') }}
+                  aria-label="Collapse agent feed"
                   style={{
                     color: 'var(--t3)', background: 'transparent', border: 'none',
                     cursor: 'pointer', display: 'flex', padding: 3, borderRadius: 4,
@@ -357,7 +358,7 @@ export function AgentFeedIsland({ hideIsland = false }: { hideIsland?: boolean }
             </div>
 
             {/* Feed log — keyed by filter so list remounts cleanly on filter change */}
-            <div ref={feedListRef} key={feedFilter} style={{ flex: 1, overflowY: 'auto', marginTop: 6 }}>
+            <div ref={feedListRef} key={feedFilter} role="region" aria-label="Agent feed" tabIndex={0} style={{ flex: 1, overflowY: 'auto', marginTop: 6 }}>
               {feed.length === 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', gap: 8 }}>
                   <Bot size={20} style={{ color: 'var(--t3)' }} strokeWidth={1.5} />

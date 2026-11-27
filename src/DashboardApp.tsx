@@ -47,10 +47,10 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
   const isGreen  = sprint.health === 'green'
   const isYellow = sprint.health === 'yellow'
   const hc = isGreen
-    ? { color: 'var(--ok)',   bg: 'rgba(33,110,78,0.08)',  bd: 'rgba(33,110,78,0.22)',  label: 'On Track' }
+    ? { color: 'var(--ok)',   bg: 'color-mix(in srgb, var(--ok) 8%, transparent)',  bd: 'color-mix(in srgb, var(--ok) 22%, transparent)',  label: 'On Track' }
     : isYellow
-    ? { color: 'var(--warn)', bg: 'rgba(151,68,0,0.09)',   bd: 'rgba(151,68,0,0.24)',   label: 'At Risk' }
-    : { color: 'var(--crit)', bg: 'rgba(174,42,25,0.09)',  bd: 'rgba(174,42,25,0.24)',  label: 'In Jeopardy' }
+    ? { color: 'var(--warn)', bg: 'color-mix(in srgb, var(--warn) 9%, transparent)',   bd: 'color-mix(in srgb, var(--warn) 24%, transparent)',   label: 'At Risk' }
+    : { color: 'var(--crit)', bg: 'color-mix(in srgb, var(--crit) 9%, transparent)',  bd: 'color-mix(in srgb, var(--crit) 24%, transparent)',  label: 'In Jeopardy' }
 
   return (
     <header style={{
@@ -58,7 +58,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
       padding: '0 14px', gap: 12, flexShrink: 0,
       background: 'var(--card)',
       borderBottom: '1px solid var(--b1)',
-      boxShadow: '0 1px 3px rgba(9,9,11,0.07)',
+      boxShadow: '0 1px 3px rgba(20, 19, 17,0.07)',
       /* Align with dark sidebar: extra separation at the layout boundary */
     }}>
       {/* Hamburger — visible on compact only */}
@@ -151,7 +151,7 @@ function Header({ settingsOpen, setSettingsOpen, onSidebarToggle }: { settingsOp
               style={{
                 display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px',
                 borderRadius: 'var(--r-ui)',
-                background: 'rgba(174,42,25,0.09)', border: '1px solid rgba(174,42,25,0.26)',
+                background: 'color-mix(in srgb, var(--crit) 9%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 26%, transparent)',
                 fontSize: 11, color: 'var(--esc-t)', fontWeight: 700, cursor: 'default',
                 fontFamily: 'var(--font-mono), monospace',
               }}

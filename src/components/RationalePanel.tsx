@@ -8,31 +8,31 @@ const E = (text: string) => <strong style={{ color: 'var(--crit)', fontWeight: 7
 
 const WRITEUP_PARAGRAPHS: { heading?: string; jsx: React.ReactNode }[] = [
   {
-    jsx: <>Sprint management fails at the same point every time: a PM who becomes the bottleneck for work that doesn't need human judgment. A task with clear requirements, manageable risk, and a skill-matched engineer at {N('40% load')} doesn't need a PM to assign it. The agent should.</>,
+    jsx: <>Sprint management fails at the same point every time: a PM who becomes the bottleneck for work that doesn&apos;t need human judgment. A task with clear requirements, manageable risk, and a skill-matched engineer at {N('40% load')} doesn&apos;t need a PM to assign it. The agent should.</>,
   },
   {
     heading: 'ACT / ASK / ESCALATE — computed on every task',
     jsx: <>{H('ACT')} fires when clarity meets the configured threshold (default {N('3/5')}), risk is below the ceiling, no unresolvable external dependencies exist, and a skill-matched engineer has load below {N('80%')}. The agent assigns, logs its reasoning in first-person to the live feed, and moves on. No confirmation, no notification unless someone checks.</>,
   },
   {
-    jsx: <>{H('ASK')} fires when the agent has enough context to know exactly what it's missing. It generates {H('one specific blocking question')} the PM can answer in a single sentence — not a vague clarification request. <em style={{ color: 'var(--t2)' }}>"The PRD says no discount stacking. The VP Growth Slack thread implies unlimited stacking. Which is authoritative?"</em> Once answered, the agent re-triages and resumes. This tier exists because some tasks look clean on every measurable dimension but carry one ambiguity that makes autonomous action genuinely risky.</>,
+    jsx: <>{H('ASK')} fires when the agent has enough context to know exactly what it&apos;s missing. It generates {H('one specific blocking question')} the PM can answer in a single sentence — not a vague clarification request. <em style={{ color: 'var(--t2)' }}>&quot;The PRD says no discount stacking. The VP Growth Slack thread implies unlimited stacking. Which is authoritative?&quot;</em> Once answered, the agent re-triages and resumes. This tier exists because some tasks look clean on every measurable dimension but carry one ambiguity that makes autonomous action genuinely risky.</>,
   },
   {
-    jsx: <>{H('ESCALATE')} fires on hard authority boundaries: clarity of {E('1/5')}, risk {E('≥ 5')} combined with effort {E('≥ 4')}, unresolvable external dependencies, or scope-breaking requests. The agent posts a specific reason, a recommended action, and stops. It doesn't attempt a partial solution. Human judgment required means exactly that.</>,
+    jsx: <>{H('ESCALATE')} fires on hard authority boundaries: clarity of {E('1/5')}, risk {E('≥ 5')} combined with effort {E('≥ 4')}, unresolvable external dependencies, or scope-breaking requests. The agent posts a specific reason, a recommended action, and stops. It doesn&apos;t attempt a partial solution. Human judgment required means exactly that.</>,
   },
   {
-    jsx: <>Thresholds aren't fixed. The agent tracks its own ACT accuracy — correct completions versus total ACT decisions made. Below {N('60% accuracy')} over {N('5')} decisions, it raises its clarity floor autonomously and posts to the feed explaining why. Above {N('90%')} over {N('10')} decisions, it lowers the floor and becomes more autonomous. The PM can override at any point.</>,
+    jsx: <>Thresholds aren&apos;t fixed. The agent tracks its own ACT accuracy — correct completions versus total ACT decisions made. Below {N('60% accuracy')} over {N('5')} decisions, it raises its clarity floor autonomously and posts to the feed explaining why. Above {N('90%')} over {N('10')} decisions, it lowers the floor and becomes more autonomous. The PM can override at any point.</>,
   },
   {
     heading: 'Ad-hoc mid-sprint requests',
-    jsx: <>Ad-hoc requests follow the same triage with one prior check: sprint buffer. If uncommitted capacity exists and the task is under {N('50%')} of that buffer, it {H('absorbs')}. If there's no room, it finds the lowest-scored backlog item, executes a {H('swap')}, and notifies the PM. If the request is scope-breaking, it {H('escalates')} immediately. The agent always returns a resolution path — it never silently refuses.</>,
+    jsx: <>Ad-hoc requests follow the same triage with one prior check: sprint buffer. If uncommitted capacity exists and the task is under {N('50%')} of that buffer, it {H('absorbs')}. If there&apos;s no room, it finds the lowest-scored backlog item, executes a {H('swap')}, and notifies the PM. If the request is scope-breaking, it {H('escalates')} immediately. The agent always returns a resolution path — it never silently refuses.</>,
   },
   {
     heading: 'Communication',
     jsx: <>The feed logs every decision with full reasoning — {H('pull, not push')}. Escalations break this rule intentionally: they fire to Slack immediately because they represent a blocked decision that needs a human to unblock the sprint. {H('Three AI-generated briefings')} (Team, PM, Manager) surface the same live sprint data framed differently for each audience.</>,
   },
   {
-    jsx: <>The hardest trade-off was autonomy versus reliability. A higher ACT threshold means more PM involvement but fewer errors. A lower threshold means more throughput but more corrections. The right answer depends on team maturity and sprint risk tolerance — so it's {H('configurable and self-tuning')} rather than a product default.</>,
+    jsx: <>The hardest trade-off was autonomy versus reliability. A higher ACT threshold means more PM involvement but fewer errors. A lower threshold means more throughput but more corrections. The right answer depends on team maturity and sprint risk tolerance — so it&apos;s {H('configurable and self-tuning')} rather than a product default.</>,
   },
 ]
 
@@ -61,14 +61,14 @@ const SECTIONS = [
           <strong style={{ color: 'var(--t1)', fontWeight: 600 }}>flexibility</strong> (endless configuration). Neither solves the actual bottleneck in sprint execution: the daily judgment tax.
         </p>
         <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.7 }}>
-          Sprint execution is 20% strategy and <strong style={{ color: 'var(--t1)', fontWeight: 600 }}>80% operational grind</strong>: who owns what, is this blocked, what does this vague request mean, who's overloaded. That 80% is boring, repetitive, and systematizable. But it currently falls on PMs and tech leads who have better things to do.
+          Sprint execution is 20% strategy and <strong style={{ color: 'var(--t1)', fontWeight: 600 }}>80% operational grind</strong>: who owns what, is this blocked, what does this vague request mean, who&apos;s overloaded. That 80% is boring, repetitive, and systematizable. But it currently falls on PMs and tech leads who have better things to do.
         </p>
         <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.7 }}>
           Sprint Agent flips the default: <strong style={{ color: 'var(--act-t)', fontWeight: 600 }}>the agent owns the operational middle</strong>, and escalates only when ambiguity or risk makes human judgment genuinely cheaper than autonomous action.
         </p>
         <div style={{ padding: '11px 14px', borderRadius: 5, background: 'var(--act-bg)', border: '1px solid var(--act-bd)', borderLeft: '3px solid var(--act)', marginTop: 4 }}>
           <p style={{ fontSize: 11, color: 'var(--t2)', lineHeight: 1.65, fontStyle: 'italic' }}>
-            "This is not AI-assisted PM. It's a different mental model: the agent is a coworker with a defined charter, not a feature bolted onto a task manager."
+            &quot;This is not AI-assisted PM. It&apos;s a different mental model: the agent is a coworker with a defined charter, not a feature bolted onto a task manager.&quot;
           </p>
         </div>
       </div>
@@ -114,7 +114,7 @@ const SECTIONS = [
           </div>
         ))}
         <p style={{ fontSize: 11, color: 'var(--t3)', fontStyle: 'italic' }}>
-          The key insight: an agent that escalates too often is useless. An agent that never escalates is dangerous. The right boundary: "would a reasonable senior engineer proceed confidently, or ask someone first?"
+          The key insight: an agent that escalates too often is useless. An agent that never escalates is dangerous. The right boundary: &quot;would a reasonable senior engineer proceed confidently, or ask someone first?&quot;
         </p>
       </div>
     ),
@@ -144,7 +144,7 @@ const SECTIONS = [
     id: 'ai-native', icon: Cpu, iconColor: 'var(--act)', title: 'Why This is AI-Native',
     content: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <p style={{ fontSize: 11, color: 'var(--t3)' }}>Not "existing PM tooling + a chatbot." AI-native in three specific ways:</p>
+        <p style={{ fontSize: 11, color: 'var(--t3)' }}>Not &quot;existing PM tooling + a chatbot.&quot; AI-native in three specific ways:</p>
         {[
           { n: '1', title: 'The agent is the primary actor', body: 'Humans set goals and resolve escalations. The agent handles everything in between. The default is autonomous action, not human action with AI assistance.' },
           { n: '2', title: 'Reasoning is the product', body: 'Every decision comes with an explanation. The triage panel shows scoring dimensions, ACT/ASK/ESCALATE rationale, assignment confidence, and dependency risks. This is how trust is established and how humans learn when to override.' },
@@ -168,9 +168,9 @@ const SECTIONS = [
     content: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {[
-          { tier: 'Tier 1 — Immediate', color: 'var(--ok)', bg: 'rgba(33,110,78,0.05)', bd: 'rgba(33,110,78,0.18)', items: ['Slack webhook intake — real messages become tasks automatically', 'Linear/Jira API — bidirectional sync for existing workflows', 'Claude API triage engine replaces rule-based scoring (with deterministic fallback)'] },
-          { tier: 'Tier 2 — Sprint 2', color: 'var(--act)', bg: 'rgba(12,102,228,0.05)', bd: 'rgba(12,102,228,0.18)', items: ['Calendar integration — assignment engine uses actual availability', 'GitHub integration — PR status feeds into task status', 'Slack notifications — briefings push to channels by role'] },
-          { tier: 'Tier 3 — Platform', color: 'var(--warn)', bg: 'rgba(151,68,0,0.05)', bd: 'rgba(151,68,0,0.18)', items: ['Multi-sprint learning — agent tunes confidence thresholds from history', 'Custom autonomy rules — PM adjusts ACT/ASK/ESCALATE thresholds per team', 'Retrospective engine — generates retro input from decision timeline'] },
+          { tier: 'Tier 1 — Immediate', color: 'var(--ok)', bg: 'color-mix(in srgb, var(--ok) 5%, transparent)', bd: 'color-mix(in srgb, var(--ok) 18%, transparent)', items: ['Slack webhook intake — real messages become tasks automatically', 'Linear/Jira API — bidirectional sync for existing workflows', 'Claude API triage engine replaces rule-based scoring (with deterministic fallback)'] },
+          { tier: 'Tier 2 — Sprint 2', color: 'var(--act)', bg: 'color-mix(in srgb, var(--act) 5%, transparent)', bd: 'color-mix(in srgb, var(--act) 18%, transparent)', items: ['Calendar integration — assignment engine uses actual availability', 'GitHub integration — PR status feeds into task status', 'Slack notifications — briefings push to channels by role'] },
+          { tier: 'Tier 3 — Platform', color: 'var(--warn)', bg: 'color-mix(in srgb, var(--warn) 5%, transparent)', bd: 'color-mix(in srgb, var(--warn) 18%, transparent)', items: ['Multi-sprint learning — agent tunes confidence thresholds from history', 'Custom autonomy rules — PM adjusts ACT/ASK/ESCALATE thresholds per team', 'Retrospective engine — generates retro input from decision timeline'] },
         ].map(({ tier, color, bg, bd, items }) => (
           <div key={tier} style={{ borderRadius: 5, border: `1px solid ${bd}`, background: bg, padding: '11px 13px', borderLeft: `3px solid ${color}` }}>
             <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color, marginBottom: 7 }}>{tier}</div>
@@ -197,7 +197,7 @@ export function RationalePanel() {
           <BookOpen size={13} style={{ color: 'var(--act)' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.015em' }}>Product Rationale</span>
         </div>
-        <p style={{ fontSize: 11, color: 'var(--t3)' }}>Thesis, decision framework, trade-offs, and what's AI-native about this design.</p>
+        <p style={{ fontSize: 11, color: 'var(--t3)' }}>Thesis, decision framework, trade-offs, and what&apos;s AI-native about this design.</p>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 20 }}>

@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, JetBrains_Mono, Instrument_Sans, Kalam } from 'next/font/google'
+import { JetBrains_Mono, Instrument_Sans, Kalam } from 'next/font/google'
 import '../index.css'
 
-const sans = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' })
-const display = Instrument_Sans({ subsets: ['latin'], variable: '--font-display-family', display: 'swap' })
+// One family everywhere: Instrument Sans is both the UI face and the display face.
+const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 const hand = Kalam({ subsets: ['latin'], weight: ['400'], variable: '--font-hand-family', display: 'swap' })
 
 export const metadata: Metadata = {
@@ -17,7 +17,11 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable} ${display.variable} ${hand.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${mono.variable} ${hand.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Apply saved or OS theme before first paint (no flash). Keep in sync with THEME_STORAGE_KEY. */}
+        <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('theme');if(t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')}catch(e){}" }} />
+      </head>
       <body>{children}</body>
     </html>
   )

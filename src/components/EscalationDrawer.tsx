@@ -17,15 +17,15 @@ const CAT_LABEL: Record<EscalationItem['category'], string> = {
 const URG_CONFIG = {
   critical: {
     color: 'var(--crit)',
-    bg: 'rgba(174,42,25,0.05)', bd: 'rgba(174,42,25,0.28)',
-    topBand: '#AE2A19', leftAccent: '#AE2A19',
+    bg: 'color-mix(in srgb, var(--crit) 5%, transparent)', bd: 'color-mix(in srgb, var(--crit) 28%, transparent)',
+    topBand: 'var(--esc)', leftAccent: 'var(--esc)',
     badgeStyle: { background: 'var(--crit)', color: '#fff' } as React.CSSProperties,
     badgeLabel: 'CRITICAL',
   },
   high: {
     color: 'var(--warn)',
-    bg: 'rgba(151,68,0,0.05)', bd: 'rgba(151,68,0,0.26)',
-    topBand: '#974400', leftAccent: '#974400',
+    bg: 'color-mix(in srgb, var(--warn) 5%, transparent)', bd: 'color-mix(in srgb, var(--warn) 26%, transparent)',
+    topBand: 'var(--ask-t)', leftAccent: 'var(--ask-t)',
     badgeStyle: { background: 'var(--warn)', color: '#fff' } as React.CSSProperties,
     badgeLabel: 'HIGH',
   },
@@ -160,7 +160,7 @@ function EscCard({ esc, onResolve }: { esc: EscalationItem; onResolve: (id: stri
                 <button
                   onClick={e => { e.stopPropagation(); onResolve(esc.id) }}
                   className="btn btn-secondary"
-                  style={{ width: '100%', justifyContent: 'center', color: 'var(--ok)', borderColor: 'rgba(33,110,78,0.28)' }}
+                  style={{ width: '100%', justifyContent: 'center', color: 'var(--ok)', borderColor: 'color-mix(in srgb, var(--ok) 28%, transparent)' }}
                 >
                   <CheckCircle size={12} />
                   Mark Resolved
@@ -210,7 +210,7 @@ export function EscalationPanel() {
           >
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(33,110,78,0.10)', border: '1px solid rgba(33,110,78,0.24)',
+              background: 'color-mix(in srgb, var(--ok) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--ok) 24%, transparent)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <CheckCircle size={14} style={{ color: 'var(--ok)' }} />
@@ -229,15 +229,15 @@ export function EscalationPanel() {
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
               style={{
                 width: 38, height: 38, borderRadius: '50%',
-                background: 'rgba(33,110,78,0.08)', border: '1px solid rgba(33,110,78,0.22)',
+                background: 'color-mix(in srgb, var(--ok) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--ok) 22%, transparent)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
               <CheckCircle size={16} style={{ color: 'var(--ok)' }} />
             </motion.div>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--t2)', letterSpacing: '-0.01em' }}>All clear</p>
-              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 3 }}>Agent is handling everything autonomously</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--t2)', letterSpacing: '-0.01em' }}>Nothing needs a human</p>
+              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 3 }}>No escalations open. Enjoy it while it lasts.</p>
             </div>
           </div>
         )}

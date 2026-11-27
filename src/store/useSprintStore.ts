@@ -16,7 +16,7 @@ import { LOAD_ELIGIBILITY_THRESHOLD, LOAD_MAX, LOAD_BASELINE } from '../logic/co
 import { computeSprintRisk } from '../logic/scoring'
 import { scoreGoalAlignment } from '../logic/goalAlignment'
 
-type View = 'sprint' | 'intake' | 'triage' | 'escalations' | 'briefings' | 'autonomy' | 'timeline' | 'review' | 'rationale' | 'planner'
+export type View = 'sprint' | 'intake' | 'triage' | 'escalations' | 'briefings' | 'autonomy' | 'timeline' | 'review' | 'rationale' | 'planner'
 
 /** Everything loaded from the database for one workspace (see lib/data/loadWorkspace). */
 export interface WorkspaceSnapshot {

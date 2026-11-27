@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowLeft, ArrowRight, MapPin } from 'lucide-react'
 import { useCategoryTour } from '../hooks/useCategoryTour'
-import { useSprintStore } from '../store/useSprintStore'
+import { withAlpha } from '../lib/utils'
+import { useSprintStore, type View } from '../store/useSprintStore'
 
 const TIP_W = Math.min(300, window.innerWidth - 24)
 const TIP_H = 230
@@ -54,18 +55,17 @@ function getSelector(step: ReturnType<typeof useCategoryTour.getState>['steps'][
 export function CategoryTour() {
   const { active, categoryLabel, categoryColor, steps, index, next, prev, end } = useCategoryTour()
   const setView = useSprintStore(s => s.setView)
-  const nav = (v: string) => setView(v as any)
-
-  const [coords, setCoords] = useState<Coords | null>(null)
-  const [floatMode, setFloatMode] = useState(false)
+  const nav = (v: string) => setView(v as View)
 
   const step = steps[index]
+  const stepKey = `${index}:${step?.featureId}:${step?.tourStep}`
+  // Result is tagged with the step it belongs to, so stale positions are ignored without resetting state.
+  const [found, setFound] = useState<{ key: string; coords: Coords | null; float: boolean } | null>(null)
+  const coords = active && found?.key === stepKey ? found.coords : null
+  const floatMode = active && found?.key === stepKey ? found.float : false
 
   useEffect(() => {
-    if (!active || !step) { setCoords(null); return }
-
-    setCoords(null)
-    setFloatMode(false)
+    if (!active || !step) return
 
     let cancelled = false
     let attempts = 0
@@ -79,8 +79,7 @@ export function CategoryTour() {
         if (el) {
           const rect = el.getBoundingClientRect()
           if (rect.width > 0 || rect.height > 0) {
-            setCoords(calcPosition(rect, step.side ?? 'bottom'))
-            setFloatMode(false)
+            setFound({ key: stepKey, coords: calcPosition(rect, step.side ?? 'bottom'), float: false })
             return
           }
         }
@@ -89,7 +88,7 @@ export function CategoryTour() {
       if (attempts < 8) {
         setTimeout(tryFind, 120)
       } else {
-        setFloatMode(true)
+        setFound({ key: stepKey, coords: null, float: true })
       }
     }
 
@@ -98,7 +97,7 @@ export function CategoryTour() {
     const needsNav = step.view && step.view !== prevStep?.view
     const t = setTimeout(tryFind, needsNav ? 350 : 150)
     return () => { cancelled = true; clearTimeout(t) }
-  }, [active, index, step?.featureId, step?.tourStep])
+  }, [active, index, step, steps, stepKey])
 
   if (!active || steps.length === 0 || !step) return null
 
@@ -127,7 +126,7 @@ export function CategoryTour() {
             background: 'var(--card)',
             border: `1.5px solid ${categoryColor}`,
             borderRadius: 10,
-            boxShadow: `0 12px 40px rgba(0,0,0,0.22), 0 0 0 4px ${categoryColor}22`,
+            boxShadow: `0 12px 40px rgba(0,0,0,0.22), 0 0 0 4px ${withAlpha(categoryColor, 0.13)}`,
             overflow: 'hidden',
           }}
         >
@@ -140,7 +139,7 @@ export function CategoryTour() {
               <span style={{
                 fontSize: 9, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase',
                 padding: '2px 6px', borderRadius: 4, fontFamily: 'var(--font-mono), monospace',
-                background: `${categoryColor}18`, color: categoryColor, border: `1px solid ${categoryColor}40`,
+                background: `${withAlpha(categoryColor, 0.09)}`, color: categoryColor, border: `1px solid ${withAlpha(categoryColor, 0.25)}`,
               }}>
                 {categoryLabel}
               </span>
@@ -148,7 +147,7 @@ export function CategoryTour() {
                 {index + 1} / {steps.length}
               </span>
             </div>
-            <button onClick={end} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
+            <button onClick={end} aria-label="End tour" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--t1)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--t3)')}>
               <X size={12} strokeWidth={1.5} />

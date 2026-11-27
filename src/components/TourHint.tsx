@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, ArrowLeft, X } from 'lucide-react'
 import { useTour, TOTAL_STEPS, TOUR_VIEW } from '../hooks/useTour'
-import { useSprintStore } from '../store/useSprintStore'
+import { useSprintStore, type View } from '../store/useSprintStore'
 
 type Side = 'right' | 'left' | 'bottom' | 'top'
 
@@ -85,12 +85,14 @@ function calcPosition(rect: DOMRect, side: Side): Coords {
 export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) {
   const { active, step: current, next, prev, end, singleMode } = useTour()
   const setView = useSprintStore(s => s.setView)
-  const nav = (view: string) => setView(view as any)
+  const nav = (view: string) => setView(view as View)
 
-  const [coords, setCoords] = useState<Coords | null>(null)
+  const key = `${current}:${step}`
+  const [found, setFound] = useState<{ key: string; coords: Coords } | null>(null)
+  const coords = active && current === step && found?.key === key ? found.coords : null
 
   useEffect(() => {
-    if (!active || current !== step) { setCoords(null); return }
+    if (!active || current !== step) return
 
     let cancelled = false
     let attempts  = 0
@@ -102,7 +104,7 @@ export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) 
       if (el) {
         const rect = el.getBoundingClientRect()
         if (rect.width > 0 || rect.height > 0) {
-          setCoords(calcPosition(rect, side))
+          setFound({ key, coords: calcPosition(rect, side) })
           return
         }
       }
@@ -112,7 +114,7 @@ export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) 
     // 300ms gives new view time to mount even with sync AnimatePresence
     const t = setTimeout(tryFind, 300)
     return () => { cancelled = true; clearTimeout(t) }
-  }, [active, current, step, side])
+  }, [active, current, step, side, key])
 
   if (!active || current !== step || !coords) return null
 
@@ -142,7 +144,7 @@ export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) 
         background:   'var(--card)',
         border:       '1.5px solid var(--act)',
         borderRadius: 10,
-        boxShadow:    '0 12px 40px rgba(0,0,0,0.22), 0 0 0 4px rgba(12,102,228,0.08)',
+        boxShadow:    '0 12px 40px rgba(0,0,0,0.22), 0 0 0 4px color-mix(in srgb, var(--act) 8%, transparent)',
         pointerEvents: 'auto',
 
         // Use position:relative so children with position:absolute work
@@ -171,6 +173,7 @@ export function TourHint({ step, title, body, side = 'bottom' }: TourHintProps) 
         </span>
         <button
           onClick={() => end()}
+          aria-label="End tour"
           style={{
             background: 'transparent', border: 'none', cursor: 'pointer',
             color: 'var(--muted-foreground)', display: 'flex', padding: 3, borderRadius: 4,

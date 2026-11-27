@@ -1,3 +1,4 @@
+import { avatarColor } from '../lib/avatarColors'
 import { motion } from 'framer-motion'
 import { Activity, Zap, HelpCircle, AlertTriangle, ChevronRight, CheckCircle } from 'lucide-react'
 import { GaugeCircle } from './ui/GaugeCircle'
@@ -30,16 +31,6 @@ const DEC_CONFIG = {
   },
 }
 
-const MEMBER_COLORS: Record<string, string> = {
-  'bg-violet-500':  '#6D28D9', 'bg-blue-500':    '#1D4ED8',
-  'bg-pink-500':    '#BE185D', 'bg-emerald-500': '#047857',
-  'bg-amber-500':   '#B45309', 'bg-cyan-500':    '#0891B2',
-  'bg-rose-500':    '#E11D48', 'bg-indigo-500':  '#4338CA',
-  'bg-teal-500':    '#0F766E', 'bg-orange-500':  '#EA580C',
-  'bg-fuchsia-500': '#C026D3', 'bg-red-600':     '#DC2626',
-  'bg-lime-500':    '#65A30D', 'bg-sky-500':     '#0284C7',
-  'bg-purple-400':  '#A855F7',
-}
 
 export function TriageQueue() {
   const { tasks, team, escalations, autonomyConfig, selectTask, setTriagePanelOpen, bulkAssign } = useSprintStore()
@@ -107,12 +98,12 @@ export function TriageQueue() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {total === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 10, padding: '48px 0' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(33,110,78,0.08)', border: '1px solid rgba(33,110,78,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'color-mix(in srgb, var(--ok) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--ok) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Activity size={16} style={{ color: 'var(--ok)' }} />
             </div>
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--t2)' }}>Nothing to triage</p>
-              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 4, lineHeight: 1.5 }}>All active tasks have decisions.<br />Add a request via Intake to see triage in action.</p>
+              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 4, lineHeight: 1.5 }}>Every active task has a decision.<br />New requests come in through Intake.</p>
             </div>
           </div>
         )}
@@ -175,11 +166,11 @@ export function TriageQueue() {
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '9px 11px', borderRadius: 5,
                         background: 'var(--card)', border: `1px solid ${isLowAlignment ? 'rgba(217,119,6,0.28)' : 'var(--b1)'}`,
-                        boxShadow: '0 1px 2px rgba(9,9,11,0.06)',
+                        boxShadow: '0 1px 2px rgba(20, 19, 17,0.06)',
                         cursor: 'pointer', transition: 'border-color 0.1s, box-shadow 0.1s',
                       }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = isLowAlignment ? 'rgba(217,119,6,0.5)' : 'var(--b2)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 6px rgba(9,9,11,0.12)' }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = isLowAlignment ? 'rgba(217,119,6,0.28)' : 'var(--b1)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(9,9,11,0.06)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = isLowAlignment ? 'rgba(217,119,6,0.5)' : 'var(--b2)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 6px rgba(20, 19, 17,0.12)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = isLowAlignment ? 'rgba(217,119,6,0.28)' : 'var(--b1)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(20, 19, 17,0.06)' }}
                     >
                       {/* Score */}
                       {(() => {
@@ -190,7 +181,7 @@ export function TriageQueue() {
                             size={36}
                             strokeWidth={3}
                             color={sc}
-                            trackColor="rgba(9,9,11,0.07)"
+                            trackColor="rgba(20, 19, 17,0.07)"
                             showValue={true}
                             valueStyle={{ fontSize: 8, fontWeight: 800 }}
                           />
@@ -251,7 +242,7 @@ export function TriageQueue() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                               <div style={{
                                 width: 18, height: 18, borderRadius: '50%',
-                                background: MEMBER_COLORS[assignedMember.color] ?? '#1D4ED8',
+                                background: avatarColor(assignedMember.color),
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: 7, fontWeight: 800, color: '#fff',
                               }}>{assignedMember.initials}</div>
@@ -272,7 +263,7 @@ export function TriageQueue() {
                               <span style={{ fontSize: 9, color: 'var(--t3)' }}>→</span>
                               <div style={{
                                 width: 18, height: 18, borderRadius: '50%',
-                                background: MEMBER_COLORS[bestMember.color] ?? '#1D4ED8',
+                                background: avatarColor(bestMember.color),
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: 7, fontWeight: 800, color: '#fff',
                               }}>{bestMember.initials}</div>

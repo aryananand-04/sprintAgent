@@ -1,3 +1,4 @@
+import { avatarColor } from '../lib/avatarColors'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Zap, AlertTriangle, HelpCircle, GitBranch, CheckCircle, Sparkles } from 'lucide-react'
@@ -13,7 +14,7 @@ const DEC = {
   ACT: {
     icon: Zap, label: 'ACT', subtitle: 'Agent acts autonomously',
     color: 'var(--act-t)', bg: 'var(--act-bg)', border: 'var(--act-bd)',
-    solid: 'var(--act)', bandColor: '#0C66E4',
+    solid: 'var(--act)', bandColor: 'var(--act)',
   },
   ASK: {
     icon: HelpCircle, label: 'ASK', subtitle: 'Requesting clarification',
@@ -23,7 +24,7 @@ const DEC = {
   ESCALATE: {
     icon: AlertTriangle, label: 'ESCALATE', subtitle: 'Human judgment required',
     color: 'var(--esc-t)', bg: 'var(--esc-bg)', border: 'var(--esc-bd)',
-    solid: 'var(--esc)', bandColor: '#AE2A19',
+    solid: 'var(--esc)', bandColor: 'var(--esc)',
   },
 }
 
@@ -35,10 +36,6 @@ const DIM = [
   { key: 'clarity' as const, label: 'Clarity', color: 'var(--ok)' },
 ]
 
-const MEMBER_COLORS: Record<string, string> = {
-  'bg-violet-500': '#6D28D9', 'bg-blue-500': '#1D4ED8',
-  'bg-pink-500': '#BE185D',   'bg-emerald-500': '#047857', 'bg-amber-500': '#B45309',
-}
 
 export function TriagePanel() {
   const {
@@ -90,7 +87,7 @@ export function TriagePanel() {
               position: 'fixed', right: 0, top: 0, bottom: 0, width: 448, zIndex: 50,
               display: 'flex', flexDirection: 'column', overflow: 'hidden',
               background: 'var(--card)', borderLeft: '1px solid var(--border)',
-              boxShadow: '-6px 0 24px rgba(9,9,11,0.14)',
+              boxShadow: '-6px 0 24px rgba(20, 19, 17,0.14)',
             }}
           >
             <div style={{ height: 2, background: meta.bandColor, flexShrink: 0 }} />
@@ -287,7 +284,7 @@ export function TriagePanel() {
                           {m && (
                             <div style={{
                               width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                              background: MEMBER_COLORS[m.color] ?? '#1D4ED8',
+                              background: avatarColor(m.color),
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: 11, fontWeight: 700, color: '#fff',
                             }}>{m.initials}</div>
@@ -314,8 +311,8 @@ export function TriagePanel() {
                         return (
                           <div key={dep} style={{
                             display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 5, fontSize: 11,
-                            background: isExt ? 'var(--esc-bg)' : depTask?.status === 'done' ? 'rgba(33,110,78,0.07)' : 'var(--s2)',
-                            border: `1px solid ${isExt ? 'var(--esc-bd)' : depTask?.status === 'done' ? 'rgba(33,110,78,0.18)' : 'var(--b1)'}`,
+                            background: isExt ? 'var(--esc-bg)' : depTask?.status === 'done' ? 'color-mix(in srgb, var(--ok) 7%, transparent)' : 'var(--s2)',
+                            border: `1px solid ${isExt ? 'var(--esc-bd)' : depTask?.status === 'done' ? 'color-mix(in srgb, var(--ok) 18%, transparent)' : 'var(--b1)'}`,
                             color: isExt ? 'var(--esc-t)' : depTask?.status === 'done' ? 'var(--ok)' : 'var(--t2)',
                           }}>
                             <GitBranch size={10} style={{ flexShrink: 0 }} />
@@ -363,7 +360,7 @@ export function TriagePanel() {
                 </button>
               )}
               {dec === 'ACT' && task.assigneeId && (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, borderRadius: 4, fontSize: 12, fontWeight: 600, background: 'rgba(33,110,78,0.08)', border: '1px solid rgba(33,110,78,0.20)', color: 'var(--ok)' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, borderRadius: 4, fontSize: 12, fontWeight: 600, background: 'color-mix(in srgb, var(--ok) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--ok) 20%, transparent)', color: 'var(--ok)' }}>
                   <CheckCircle size={12} /> Assigned
                 </div>
               )}

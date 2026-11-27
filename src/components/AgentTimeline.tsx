@@ -77,8 +77,8 @@ export function AgentTimeline() {
               <Clock size={16} style={{ color: 'var(--t3)' }} />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--t2)' }}>No events yet</p>
-              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 3 }}>Trigger a scenario to see the agent's decision log</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--t2)' }}>No decisions yet</p>
+              <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: 3 }}>The agent hasn&apos;t decided anything this sprint. Give it a request.</p>
             </div>
           </div>
         ) : (
@@ -105,10 +105,10 @@ export function AgentTimeline() {
                     {/* Icon dot */}
                     <div style={{
                       width: 27, height: 27, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                      background: isEscalation ? 'rgba(174,42,25,0.10)' : 'var(--s1)',
-                      border: `1px solid ${isEscalation ? 'rgba(174,42,25,0.28)' : 'var(--b2)'}`,
+                      background: isEscalation ? 'color-mix(in srgb, var(--crit) 10%, transparent)' : 'var(--s1)',
+                      border: `1px solid ${isEscalation ? 'color-mix(in srgb, var(--crit) 28%, transparent)' : 'var(--b2)'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(9,9,11,0.10)',
+                      boxShadow: '0 1px 3px rgba(20, 19, 17,0.10)',
                     }}>
                       <Icon size={11} style={{ color: cfg.color }} />
                     </div>
@@ -133,9 +133,9 @@ export function AgentTimeline() {
                         padding: '9px 12px', borderRadius: 5, fontSize: 11,
                         color: isEscalation ? 'var(--t1)' : 'var(--t2)',
                         lineHeight: 1.6,
-                        background: isEscalation ? 'rgba(174,42,25,0.05)' : 'var(--s2)',
-                        border: `1px solid ${isEscalation ? 'rgba(174,42,25,0.18)' : 'var(--b1)'}`,
-                        borderLeft: isEscalation ? '3px solid var(--crit)' : `1px solid ${isEscalation ? 'rgba(174,42,25,0.18)' : 'var(--b1)'}`,
+                        background: isEscalation ? 'color-mix(in srgb, var(--crit) 5%, transparent)' : 'var(--s2)',
+                        border: `1px solid ${isEscalation ? 'color-mix(in srgb, var(--crit) 18%, transparent)' : 'var(--b1)'}`,
+                        borderLeft: isEscalation ? '3px solid var(--crit)' : `1px solid ${isEscalation ? 'color-mix(in srgb, var(--crit) 18%, transparent)' : 'var(--b1)'}`,
                       }}>
                         {event.message}
                       </div>

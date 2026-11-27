@@ -1,3 +1,4 @@
+import { avatarColor } from '../lib/avatarColors'
 import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -31,16 +32,6 @@ const URGENCY_COLOR: Record<string, string> = {
   low:      'var(--t3)',
 }
 
-const MEMBER_COLORS: Record<string, string> = {
-  'bg-violet-500':  '#6D28D9', 'bg-blue-500':    '#1D4ED8',
-  'bg-pink-500':    '#BE185D', 'bg-emerald-500': '#047857',
-  'bg-amber-500':   '#B45309', 'bg-cyan-500':    '#0891B2',
-  'bg-rose-500':    '#E11D48', 'bg-indigo-500':  '#4338CA',
-  'bg-teal-500':    '#0F766E', 'bg-orange-500':  '#EA580C',
-  'bg-fuchsia-500': '#C026D3', 'bg-red-600':     '#DC2626',
-  'bg-lime-500':    '#65A30D', 'bg-sky-500':     '#0284C7',
-  'bg-purple-400':  '#A855F7',
-}
 
 interface TaskCardProps { task: Task; compact?: boolean }
 
@@ -176,7 +167,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                     <>
                       <div style={{
                         width: 14, height: 14, borderRadius: '50%', flexShrink: 0,
-                        background: MEMBER_COLORS[assignee.color] ?? '#1D4ED8',
+                        background: avatarColor(assignee.color),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 7, fontWeight: 800, color: '#fff',
                       }}>{assignee.initials}</div>
@@ -269,7 +260,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.01em' }}>Assign to</div>
                   <div style={{ fontSize: 10, color: 'var(--t3)', marginTop: 1 }}>{task.title.slice(0, 36)}{task.title.length > 36 ? '…' : ''}</div>
                 </div>
-                <button onClick={() => setAssignOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
+                <button onClick={() => setAssignOpen(false)} aria-label="Close assignee picker" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
                   onMouseEnter={e => (e.currentTarget.style.color = 'var(--t1)')}
                   onMouseLeave={e => (e.currentTarget.style.color = 'var(--t3)')}>
                   <X size={13} strokeWidth={1.5} />
@@ -299,7 +290,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                       {/* Avatar */}
                       <div style={{
                         width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
-                        background: MEMBER_COLORS[m.color] ?? '#1D4ED8',
+                        background: avatarColor(m.color),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 10, fontWeight: 800, color: '#fff',
                         boxShadow: isBest ? `0 0 0 2px var(--act)` : undefined,

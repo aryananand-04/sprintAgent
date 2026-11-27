@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { X, Zap, AlertTriangle, Users, Shield, Flag, FileText, BarChart2, Monitor, BookOpen, Sparkles, ArrowRight } from 'lucide-react'
-import { useSprintStore } from '../store/useSprintStore'
+import { useSprintStore, type View } from '../store/useSprintStore'
 import { useTour } from '../hooks/useTour'
 import { useCategoryTour, type CategoryStep } from '../hooks/useCategoryTour'
 
@@ -24,7 +24,7 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: 'autonomy', icon: Shield, color: '#d97706', label: 'Agent Autonomy',
+    id: 'autonomy', icon: Shield, color: 'var(--ask-t)', label: 'Agent Autonomy',
     steps: [
       { title: 'Continuous agent loop',   liveIn: 'Agent Feed Island',  tourStep: 3,                              side: 'top',    desc: 'Runs every 60s: rebalances capacity, resolves blockers, monitors velocity, nudges stale escalations. Visible in the live feed at the bottom.' },
       { title: 'Self-tuning',             liveIn: 'Team Report',        view: 'utilization', featureId: 'calibration-section', side: 'top',    desc: 'Agent tracks ACT accuracy. Below 60% over 5 decisions it raises its clarity floor. Above 90% over 10 decisions it lowers it — and posts why to the feed.' },
@@ -104,7 +104,7 @@ export function SmartHelp({ onClose }: { onClose: () => void }) {
   const { start: startTour } = useTour()
   const { start: startCategoryTour } = useCategoryTour()
 
-  const nav = (v: string) => setView(v as any)
+  const nav = (v: string) => setView(v as View)
 
   function launchCategory(cat: Category) {
     onClose()
@@ -139,7 +139,7 @@ export function SmartHelp({ onClose }: { onClose: () => void }) {
           position: 'fixed', top: 52, right: 12, zIndex: 9998,
           width: Math.min(300, window.innerWidth - 16), maxHeight: 'calc(100vh - 72px)',
           background: 'var(--card)', border: '1px solid var(--border)',
-          borderRadius: 10, boxShadow: '0 8px 28px rgba(9,9,11,0.16)',
+          borderRadius: 10, boxShadow: '0 8px 28px rgba(20, 19, 17,0.16)',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}
       >
@@ -149,7 +149,7 @@ export function SmartHelp({ onClose }: { onClose: () => void }) {
             <BookOpen size={13} style={{ color: 'var(--act)' }} strokeWidth={1.5} />
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-0.015em' }}>Help & Features</span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', padding: 3, borderRadius: 4 }}
+          <button onClick={onClose} aria-label="Close help" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', padding: 3, borderRadius: 4 }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--foreground)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted-foreground)')}>
             <X size={13} strokeWidth={1.5} />

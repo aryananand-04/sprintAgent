@@ -42,14 +42,14 @@ export function DemoScenarios() {
           position: 'fixed', bottom: 20, right: 20, zIndex: 30,
           display: 'flex', alignItems: 'center', gap: 6,
           padding: '7px 13px', borderRadius: 5,
-          background: 'var(--act)', color: '#fff',
+          background: 'var(--act)', color: 'var(--background)',
           fontSize: 12, fontWeight: 700,
           border: '1px solid rgba(255,255,255,0.12)',
-          boxShadow: '0 2px 8px rgba(12,102,228,0.28)',
+          boxShadow: '0 2px 8px color-mix(in srgb, var(--act) 28%, transparent)',
           cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif', letterSpacing: '-0.01em',
           transition: 'background 0.12s, box-shadow 0.12s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = '#0052CC' }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'var(--act-t)' }}
         onMouseLeave={e => { e.currentTarget.style.background = 'var(--act)' }}
       >
         <Zap size={11} /> Simulate
@@ -66,7 +66,7 @@ export function DemoScenarios() {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setDemoOpen(false)}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(9,9,11,0.22)', zIndex: 40, backdropFilter: 'blur(2px)' }}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(20, 19, 17,0.22)', zIndex: 40, backdropFilter: 'blur(2px)' }}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 10 }}
@@ -77,7 +77,7 @@ export function DemoScenarios() {
                 position: 'fixed', bottom: 58, right: 20, zIndex: 50,
                 width: 300, borderRadius: 8,
                 background: 'var(--card)', border: '1px solid var(--b2)',
-                boxShadow: '0 8px 24px rgba(9,9,11,0.18)', overflow: 'hidden',
+                boxShadow: '0 8px 24px rgba(20, 19, 17,0.18)', overflow: 'hidden',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px', borderBottom: '1px solid var(--b1)' }}>
@@ -107,8 +107,8 @@ export function DemoScenarios() {
                       whileHover={!firing && !isDone ? { x: 2 } : {}}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10, padding: '8px 9px', borderRadius: 5,
-                        background: isFiring ? 'var(--s2)' : isDone ? 'rgba(33,110,78,0.04)' : 'transparent',
-                        border: `1px solid ${isFiring ? 'var(--b2)' : isDone ? 'rgba(33,110,78,0.18)' : 'transparent'}`,
+                        background: isFiring ? 'var(--s2)' : isDone ? 'color-mix(in srgb, var(--ok) 4%, transparent)' : 'transparent',
+                        border: `1px solid ${isFiring ? 'var(--b2)' : isDone ? 'color-mix(in srgb, var(--ok) 18%, transparent)' : 'transparent'}`,
                         cursor: isDone ? 'default' : firing ? 'not-allowed' : 'pointer',
                         opacity: firing && !isFiring ? 0.3 : 1, textAlign: 'left',
                         transition: 'all 0.1s', width: '100%',
@@ -116,7 +116,7 @@ export function DemoScenarios() {
                       onMouseEnter={e => { if (!firing && !isDone) { e.currentTarget.style.background = 'var(--s2)'; e.currentTarget.style.borderColor = 'var(--b1)' } }}
                       onMouseLeave={e => { if (!isFiring && !isDone) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' } }}
                     >
-                      <div style={{ width: 24, height: 24, borderRadius: 5, background: isDone ? 'rgba(33,110,78,0.10)' : 'var(--s2)', border: `1px solid ${isDone ? 'rgba(33,110,78,0.22)' : 'var(--b1)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 5, background: isDone ? 'color-mix(in srgb, var(--ok) 10%, transparent)' : 'var(--s2)', border: `1px solid ${isDone ? 'color-mix(in srgb, var(--ok) 22%, transparent)' : 'var(--b1)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {isFiring ? (
                           <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}>
                             <Zap size={11} style={{ color: 'var(--act)' }} />

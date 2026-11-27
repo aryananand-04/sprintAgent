@@ -41,7 +41,7 @@ function RuleRow({ rule, index }: { rule: AutonomyRule; index: number }) {
         border: `1px solid ${expanded ? cfg.bd : 'var(--b1)'}`,
         background: expanded ? cfg.bg : 'var(--s1)',
         transition: 'border-color 0.12s, background 0.12s',
-        boxShadow: '0 1px 2px rgba(9,9,11,0.05)',
+        boxShadow: '0 1px 2px rgba(20, 19, 17,0.05)',
         cursor: 'pointer',
       }}
       onClick={() => setExpanded(!expanded)}
@@ -103,7 +103,7 @@ export function PolicyPanel() {
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.015em' }}>Autonomy Framework</span>
         </div>
         <p style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 12 }}>
-          The agent's decision-making ruleset. What it owns, when it asks, when it defers.
+          The agent&apos;s decision-making ruleset. What it owns, when it asks, when it defers.
         </p>
 
         {/* Distribution bar */}
@@ -126,7 +126,7 @@ export function PolicyPanel() {
           background: 'var(--s2)', borderLeft: '3px solid var(--act)',
         }}>
           <p style={{ fontSize: 11, color: 'var(--t2)', lineHeight: 1.7, fontStyle: 'italic' }}>
-            "The agent optimizes for <span style={{ color: 'var(--act-t)', fontWeight: 600, fontStyle: 'normal' }}>velocity without overreach</span>. It acts when confidence is high and cost of error is low. It pauses when ambiguity or risk makes human judgment cheaper than autonomous action. Trust is earned incrementally."
+            &quot;The agent optimizes for <span style={{ color: 'var(--act-t)', fontWeight: 600, fontStyle: 'normal' }}>velocity without overreach</span>. It acts when confidence is high and cost of error is low. It pauses when ambiguity or risk makes human judgment cheaper than autonomous action. Trust is earned incrementally.&quot;
           </p>
         </div>
 

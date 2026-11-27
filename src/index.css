@@ -173,21 +173,21 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  box-shadow: 0 1px 3px rgba(9, 9, 11, 0.08);
+  box-shadow: 0 1px 3px rgba(20, 19, 17, 0.08);
 }
 
 @utility card-interactive {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  box-shadow: 0 1px 3px rgba(9, 9, 11, 0.07);
+  box-shadow: 0 1px 3px rgba(20, 19, 17, 0.07);
   cursor: pointer;
   transition:
     border-color 0.12s,
     box-shadow 0.12s;
   &:hover {
     border-color: var(--muted-foreground);
-    box-shadow: 0 2px 8px rgba(9, 9, 11, 0.12);
+    box-shadow: 0 2px 8px rgba(20, 19, 17, 0.12);
   }
   &:active {
     transform: translateY(1px);
@@ -249,7 +249,7 @@
   background: var(--act);
   color: #fff;
   box-shadow:
-    0 1px 2px rgba(9, 9, 11, 0.18),
+    0 1px 2px rgba(20, 19, 17, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   &:hover {
     filter: brightness(1.08);
@@ -267,7 +267,7 @@
   background: var(--background);
   color: var(--muted-foreground);
   border-color: var(--border);
-  box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06);
+  box-shadow: 0 1px 2px rgba(20, 19, 17, 0.06);
   &:hover {
     border-color: var(--muted-foreground);
     color: var(--foreground);
@@ -446,65 +446,25 @@
    Custom product tokens map directly to zinc values.
 ═══════════════════════════════════════════════════ */
   :root {
-    /* shadcn standard tokens */
-    --background: #ffffff;
-    --foreground: #09090b;
-    --card: #ffffff;
-    --card-foreground: #09090b;
-    --popover: #ffffff;
-    --popover-foreground: #09090b;
-    --primary: #18181b;
-    --primary-foreground: #fafafa;
-    --secondary: #f4f4f5;
-    --secondary-foreground: #18181b;
-    --muted: #f4f4f5;
-    --muted-foreground: #71717a;
-    --accent: #f4f4f5;
-    --accent-foreground: #18181b;
-    --destructive: #ef4444;
-    --destructive-foreground: #fafafa;
-    --border: #e4e4e7;
-    --input: #e4e4e7;
-    --ring: #18181b;
-    --radius: 0.5rem;
-
-    /* Product surface tokens — zinc */
-    --bg: #fafafa;
-    --s0: #f4f4f5;
-    --s1: #ffffff;
-    --s2: #f4f4f5;
-    --s3: #e4e4e7;
-    --s4: #d4d4d8;
-
-    --b0: rgba(9, 9, 11, 0.04);
-    --b1: rgba(9, 9, 11, 0.1);
-    --b2: rgba(9, 9, 11, 0.18);
-    --b3: rgba(9, 9, 11, 0.32);
-
-    --t1: #09090b;
-    --t2: #71717a;
-    --t3: #a1a1aa;
-
-    /* Decision system */
-    --act: #3b82f6;
-    --act-bg: rgba(59, 130, 246, 0.08);
-    --act-bd: rgba(59, 130, 246, 0.22);
-    --act-t: #1d4ed8;
-
-    --ask: #d97706;
-    --ask-bg: rgba(217, 119, 6, 0.08);
-    --ask-bd: rgba(217, 119, 6, 0.22);
-    --ask-t: #b45309;
-
-    --esc: #dc2626;
-    --esc-bg: rgba(220, 38, 38, 0.07);
-    --esc-bd: rgba(220, 38, 38, 0.22);
-    --esc-t: #991b1b;
-
-    --ok: #16a34a;
-    --warn: #d97706;
-    --crit: #dc2626;
-
+    /* Remapped onto the brand system (src/styles/brand.css): warm paper + ink, decision palettes. */
+    --background: #fdfcf9; --foreground: #141311;
+    --card: #fdfcf9; --card-foreground: #141311;
+    --popover: #fdfcf9; --popover-foreground: #141311;
+    --primary: #141311; --primary-foreground: #fdfcf9;
+    --secondary: #f4f2ec; --secondary-foreground: #141311;
+    --muted: #f4f2ec; --muted-foreground: #5e5b55;
+    --accent: #f4f2ec; --accent-foreground: #141311;
+    --destructive: #c2331f; --destructive-foreground: #fdfcf9;
+    --border: #e5e1d8; --input: #e5e1d8; --ring: #0b6e64;
+    --radius: 0.625rem;
+    --bg: #f4f2ec;
+    --s0: #f4f2ec; --s1: #fdfcf9; --s2: #f4f2ec; --s3: #ebe8e0; --s4: #dedad1;
+    --b0: rgba(20, 19, 17, 0.04); --b1: rgba(20, 19, 17, 0.09); --b2: rgba(20, 19, 17, 0.16); --b3: rgba(20, 19, 17, 0.3);
+    --t1: #141311; --t2: #5e5b55; --t3: #706c65;
+    --act: #5f7100; --act-bg: #f3f7d4; --act-bd: rgba(95, 113, 0, 0.26); --act-t: #4a5800;
+    --ask: #9a4d00; --ask-bg: #fcefdd; --ask-bd: rgba(154, 77, 0, 0.26); --ask-t: #7a3d00;
+    --esc: #c2331f; --esc-bg: #fce8e4; --esc-bd: rgba(194, 51, 31, 0.26); --esc-t: #9c2615;
+    --ok: #2c7a3f; --warn: #9a4d00; --crit: #c2331f;
     --r-ui: calc(var(--radius) * 0.75);
     --r-card: var(--radius);
   }
@@ -513,60 +473,23 @@
    shadcn zinc — dark mode (html.dark)
 ═══════════════════════════════════════════ */
   html.dark {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card: #18181b;
-    --card-foreground: #fafafa;
-    --popover: #18181b;
-    --popover-foreground: #fafafa;
-    --primary: #fafafa;
-    --primary-foreground: #18181b;
-    --secondary: #27272a;
-    --secondary-foreground: #fafafa;
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
-    --accent: #27272a;
-    --accent-foreground: #fafafa;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fafafa;
-    --border: #27272a;
-    --input: #27272a;
-    --ring: #d4d4d8;
-
-    --bg: #09090b;
-    --s0: #18181b;
-    --s1: #27272a;
-    --s2: #3f3f46;
-    --s3: #52525b;
-    --s4: #71717a;
-
-    --b0: rgba(255, 255, 255, 0.04);
-    --b1: rgba(255, 255, 255, 0.08);
-    --b2: rgba(255, 255, 255, 0.14);
-    --b3: rgba(255, 255, 255, 0.24);
-
-    --t1: #fafafa;
-    --t2: #a1a1aa;
-    --t3: #71717a;
-
-    --act: #60a5fa;
-    --act-bg: rgba(96, 165, 250, 0.1);
-    --act-bd: rgba(96, 165, 250, 0.22);
-    --act-t: #93c5fd;
-
-    --ask: #fbbf24;
-    --ask-bg: rgba(251, 191, 36, 0.1);
-    --ask-bd: rgba(251, 191, 36, 0.22);
-    --ask-t: #fcd34d;
-
-    --esc: #f87171;
-    --esc-bg: rgba(248, 113, 113, 0.1);
-    --esc-bd: rgba(248, 113, 113, 0.22);
-    --esc-t: #fca5a5;
-
-    --ok: #4ade80;
-    --warn: #fbbf24;
-    --crit: #f87171;
+    --background: #121110; --foreground: #f5f3ee;
+    --card: #1c1b19; --card-foreground: #f5f3ee;
+    --popover: #1c1b19; --popover-foreground: #f5f3ee;
+    --primary: #f5f3ee; --primary-foreground: #121110;
+    --secondary: #24221f; --secondary-foreground: #f5f3ee;
+    --muted: #24221f; --muted-foreground: #b3ada2;
+    --accent: #24221f; --accent-foreground: #f5f3ee;
+    --destructive: #ff8a76; --destructive-foreground: #121110;
+    --border: #2f2c28; --input: #2f2c28; --ring: #5fd3c2;
+    --bg: #121110;
+    --s0: #161514; --s1: #1c1b19; --s2: #24221f; --s3: #2f2c28; --s4: #3d3a35;
+    --b0: rgba(255, 255, 255, 0.04); --b1: rgba(255, 255, 255, 0.08); --b2: rgba(255, 255, 255, 0.14); --b3: rgba(255, 255, 255, 0.24);
+    --t1: #f5f3ee; --t2: #b3ada2; --t3: #958f85;
+    --act: #c6dc3c; --act-bg: rgba(198, 220, 60, 0.1); --act-bd: rgba(198, 220, 60, 0.26); --act-t: #d9ec6a;
+    --ask: #ffae5c; --ask-bg: rgba(255, 174, 92, 0.1); --ask-bd: rgba(255, 174, 92, 0.26); --ask-t: #ffc58a;
+    --esc: #ff8a76; --esc-bg: rgba(255, 138, 118, 0.1); --esc-bd: rgba(255, 138, 118, 0.26); --esc-t: #ffb3a6;
+    --ok: #6fd08a; --warn: #ffae5c; --crit: #ff8a76;
   }
 
   /* ─── Base ─────────────────────────────────── */
@@ -587,12 +510,12 @@
     font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
-  ::selection { background: rgba(59,130,246,0.15); color: var(--t1); }
+  ::selection { background: color-mix(in srgb, var(--act) 15%, transparent); color: var(--t1); }
 
   ::-webkit-scrollbar       { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.22); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.38); }
+  ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--act) 22%, transparent); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--act) 38%, transparent); }
 
   html.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); }
   html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }
@@ -612,12 +535,12 @@
   }
   .sidebar-drawer.open {
     transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(9,9,11,0.18);
+    box-shadow: 4px 0 24px rgba(20, 19, 17,0.18);
   }
   .sidebar-backdrop {
     display: block;
     position: fixed; inset: 0; z-index: 9984;
-    background: rgba(9,9,11,0.32);
+    background: rgba(20, 19, 17,0.32);
     backdrop-filter: blur(2px);
   }
 }

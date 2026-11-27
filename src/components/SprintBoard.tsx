@@ -1,7 +1,10 @@
+import { avatarColor } from '../lib/avatarColors'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Target, TrendingUp, AlertTriangle, CheckCircle, Users, Plus, MessageCircle, GripVertical, X, Send, GitBranch, ChevronDown, Sparkles, Star } from 'lucide-react'
+import { useNow } from '../hooks/useNow'
+import { withAlpha } from '../lib/utils'
 import { useSprintStore } from '../store/useSprintStore'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -17,31 +20,21 @@ const COLUMNS: { id: TaskStatus; label: string; accent: string; tint?: string; h
   { id: 'backlog',     label: 'Backlog',     accent: 'var(--muted-foreground)' },
   { id: 'triaged',     label: 'Triaged',     accent: 'var(--act)' },
   { id: 'assigned',    label: 'Assigned',    accent: 'var(--act)' },
-  { id: 'in-progress', label: 'In Progress', accent: '#2563EB' },
+  { id: 'in-progress', label: 'In Progress', accent: '#0b6e64' },
   { id: 'blocked',     label: 'Blocked',     accent: 'var(--crit)', tint: 'rgba(220,38,38,0.04)', headerBg: 'rgba(220,38,38,0.07)' },
   { id: 'done',        label: 'Done',        accent: 'var(--ok)',   tint: 'rgba(22,163,74,0.04)',  headerBg: 'rgba(22,163,74,0.06)' },
 ]
 
 const DECISION_COLORS = {
-  ACT:     { bg: 'rgba(12,102,228,0.10)',  border: 'rgba(12,102,228,0.28)',  text: '#0047B3' },
-  ASK:     { bg: 'rgba(184,92,0,0.10)',    border: 'rgba(184,92,0,0.28)',    text: '#8B4300' },
-  ESCALATE:{ bg: 'rgba(174,42,25,0.10)',   border: 'rgba(174,42,25,0.28)',   text: '#7D1A0D' },
+  ACT:      { bg: 'var(--act-bg)', border: 'var(--act-bd)', text: 'var(--act-t)' },
+  ASK:      { bg: 'var(--ask-bg)', border: 'var(--ask-bd)', text: 'var(--ask-t)' },
+  ESCALATE: { bg: 'var(--esc-bg)', border: 'var(--esc-bd)', text: 'var(--esc-t)' },
 }
 
 const URGENCY_COLORS: Record<string, string> = {
   critical: 'var(--crit)', high: 'var(--warn)', medium: 'var(--muted-foreground)', low: 'var(--muted-foreground)',
 }
 
-const MEMBER_BG: Record<string, string> = {
-  'bg-violet-500':  '#6D28D9', 'bg-blue-500':    '#1D4ED8',
-  'bg-pink-500':    '#BE185D', 'bg-emerald-500': '#047857',
-  'bg-amber-500':   '#B45309', 'bg-cyan-500':    '#0891B2',
-  'bg-rose-500':    '#E11D48', 'bg-indigo-500':  '#4338CA',
-  'bg-teal-500':    '#0F766E', 'bg-orange-500':  '#EA580C',
-  'bg-fuchsia-500': '#C026D3', 'bg-red-600':     '#DC2626',
-  'bg-lime-500':    '#65A30D', 'bg-sky-500':     '#0284C7',
-  'bg-purple-400':  '#A855F7',
-}
 
 /* ── Header stat ── */
 function StatItem({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: string; color?: string }) {
@@ -62,6 +55,7 @@ function StatItem({ icon: Icon, label, value, color }: { icon: React.ElementType
 
 /* ── Kanban card with inline comments ── */
 function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
+  const now = useNow()
   const { team, tasks, selectTask, setTriagePanelOpen, addComment, assignTaskById } = useSprintStore()
   const [showComments, setShowComments] = useState(false)
   const [commentText, setCommentText] = useState('')
@@ -106,7 +100,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
     setTriagePanelOpen(true)
   }
 
-  const handleSubmitComment = (e: React.MouseEvent) => {
+  const handleSubmitComment = (e: { stopPropagation(): void }) => {
     e.stopPropagation()
     const text = commentText.trim()
     if (!text) return
@@ -115,7 +109,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
   }
 
   function formatTime(iso: string) {
-    const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+    const m = Math.floor((now - new Date(iso).getTime()) / 60000)
     if (m < 1) return 'now'
     if (m < 60) return `${m}m`
     return `${Math.floor(m / 60)}h`
@@ -133,11 +127,11 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
         onClick={handleCardClick}
         style={{
           background: 'var(--card)', border: '1px solid var(--border)',
-          borderRadius: 8, boxShadow: '0 1px 3px rgba(9,9,11,0.06)',
+          borderRadius: 8, boxShadow: '0 1px 3px rgba(20, 19, 17,0.06)',
           overflow: 'hidden', transition: 'box-shadow 0.12s, border-color 0.12s',
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 3px 10px rgba(9,9,11,0.10)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--muted-foreground)' }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(9,9,11,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 3px 10px rgba(20, 19, 17,0.10)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--muted-foreground)' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(20, 19, 17,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
       >
         <CardContent className="p-0">
           {/* Decision band */}
@@ -173,8 +167,8 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
               {(task.urgency === 'critical' || task.urgency === 'high') && (
                 <Badge style={{
                   fontSize: 9, padding: '1px 6px', borderRadius: 3,
-                  background: `${URGENCY_COLORS[task.urgency]}18`,
-                  border: `1px solid ${URGENCY_COLORS[task.urgency]}44`,
+                  background: `${withAlpha(URGENCY_COLORS[task.urgency], 0.09)}`,
+                  border: `1px solid ${withAlpha(URGENCY_COLORS[task.urgency], 0.27)}`,
                   color: URGENCY_COLORS[task.urgency], fontWeight: 700,
                   letterSpacing: '0.06em', textTransform: 'uppercase',
                   fontFamily: 'var(--font-mono), monospace',
@@ -202,14 +196,14 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
               ))}
               {/* Fix #5: blocked age indicator */}
               {isBlocked && task.createdAt && (() => {
-                const h = Math.round((Date.now() - new Date(task.createdAt).getTime()) / 3_600_000)
+                const h = Math.round((now - new Date(task.createdAt).getTime()) / 3_600_000)
                 const label = h < 1 ? '<1h blocked' : h < 24 ? `${h}h blocked` : `${Math.floor(h / 24)}d blocked`
                 return (
                   <Badge style={{
                     fontSize: 9, padding: '1px 6px', borderRadius: 3,
-                    background: 'rgba(174,42,25,0.10)', border: '1px solid rgba(174,42,25,0.28)',
-                    color: 'var(--crit)', fontWeight: 800, letterSpacing: '0.04em',
-                    fontFamily: 'var(--font-mono), monospace', animation: h >= 2 ? 'pulseDot 2s ease-in-out infinite' : 'none',
+                    background: 'color-mix(in srgb, var(--crit) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 28%, transparent)',
+                    color: 'var(--esc-t)', fontWeight: 800, letterSpacing: '0.04em',
+                    fontFamily: 'var(--font-mono), monospace',
                   }}>{label}</Badge>
                 )
               })()}
@@ -241,6 +235,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                 {/* Comment toggle button — stops card click */}
                 <button
                   onClick={e => { e.stopPropagation(); setShowComments(s => !s) }}
+                  aria-label={showComments ? 'Hide comments' : 'Show comments'} aria-expanded={showComments}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 3,
                     background: showComments ? 'var(--act-bg)' : 'transparent',
@@ -268,18 +263,18 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
               </div>
 
               {assignee ? (
-                <button onClick={openAssign} title="Reassign"
+                <button onClick={openAssign} title="Reassign" aria-label="Reassign task"
                   style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', borderRadius: '50%', transition: 'opacity 0.1s' }}
                   onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
                   onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
                   <Avatar style={{ width: 22, height: 22 }}>
-                    <AvatarFallback style={{ fontSize: 7, fontWeight: 800, color: '#fff', background: MEMBER_BG[assignee.color] ?? '#1E40AF' }}>
+                    <AvatarFallback style={{ fontSize: 7, fontWeight: 800, color: '#fff', background: avatarColor(assignee.color) }}>
                       {assignee.initials}
                     </AvatarFallback>
                   </Avatar>
                 </button>
               ) : (
-                <button onClick={openAssign} title="Assign member"
+                <button onClick={openAssign} title="Assign member" aria-label="Assign a team member"
                   style={{
                     width: 22, height: 22, borderRadius: '50%', background: 'var(--muted)',
                     border: '1px dashed var(--border)', display: 'flex', alignItems: 'center',
@@ -320,6 +315,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setShowComments(false) }}
+                        aria-label="Close comments"
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', padding: 2, borderRadius: 3 }}
                         onMouseEnter={e => (e.currentTarget.style.color = 'var(--foreground)')}
                         onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted-foreground)')}
@@ -390,7 +386,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                       <textarea
                         value={commentText}
                         onChange={e => setCommentText(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.stopPropagation(); handleSubmitComment(e as any) } }}
+                        onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.stopPropagation(); handleSubmitComment(e) } }}
                         placeholder="Add a comment… (⌘+Enter)"
                         rows={2}
                         onClick={e => e.stopPropagation()}
@@ -435,7 +431,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
         {/* Blue backdrop */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }} onClick={e => { e.stopPropagation(); setAssignOpen(false) }}
-          style={{ position: 'fixed', inset: 0, zIndex: 9990, background: 'rgba(9,9,11,0.22)', backdropFilter: 'blur(4px)' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 9990, background: 'rgba(20, 19, 17,0.22)', backdropFilter: 'blur(4px)' }}
         />
         {/* Member list panel — onClick stopPropagation on the panel itself prevents bubbling to card */}
         <motion.div
@@ -450,7 +446,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t1)', letterSpacing: '-0.01em' }}>Assign to member</div>
               <div style={{ fontSize: 10, color: 'var(--t3)', marginTop: 1 }}>{task.title.slice(0, 40)}{task.title.length > 40 ? '…' : ''}</div>
             </div>
-            <button onClick={() => setAssignOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
+            <button onClick={() => setAssignOpen(false)} aria-label="Close assignee picker" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', display: 'flex', padding: 3, borderRadius: 4 }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--t1)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--t3)')}>
               <X size={13} strokeWidth={1.5} />
@@ -481,7 +477,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                   {/* Avatar */}
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: MEMBER_BG[m.color] ?? '#1D4ED8',
+                    background: avatarColor(m.color),
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 11, fontWeight: 800, color: '#fff',
                     boxShadow: isEffectiveBest ? '0 0 0 2px var(--act)' : undefined,
@@ -538,9 +534,7 @@ export function SprintBoard() {
   const [newAssignee, setNewAssignee] = useState('')
 
   const pct          = Math.round((sprint.completedPoints / sprint.committedPoints) * 100)
-  const daysRemaining = sprint.endDate
-    ? Math.max(0, Math.ceil((new Date(sprint.endDate).getTime() - Date.now()) / 86_400_000))
-    : sprint.daysRemaining
+  const daysRemaining = sprint.daysRemaining // kept fresh by the store on load and health refresh
   const teamAvgLoad  = Math.round(team.reduce((s, m) => s + m.currentLoad, 0) / team.length)
   const blockedCount = tasks.filter(t => t.status === 'blocked').length
   const doneCount    = tasks.filter(t => t.status === 'done').length
@@ -579,7 +573,7 @@ export function SprintBoard() {
             {isBootstrapping && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--act)', display: 'inline-block', animation: 'pulseDot 1.4s ease-in-out infinite' }} />
-                <span style={{ fontSize: 11, color: 'var(--act)', fontWeight: 600 }}>Agent analyzing tasks…</span>
+                <span style={{ fontSize: 11, color: 'var(--act)', fontWeight: 600 }}>Reading the backlog…</span>
               </div>
             )}
             {!isBootstrapping && sprintNarrative && (
@@ -647,8 +641,8 @@ export function SprintBoard() {
                   width: 230, flexShrink: 0, display: 'flex', flexDirection: 'column',
                   borderRadius: 8,
                   background: col.tint ?? 'var(--card)',
-                  border: isOver ? `1px solid ${col.accent}99` : '1px solid var(--border)',
-                  boxShadow: isOver ? `0 0 0 2px ${col.accent}22` : '0 1px 3px rgba(9,9,11,0.06)',
+                  border: isOver ? `1px solid ${withAlpha(col.accent, 0.60)}` : '1px solid var(--border)',
+                  boxShadow: isOver ? `0 0 0 2px ${withAlpha(col.accent, 0.13)}` : '0 1px 3px rgba(20, 19, 17,0.06)',
                   overflow: 'hidden', transition: 'border-color 0.12s, box-shadow 0.12s',
                 }}
               >
@@ -673,11 +667,12 @@ export function SprintBoard() {
                       <span style={{
                         fontSize: 10, fontFamily: 'var(--font-mono), monospace', fontWeight: 700,
                         color: col.id === 'blocked' ? 'var(--crit)' : col.id === 'done' ? 'var(--ok)' : 'var(--muted-foreground)',
-                        background: 'rgba(9,9,11,0.06)', padding: '0 5px', borderRadius: 10, lineHeight: '16px',
+                        background: 'rgba(20, 19, 17,0.06)', padding: '0 5px', borderRadius: 10, lineHeight: '16px',
                       }}>{colTasks.length}</span>
                     )}
                     <button
                       onClick={() => { setAddingToCol(addingToCol === col.id ? null : col.id); setNewTitle(''); setNewAssignee('') }}
+                      aria-label={`Add task to ${col.label}`} aria-expanded={addingToCol === col.id}
                       style={{
                         background: addingToCol === col.id ? 'var(--act-bg)' : 'transparent',
                         border: 'none', cursor: 'pointer', display: 'flex', borderRadius: 3,
@@ -744,7 +739,7 @@ export function SprintBoard() {
                                 >
                                   <div style={{
                                     width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
-                                    background: MEMBER_BG[m.color] ?? '#1D4ED8',
+                                    background: avatarColor(m.color),
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: 6, fontWeight: 800, color: '#fff',
                                   }}>{m.initials}</div>

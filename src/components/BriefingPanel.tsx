@@ -139,8 +139,10 @@ export function BriefingPanel() {
   const [activeTab, setActiveTab] = useState<'team' | 'pm' | 'manager' | 'standup'>('pm')
   const briefings = generateBriefings(tasks, team, sprint, escalations)
   const activeBrief = activeTab !== 'standup' ? briefings.find((b) => b.type === activeTab)! : null
-  const [aiSummary, setAiSummary] = useState<string>('')
-  const [aiLoading, setAiLoading] = useState(false)
+  // AI summaries cached per tab for this visit; loading is derived, not stored.
+  const [summaries, setSummaries] = useState<Partial<Record<string, string>>>({})
+  const aiSummary = summaries[activeTab] ?? ''
+  const aiLoading = activeTab !== 'standup' && summaries[activeTab] === undefined
   const [copied, setCopied] = useState(false)
 
   // Fix #6: build copy text from active brief content
@@ -156,13 +158,14 @@ export function BriefingPanel() {
   }
 
   useEffect(() => {
-    if (activeTab === 'standup') return
-    setAiSummary('')
-    setAiLoading(true)
-    generateBriefingSummary(activeTab as 'team' | 'pm' | 'manager', tasks, team, sprint, escalations)
-      .then(s => { setAiSummary(s); setAiLoading(false) })
-      .catch(() => setAiLoading(false))
-  }, [activeTab])
+    if (activeTab === 'standup' || summaries[activeTab] !== undefined) return
+    let cancelled = false
+    const st = useSprintStore.getState()
+    generateBriefingSummary(activeTab as 'team' | 'pm' | 'manager', st.tasks, st.team, st.sprint, st.escalations)
+      .then(s => { if (!cancelled) setSummaries(m => ({ ...m, [activeTab]: s })) })
+      .catch(() => { if (!cancelled) setSummaries(m => ({ ...m, [activeTab]: '' })) })
+    return () => { cancelled = true }
+  }, [activeTab, summaries])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>

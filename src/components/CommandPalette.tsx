@@ -59,7 +59,7 @@ export function CommandPalette() {
       subtitle: 'Auto-assign best fit', group: 'assign' as const, icon: Zap,
       keywords: ['assign', t.type], action: () => assignTaskById(t.id),
     })),
-  ], [tasks, canRunScenarios, canManage])
+  ], [tasks, canRunScenarios, canManage, setView, triageTaskById, assignTaskById, triggerScenario])
 
   const filtered = useMemo(() => {
     if (!query.trim()) return allCmds
@@ -72,9 +72,14 @@ export function CommandPalette() {
     return order.flatMap(g => { const c = filtered.filter(x => x.group === g); return c.length ? [[g, c] as [Command['group'], Command[]]] : [] })
   }, [filtered])
 
-  useEffect(() => setSel(0), [query])
   useEffect(() => { const h = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setIsOpen(!isOpen) } }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h) }, [isOpen, setIsOpen])
-  useEffect(() => { if (isOpen) { setTimeout(() => inputRef.current?.focus(), 50); setQuery(''); setSel(0) } }, [isOpen])
+  // Reset the search each time the palette opens (React's "adjust state on prop change" pattern, no effect).
+  const [wasOpen, setWasOpen] = useState(isOpen)
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen)
+    if (isOpen) { setQuery(''); setSel(0) }
+  }
+  useEffect(() => { if (isOpen) setTimeout(() => inputRef.current?.focus(), 50) }, [isOpen])
   useEffect(() => { listRef.current?.querySelector('[data-sel="true"]')?.scrollIntoView({ block: 'nearest' }) }, [sel])
 
   const exec = (c: Command) => { c.action(); setIsOpen(false); setQuery('') }
@@ -97,7 +102,7 @@ export function CommandPalette() {
               /* #6 — stronger border + layered shadow */
               border: '1px solid var(--b2)',
               borderRadius: 8,
-              boxShadow: '0 0 0 1px rgba(9,9,11,0.08), 0 8px 24px rgba(9,9,11,0.18), 0 24px 48px rgba(9,9,11,0.10)',
+              boxShadow: '0 0 0 1px rgba(20, 19, 17,0.08), 0 8px 24px rgba(20, 19, 17,0.18), 0 24px 48px rgba(20, 19, 17,0.10)',
               overflow: 'hidden',
             }}
           >
@@ -109,7 +114,7 @@ export function CommandPalette() {
             }}>
               {/* #11 — strokeWidth 1.5 */}
               <Search size={14} style={{ color: 'var(--t2)', flexShrink: 0 }} strokeWidth={1.5} />
-              <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)}
+              <input ref={inputRef} value={query} onChange={e => { setQuery(e.target.value); setSel(0) }}
                 onKeyDown={e => {
                   if (e.key === 'Escape') { setIsOpen(false); return }
                   if (e.key === 'ArrowDown') { e.preventDefault(); setSel(i => Math.min(i + 1, filtered.length - 1)) }
@@ -135,7 +140,7 @@ export function CommandPalette() {
             <div ref={listRef} style={{ maxHeight: 340, overflowY: 'auto', padding: '4px 0' }}>
               {filtered.length === 0 ? (
                 <div style={{ padding: '28px 16px', textAlign: 'center', fontSize: 12, color: 'var(--t3)' }}>
-                  No results for "<span style={{ color: 'var(--t2)' }}>{query}</span>"
+                  No results for &quot;<span style={{ color: 'var(--t2)' }}>{query}</span>&quot;
                 </div>
               ) : grouped.map(([g, cmds]) => (
                 <div key={g}>
@@ -154,7 +159,7 @@ export function CommandPalette() {
                           width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                           padding: '7px 14px', cursor: 'pointer', textAlign: 'left',
                           /* #6 — selected row uses act-bg + left accent stripe */
-                          background: isSel ? 'rgba(12,102,228,0.06)' : 'transparent',
+                          background: isSel ? 'color-mix(in srgb, var(--act) 6%, transparent)' : 'transparent',
                           borderLeft: isSel ? '3px solid var(--act)' : '3px solid transparent',
                           paddingLeft: isSel ? 11 : 14,
                           border: 'none', transition: 'background 0.08s, border-color 0.08s',

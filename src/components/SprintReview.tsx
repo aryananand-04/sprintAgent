@@ -1,3 +1,4 @@
+import { avatarColor } from '../lib/avatarColors'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { BurndownChart } from './BurndownChart'
@@ -40,10 +41,6 @@ function generateRetro(
   return { wentWell, didntGo, tryNext }
 }
 
-const MEMBER_COLORS: Record<string, string> = {
-  'bg-violet-500': '#6D28D9', 'bg-blue-500': '#1D4ED8',
-  'bg-pink-500': '#BE185D',   'bg-emerald-500': '#047857', 'bg-amber-500': '#B45309',
-}
 
 import type { SprintArchive } from '../types'
 
@@ -144,12 +141,10 @@ export function SprintReview() {
   const canManageSprint = useCan('sprint:manage')
   const [showNewSprint, setShowNewSprint] = useState(false)
   const nextNum = parseInt(sprint.name.replace(/\D/g, '') || '23') + 1
-  const nextStart = new Date().toISOString().slice(0, 10)
-  const nextEnd = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10)
   const [newName, setNewName] = useState(`Sprint ${nextNum}`)
   const [newGoal, setNewGoal] = useState('')
-  const [newStart, setNewStart] = useState(nextStart)
-  const [newEnd, setNewEnd] = useState(nextEnd)
+  const [newStart, setNewStart] = useState(() => new Date().toISOString().slice(0, 10))
+  const [newEnd, setNewEnd] = useState(() => new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10))
   const [newPts, setNewPts] = useState(() => sprint.velocity)
   const done = tasks.filter(t => t.status === 'done')
   const inProgress = tasks.filter(t => t.status === 'in-progress')
@@ -269,12 +264,12 @@ export function SprintReview() {
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 5, background: 'rgba(33,110,78,0.05)', border: '1px solid rgba(33,110,78,0.18)' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 5, background: 'color-mix(in srgb, var(--ok) 5%, transparent)', border: '1px solid color-mix(in srgb, var(--ok) 18%, transparent)' }}
                   >
                     <CheckCircle size={11} style={{ color: 'var(--ok)', flexShrink: 0 }} />
                     <span style={{ fontSize: 12, color: 'var(--t1)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</span>
                     {assignee && (
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: MEMBER_COLORS[assignee.color] ?? '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: avatarColor(assignee.color), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
                         {assignee.initials}
                       </div>
                     )}
@@ -296,7 +291,7 @@ export function SprintReview() {
                   initial={{ opacity: 0, x: -6 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04 }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 5, background: 'rgba(174,42,25,0.05)', border: '1px solid rgba(174,42,25,0.18)' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 5, background: 'color-mix(in srgb, var(--crit) 5%, transparent)', border: '1px solid color-mix(in srgb, var(--crit) 18%, transparent)' }}
                 >
                   <AlertTriangle size={11} style={{ color: 'var(--crit)', flexShrink: 0 }} />
                   <span style={{ fontSize: 12, color: 'var(--t1)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</span>
@@ -347,11 +342,11 @@ export function SprintReview() {
             <>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onClick={() => setShowNewSprint(false)}
-                style={{ position: 'fixed', inset: 0, background: 'rgba(9,9,11,0.45)', zIndex: 9998, backdropFilter: 'blur(3px)' }} />
+                style={{ position: 'fixed', inset: 0, background: 'rgba(20, 19, 17,0.45)', zIndex: 9998, backdropFilter: 'blur(3px)' }} />
               <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '48px 16px', pointerEvents: 'none' }}>
                 <motion.div initial={{ opacity: 0, y: -8, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -4 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                  style={{ width: '100%', maxWidth: 440, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(9,9,11,0.18)', overflow: 'hidden', pointerEvents: 'auto' }}>
+                  style={{ width: '100%', maxWidth: 440, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(20, 19, 17,0.18)', overflow: 'hidden', pointerEvents: 'auto' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid var(--border)' }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-0.015em' }}>Start New Sprint</span>
                     <button onClick={() => setShowNewSprint(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', padding: 4, borderRadius: 4 }}>
@@ -421,9 +416,9 @@ export function SprintReview() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[
-              { icon: ThumbsUp, label: 'What went well', items: retro.wentWell, color: 'var(--ok)', bg: 'rgba(33,110,78,0.05)', bd: 'rgba(33,110,78,0.18)' },
-              { icon: ThumbsDown, label: "What didn't go well", items: retro.didntGo, color: 'var(--crit)', bg: 'rgba(174,42,25,0.05)', bd: 'rgba(174,42,25,0.18)' },
-              { icon: Lightbulb, label: 'Try next sprint', items: retro.tryNext, color: 'var(--act)', bg: 'rgba(12,102,228,0.05)', bd: 'rgba(12,102,228,0.18)' },
+              { icon: ThumbsUp, label: 'What went well', items: retro.wentWell, color: 'var(--ok)', bg: 'color-mix(in srgb, var(--ok) 5%, transparent)', bd: 'color-mix(in srgb, var(--ok) 18%, transparent)' },
+              { icon: ThumbsDown, label: "What didn't go well", items: retro.didntGo, color: 'var(--crit)', bg: 'color-mix(in srgb, var(--crit) 5%, transparent)', bd: 'color-mix(in srgb, var(--crit) 18%, transparent)' },
+              { icon: Lightbulb, label: 'Try next sprint', items: retro.tryNext, color: 'var(--act)', bg: 'color-mix(in srgb, var(--act) 5%, transparent)', bd: 'color-mix(in srgb, var(--act) 18%, transparent)' },
             ].map(({ icon: Icon, label, items, color, bg, bd }) => (
               <div key={label} style={{ borderRadius: 6, border: `1px solid ${bd}`, background: bg, padding: '12px 14px', borderLeft: `3px solid ${color}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>

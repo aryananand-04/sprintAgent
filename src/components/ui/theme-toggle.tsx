@@ -1,11 +1,11 @@
 import {
   useState,
   useCallback,
-  useRef,
-  useEffect,
   type ReactNode,
   type CSSProperties,
 } from 'react'
+
+export const THEME_STORAGE_KEY = 'theme'
 
 export type Theme = 'light' | 'dark'
 
@@ -22,15 +22,15 @@ export interface ThemeToggleProps {
 /* ── Curtain + button palette — tuned to this project's design tokens ── */
 const TOKENS: Record<Theme, Record<string, string>> = {
   light: {
-    pageBg:  '#F4F5F7',   /* curtain color when sweeping to light */
-    btnBg:   '#EBECF0',
-    btnText: '#5E6C84',
-    btnRing: 'rgba(9,30,66,0.14)',
+    pageBg:  '#f4f2ec',   /* curtain color when sweeping to light */
+    btnBg:   '#ebe8e0',
+    btnText: '#5e5b55',
+    btnRing: 'rgba(20,19,17,0.14)',
   },
   dark: {
-    pageBg:  '#0D0D10',   /* curtain color when sweeping to dark */
-    btnBg:   '#252529',
-    btnText: '#EEEEF2',
+    pageBg:  '#121110',   /* curtain color when sweeping to dark */
+    btnBg:   '#24221f',
+    btnText: '#f5f3ee',
     btnRing: 'rgba(255,255,255,0.10)',
   },
 }
@@ -68,34 +68,26 @@ export function ThemeToggle({
   duration    = 500,
   onThemeChange,
 }: ThemeToggleProps) {
-  const [theme, setTheme]     = useState<Theme>(defaultTheme)
+  // The no-flash script in the root layout has already applied the saved/OS theme to <html>.
+  const [theme, setTheme]     = useState<Theme>(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : defaultTheme)
   const [phase, setPhase]     = useState<CurtainPhase>('idle')
   const [hovered, setHovered] = useState(false)
   const [pressed, setPressed] = useState(false)
-  const curtainColorRef       = useRef<string>('')
+  const [curtainColor, setCurtainColor] = useState('')
   const t                     = TOKENS[theme]
-
-  /* Sync with existing dark class on mount */
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark')
-    if (isDark && theme !== 'dark') setTheme('dark')
-    else if (!isDark && theme !== 'light') setTheme('light')
-  }, [])
 
   const toggle = useCallback(() => {
     if (phase !== 'idle') return
     const next: Theme = theme === 'light' ? 'dark' : 'light'
-    curtainColorRef.current = TOKENS[next].pageBg
+    setCurtainColor(TOKENS[next].pageBg)
     setPhase('falling')
 
     setTimeout(() => {
       setTheme(next)
       onThemeChange?.(next)
-      if (next === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+      document.documentElement.classList.toggle('dark', next === 'dark')
+      try { localStorage.setItem(THEME_STORAGE_KEY, next) } catch { /* private mode */ }
       setPhase('rising')
       setTimeout(() => setPhase('idle'), duration + 60)
     }, duration)
@@ -104,7 +96,7 @@ export function ThemeToggle({
   const curtainStyle: CSSProperties = {
     position: 'fixed',
     inset: 0,
-    background: curtainColorRef.current,
+    background: curtainColor,
     transformOrigin: 'top',
     transform: phase === 'falling' ? 'scaleY(1)' : 'scaleY(0)',
     transition: phase !== 'idle' ? `transform ${duration}ms ${EASING}` : 'none',

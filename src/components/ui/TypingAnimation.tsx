@@ -20,30 +20,28 @@ export function TypingAnimation({
   showCursor = true,
   onDone,
 }: TypingAnimationProps) {
-  const [displayed, setDisplayed] = useState('')
-  const [done, setDone] = useState(false)
-  const prevText = useRef('')
+  // Progress is tagged with its text, so a new text starts from zero without resetting state in an effect.
+  const [progress, setProgress] = useState({ text: '', n: 0 })
+  const onDoneRef = useRef(onDone)
+  useEffect(() => { onDoneRef.current = onDone })
 
   useEffect(() => {
-    if (text === prevText.current) return
-    prevText.current = text
-    setDisplayed('')
-    setDone(false)
     if (!text) return
-
     let i = 0
     const interval = setInterval(() => {
       i++
-      setDisplayed(text.slice(0, i))
+      setProgress({ text, n: i })
       if (i >= text.length) {
         clearInterval(interval)
-        setDone(true)
-        onDone?.()
+        onDoneRef.current?.()
       }
     }, speed)
-
     return () => clearInterval(interval)
   }, [text, speed])
+
+  const n = progress.text === text ? progress.n : 0
+  const displayed = text.slice(0, n)
+  const done = !!text && n >= text.length
 
   return (
     <span className={className} style={style}>

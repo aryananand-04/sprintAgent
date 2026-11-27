@@ -16,7 +16,7 @@ interface GaugeCircleProps {
 
 /**
  * SVG circular progress gauge.
- * Works on both light (trackColor: rgba(9,9,11,0.08)) and dark
+ * Works on both light (trackColor: rgba(20, 19, 17,0.08)) and dark
  * (trackColor: rgba(255,255,255,0.12)) backgrounds.
  * Set showValue={false} for mini ring usage without center text.
  */
@@ -37,7 +37,7 @@ export function GaugeCircle({
 
   /* Auto-select track color based on whether a custom one is provided.
      Defaults to a neutral that works on white backgrounds. */
-  const resolvedTrack = trackColor ?? 'rgba(9,9,11,0.08)'
+  const resolvedTrack = trackColor ?? 'rgba(20, 19, 17,0.08)'
 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>

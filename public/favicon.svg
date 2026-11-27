@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#0C66E4"/>
-  <polygon points="18,5 10,18 15,18 14,27 22,14 17,14" fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#141311"/><circle cx="9.5" cy="16" r="4" fill="#d7ea3a"/><circle cx="16" cy="16" r="4" fill="#ff9a3c"/><circle cx="22.5" cy="16" r="4" fill="#ff6b57"/></svg>

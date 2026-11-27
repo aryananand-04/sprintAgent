@@ -7,7 +7,7 @@ export function BurndownChart() {
 
   useEffect(() => {
     recordBurndownSnapshot()
-  }, [sprint.completedPoints])
+  }, [sprint.completedPoints, recordBurndownSnapshot])
 
   if (burndownSnapshots.length < 2) {
     return (
