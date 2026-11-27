@@ -12,6 +12,7 @@
     "test:db": "VITEST_DB=1 vitest run db.test",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
+    "github:webhooks": "tsx scripts/github-webhooks.ts",
     "jobs:dev": "npx --yes inngest-cli@1.53.0 dev --no-discovery -u http://localhost:3000/api/inngest",
     "eval:triage": "tsx --conditions=react-server scripts/eval-triage.ts",
     "spdx": "tsx scripts/spdx.ts",
@@ -74,5 +75,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "inngest": {
+      "zod": "$zod"
+    }
   }
 }

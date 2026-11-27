@@ -12,7 +12,7 @@ import { Dashboard } from './Dashboard'
 import { useSprintStore } from '../../store/useSprintStore'
 import { useCommandPaletteStore } from '../../store/commandPaletteStore'
 import { Search, AlertTriangle, Zap, Settings2, HelpCircle, Menu } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from '../ui/theme-toggle'
 import { UserMenu } from '../auth/UserMenu'
@@ -273,6 +273,19 @@ export default function App() {
   useAgentBootstrap(agentEnabled)
   useScheduledStandup(agentEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
+
+  // Back from installing the GitHub App: say what happened, then tidy the URL.
+  useEffect(() => {
+    const result = new URLSearchParams(window.location.search).get('github')
+    if (!result) return
+    const messages: Record<string, string> = {
+      connected: 'GitHub connected. Importing open issues now; new ones will be triaged as they arrive.',
+      taken: 'That GitHub installation is already linked to another workspace.',
+      denied: 'GitHub connection wasn’t completed. Only workspace admins can connect GitHub.',
+    }
+    useSprintStore.getState().addFeedEvent({ type: 'status', message: messages[result] ?? 'GitHub connection didn’t work. Try again from Settings.' })
+    window.history.replaceState(null, '', window.location.pathname)
+  }, [])
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (

@@ -167,6 +167,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"github_installations": {
+                  Row: {
+                    "account_login": string,"connected_by": string | null,"created_at": string,"id": string,"installation_id": number,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "account_login": string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id": number,"workspace_id": string
+                  }
+                  Update: {
+                    "account_login"?: string,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"installation_id"?: number,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "github_installations_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"integrations": {
                   Row: {
                     "created_at": string,"enabled": boolean,"id": string,"kind": Database["public"]['Enums']["integration_kind"],"updated_at": string,"url": string,"workspace_id": string

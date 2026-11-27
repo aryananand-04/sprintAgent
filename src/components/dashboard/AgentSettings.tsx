@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Settings, RefreshCw } from 'lucide-react'
 import { IntegrationsSettings } from './IntegrationsSettings'
+import { GitHubSettings } from './GitHubSettings'
 import { useSprintStore } from '../../store/useSprintStore'
 import type { TaskType } from '../../types'
 import { useCan } from '../auth/SessionProvider'
@@ -85,6 +86,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
           )}
           <fieldset disabled={!canEditPolicy} style={{ display: 'contents' }}>
           <IntegrationsSettings canEdit={canEditPolicy} />
+          <GitHubSettings isAdmin={canEditPolicy} />
 
           {/* Autonomy thresholds */}
           <div>

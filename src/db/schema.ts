@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { sql } from 'drizzle-orm'
 import {
-  pgTable, pgEnum, uuid, text, integer, smallint, boolean, timestamp, date, jsonb,
+  pgTable, pgEnum, uuid, text, integer, bigint, smallint, boolean, timestamp, date, jsonb,
   primaryKey, index, uniqueIndex, check,
 } from 'drizzle-orm/pg-core'
 import { authUsers } from 'drizzle-orm/supabase'
@@ -264,3 +264,13 @@ export const agentCooldowns = pgTable('agent_cooldowns', {
   key: text('key').notNull(),
   firedAt: timestamp('fired_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.workspaceId, t.key] })])
+
+/** A GitHub App installation linked to a workspace. One installation belongs to one workspace. */
+export const githubInstallations = pgTable('github_installations', {
+  id: id(),
+  workspaceId: workspaceId(),
+  installationId: bigint('installation_id', { mode: 'number' }).notNull(),
+  accountLogin: text('account_login').notNull(),
+  connectedBy: uuid('connected_by').references(() => authUsers.id, { onDelete: 'set null' }),
+  createdAt: createdAt(),
+}, (t) => [uniqueIndex('github_installations_installation_key').on(t.installationId)])

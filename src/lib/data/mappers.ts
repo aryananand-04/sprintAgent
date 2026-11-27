@@ -82,7 +82,7 @@ export function taskToUpdate(t: Task, sprintId: string | null): TablesUpdate<'ta
   }
 }
 
-export function taskToInsert(t: Task, workspaceId: string, sprintId: string | null, userId: string): TablesInsert<'tasks'> {
+export function taskToInsert(t: Task, workspaceId: string, sprintId: string | null, userId: string | null): TablesInsert<'tasks'> {
   const { sprint_id, ...rest } = taskToUpdate(t, sprintId)
   return {
     ...rest,

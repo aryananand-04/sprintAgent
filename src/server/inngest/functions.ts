@@ -5,6 +5,7 @@ import { inngest } from './client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { activeWorkspaceIds, runAgentTick } from '@/server/agent/runTick'
 import { deliverDue } from '@/server/outbox'
+import { importInstallation } from '@/server/github/sync'
 
 /** Every 5 minutes: one agent tick per active workspace, fanned out as events. */
 export const scheduleAgentTicks = inngest.createFunction(
@@ -42,4 +43,13 @@ export const deliverOutbox = inngest.createFunction(
   async ({ step }) => step.run('deliver', () => deliverDue(createAdminClient(), { limit: 100 })),
 )
 
-export const functions = [scheduleAgentTicks, agentTick, deliverOutbox]
+/** Full GitHub import after an install. One at a time per workspace; retried on GitHub hiccups. */
+export const githubImport = inngest.createFunction(
+  { id: 'github-import', triggers: [{ event: 'github/import.requested' }], concurrency: { key: 'event.data.workspaceId', limit: 1 }, retries: 3 },
+  async ({ event, step }) => {
+    const { workspaceId, installationId } = event.data as { workspaceId: string; installationId: number }
+    return step.run('import', () => importInstallation(createAdminClient(), workspaceId, installationId))
+  },
+)
+
+export const functions = [scheduleAgentTicks, agentTick, deliverOutbox, githubImport]

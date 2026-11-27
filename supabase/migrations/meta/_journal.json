@@ -64,6 +64,20 @@
       "when": 1795804977195,
       "tag": "20261127184257_agent_cooldowns_security",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795807345383,
+      "tag": "20261127192225_github_installations",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795807345674,
+      "tag": "20261127192226_github_installations_security",
+      "breakpoints": true
     }
   ]
 }
