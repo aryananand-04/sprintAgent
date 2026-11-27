@@ -90,3 +90,19 @@ export function analyzeRequest(raw: string): TextAnalysis {
     signals,
   }
 }
+
+/**
+ * The one question the agent asks when it can't act. Targets the weakest dimension, in plain words.
+ */
+export function askQuestion(task: TextAnalysis['task']): string | null {
+  if (task.externalBlockers.length) return `Who owns the ${task.externalBlockers[0]}, and is there a date?`
+  if (task.clarity <= 2) {
+    if (/\b(premium|better|nicer|modern|polish|feel|pop)\b/i.test(task.description)) {
+      return 'Which screen bothers you most, and what would “better” look like there? One example is plenty.'
+    }
+    return 'What does “done” look like for this? One sentence is fine.'
+  }
+  if (task.effort >= 4) return 'Can we ship a smaller first slice this sprint? What is the must-have part?'
+  if (task.risk >= 4) return 'What is the rollback plan if this misbehaves in production?'
+  return null
+}

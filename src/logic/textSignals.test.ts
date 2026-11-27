@@ -31,3 +31,20 @@ describe('analyzeRequest', () => {
     for (const v of [task.impact, task.effort, task.risk, task.clarity]) expect(v).toBeLessThanOrEqual(5)
   })
 })
+
+import { askQuestion } from './textSignals'
+
+describe('askQuestion', () => {
+  it('asks about the outside dependency first', () => {
+    expect(askQuestion(analyzeRequest('Rotate keys; waiting on legal sign-off').task)).toMatch(/legal sign-off/)
+  })
+  it('asks for an example when the request is subjective', () => {
+    expect(askQuestion(analyzeRequest('make it feel more premium').task)).toMatch(/Which screen/)
+  })
+  it('asks for done-ness when the request is just short', () => {
+    expect(askQuestion(analyzeRequest('fix search').task)).toMatch(/done/)
+  })
+  it('stays quiet when nothing needs asking', () => {
+    expect(askQuestion(analyzeRequest('Typo on pricing page: “recieve” should be “receive”. Steps: open /pricing, see FAQ 2.').task)).toBeNull()
+  })
+})

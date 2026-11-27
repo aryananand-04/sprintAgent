@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/#how', label: 'How it works' },
   { href: '/#decisions', label: 'Decisions' },
   { href: '/#autonomy', label: 'Earned Autonomy' },
+  { href: '/try', label: 'Try it' },
   { href: '/pricing', label: 'Pricing' },
 ]
 
@@ -49,7 +50,7 @@ export function Nav() {
         </ul>
         <div className="ml-auto hidden items-center gap-2 md:flex">
           <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:text-ink">Log in</Link>
-          <ButtonLink href="/pricing#enterprise" variant="secondary">Book a demo</ButtonLink>
+          <ButtonLink href="/try" variant="secondary">Try on your repo</ButtonLink>
           <ButtonLink href="/login">Start free</ButtonLink>
         </div>
         <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="mobile-nav"

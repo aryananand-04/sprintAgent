@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getSession()) redirect(next)
 
   return (
-    <AuthCard title="Sign in" subtitle="Your agent has been keeping an eye on the sprint.">
+    <AuthCard title="Sign in" subtitle="Pick up where the sprint left off.">
       {params.error && ERRORS[params.error] && (
         <p role="alert" className="mb-6 rounded-lg border border-esc-accent/30 bg-esc-tint px-3 py-2 text-xs text-esc-accent">
           {ERRORS[params.error]}

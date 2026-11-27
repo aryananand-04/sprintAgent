@@ -76,13 +76,7 @@ export function TriageDemo() {
         <div className="flex items-center justify-between gap-3">
           <label htmlFor={inputId} className="text-sm font-medium text-ink">Paste a messy request</label>
           {auto && (
-            <span className="flex items-center gap-1.5 text-[11px] text-mute motion-reduce:hidden">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-act-accent opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-act-accent" />
-              </span>
-              Live demo. Click to try your own
-            </span>
+            <span className="font-hand text-[15px] text-mute motion-reduce:hidden">it’s typing by itself. click to take over</span>
           )}
         </div>
         <div className="mt-2 rounded-2xl bg-paper-2 ring-1 ring-inset ring-line focus-within:ring-2 focus-within:ring-agent-accent">
@@ -173,7 +167,7 @@ export function TriageDemo() {
         </motion.div>
       </AnimatePresence>
 
-      <p className="mt-3 text-[11px] text-mute">Same rule engine as the product, running in your browser. No AI call, nothing stored.</p>
+      <p className="mt-3 text-[11px] text-mute">The real rule engine, running in your browser. No AI call, nothing saved, nobody watching.</p>
     </div>
   )
 }

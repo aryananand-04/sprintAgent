@@ -17,7 +17,7 @@
   --act-tint: #f6f9dc;  --act-ink: #1d2a05;  --act-accent: #5f7100;  --act-pop: #d7ea3a;
   --ask-tint: #fdf1e1;  --ask-ink: #3b1d02;  --ask-accent: #9a4d00;  --ask-pop: #ff9a3c;
   --esc-tint: #fdebe8;  --esc-ink: #3f0b06;  --esc-accent: #c2331f;  --esc-pop: #ff6b57;
-  --agent-tint: #ebf2ff; --agent-ink: #06173a; --agent-accent: #2f5bea; --agent-pop: #5b8cff;
+  --agent-tint: #e4f3ef; --agent-ink: #05241f; --agent-accent: #0b6e64; --agent-pop: #2bb3a3;
 
   --shadow-soft: 0 1px 2px rgb(20 19 17 / 0.04), 0 8px 24px -8px rgb(20 19 17 / 0.10);
   --shadow-lift: 0 2px 4px rgb(20 19 17 / 0.05), 0 24px 48px -16px rgb(20 19 17 / 0.18);
@@ -36,7 +36,7 @@
   --act-tint: #1a1f0b;  --act-ink: #eef7c4;  --act-accent: #c6dc3c;  --act-pop: #d7ea3a;
   --ask-tint: #241708;  --ask-ink: #ffe6c7;  --ask-accent: #ffae5c;  --ask-pop: #ff9a3c;
   --esc-tint: #26100c;  --esc-ink: #ffdcd5;  --esc-accent: #ff8a76;  --esc-pop: #ff6b57;
-  --agent-tint: #0d1730; --agent-ink: #dce7ff; --agent-accent: #8aa9ff; --agent-pop: #5b8cff;
+  --agent-tint: #0a1f1c; --agent-ink: #d3f1eb; --agent-accent: #5fd3c2; --agent-pop: #2bb3a3;
 
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.6);
@@ -58,6 +58,7 @@
   --color-agent-tint: var(--agent-tint); --color-agent-ink: var(--agent-ink); --color-agent-accent: var(--agent-accent); --color-agent-pop: var(--agent-pop);
 
   --font-display: var(--font-display-family), var(--font-sans), system-ui, sans-serif;
+  --font-hand: var(--font-hand-family), 'Comic Sans MS', cursive;
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
   --radius-panel: 2.5rem;

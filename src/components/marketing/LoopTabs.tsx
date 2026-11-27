@@ -2,28 +2,27 @@
 
 import { useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Inbox, Filter, UserCheck, Newspaper, Bell } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const STEPS = [
   {
-    id: 'intake', icon: Inbox, title: 'Intake', blurb: 'Requests arrive from Slack, GitHub or a form, and none get lost in DMs.',
+    id: 'intake', title: 'Intake', blurb: 'Requests arrive from Slack, GitHub or a form. None of them die quietly in someone’s DMs.',
     rows: [['#checkout-team', '“Promo codes broke on iOS again?”'], ['GitHub #4421', 'Crash on apply-promo (Sentry)'], ['Form', 'Loyalty points in checkout']],
   },
   {
-    id: 'triage', icon: Filter, title: 'Triage', blurb: 'Each item is scored on urgency, impact, effort, risk and clarity, then gets a decision.',
+    id: 'triage', title: 'Triage', blurb: 'Every item gets scored on five things and gets exactly one of three decisions. No “let’s circle back”.',
     rows: [['Crash on apply-promo', 'ACT · 84'], ['Make checkout premium', 'ASK · 41'], ['Loyalty points', 'ESCALATE · 38']],
   },
   {
-    id: 'assign', icon: UserCheck, title: 'Assign', blurb: 'Clear work goes to the best-fit person who has room, with confidence shown.',
+    id: 'assign', title: 'Assign', blurb: 'Clear work goes to whoever fits best and actually has room, with a confidence score so you can disagree.',
     rows: [['Crash on apply-promo', 'Arjun · 91% fit'], ['Analytics event', 'Mei · 78% fit'], ['Copy fix', 'Sam · 74% fit']],
   },
   {
-    id: 'brief', icon: Newspaper, title: 'Brief', blurb: 'Each role gets a briefing written for it: team status, PM trade-offs, manager confidence.',
+    id: 'brief', title: 'Brief', blurb: 'Everyone gets the update they need and nothing else. The team’s is short; the manager’s has a percentage.',
     rows: [['Team', '2 blocked, 1 needs review'], ['PM', '1 scope decision needed'], ['Manager', 'On pace: 82% confidence']],
   },
   {
-    id: 'escalate', icon: Bell, title: 'Escalate', blurb: 'Risky or ambiguous calls go to a human with the reason and a recommendation.',
+    id: 'escalate', title: 'Escalate', blurb: 'Anything risky or political goes to a human, with the reason and a recommendation.',
     rows: [['Loyalty points', 'Scope +8 pts → PM decides'], ['Session tokens', 'Legal sign-off needed'], ['Dev at 98% load', 'Rebalance suggested']],
   },
 ] as const
@@ -57,8 +56,8 @@ export function LoopTabs() {
               <motion.span layoutId="loop-tab" className="absolute inset-0 rounded-xl bg-paper shadow-soft"
                 transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
             )}
-            <s.icon size={15} className="relative" aria-hidden />
-            <span className="relative">{i + 1}. {s.title}</span>
+            <span className="relative font-mono text-xs text-mute">0{i + 1}</span>
+            <span className="relative">{s.title}</span>
           </button>
         ))}
       </div>

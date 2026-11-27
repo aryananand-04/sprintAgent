@@ -33,7 +33,8 @@ const FAQ = [
   ['Who counts as an active contributor?', 'Anyone who was assigned work or changed a task during the billing month. Viewers and stakeholders who only read briefings never count.'],
   ['Does the free plan use AI?', 'No. Free uses the deterministic rule engine, which handles the full Act / Ask / Escalate flow. AI-assisted triage starts on Team.'],
   ['Can the agent change things without us knowing?', 'Every agent decision is written to an append-only log with its reason, and every agent action can be undone.'],
-  ['Can we start with our existing backlog?', 'Yes. Import from GitHub and the agent triages the backlog before it touches anything.'],
+  ['Can we start with our existing backlog?', 'Yes. Import from GitHub and the agent triages the backlog before it touches anything. You can also try it on a public repo right now, no signup.'],
+  ['Will it replace our PM?', 'No. It replaces the parts of the PM job nobody went to PM school for: chasing updates, re-asking the same question, moving tickets between columns.'],
 ] as const
 
 export default function PricingPage() {
@@ -41,8 +42,8 @@ export default function PricingPage() {
     <Container className="pb-10 pt-12 sm:pt-20">
       <div className="max-w-2xl">
         <Tag tone="act">Pricing</Tag>
-        <h1 className="display-lg mt-6 text-ink">Pay for the people the agent works <span className="text-act-accent">with</span></h1>
-        <p className="mt-5 text-lg text-ink-2">Billing is per active contributor. Viewers and stakeholders are always free.</p>
+        <h1 className="display-lg mt-6 text-ink">Pay for the people it works <span className="text-act-accent">with</span>, not the people who watch</h1>
+        <p className="mt-5 text-lg text-ink-2">Billed per active contributor. Viewers, stakeholders and the VP who only reads the briefing are free forever.</p>
       </div>
 
       <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">

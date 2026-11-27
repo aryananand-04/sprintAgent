@@ -48,7 +48,7 @@ export function ClayFunnel({ className }: Props) {
         <Clay id={g.act} light="#f4ff9e" base="#c9de2c" dark="#7f9200" />
         <Clay id={g.ask} light="#ffd39e" base="#ff9a3c" dark="#c25d00" />
         <Clay id={g.esc} light="#ffb7ab" base="#ff6b57" dark="#b8301d" />
-        <Clay id={g.cup} light="#9cc0ff" base="#5b8cff" dark="#2747b8" />
+        <Clay id={g.cup} light="#9be8dc" base="#2bb3a3" dark="#0b6e64" />
         <linearGradient id={g.stem} x1="0" x2="1">
           <stop offset="0" stopColor="#d8cbb6" /><stop offset="0.5" stopColor="#f5eee2" /><stop offset="1" stopColor="#c9bba3" />
         </linearGradient>
@@ -72,7 +72,7 @@ export function ClayFunnel({ className }: Props) {
       {[{ x: 110, f: g.act }, { x: 200, f: g.ask }, { x: 290, f: g.esc }].map(({ x, f }) => (
         <g key={x}>
           <path d={`M${x - 34} 232 Q${x - 30} 282 ${x} 282 Q${x + 30} 282 ${x + 34} 232 Z`} fill={`url(#${g.cup})`} />
-          <ellipse cx={x} cy="232" rx="34" ry="9" fill="#2747b8" opacity="0.55" />
+          <ellipse cx={x} cy="232" rx="34" ry="9" fill="#0b6e64" opacity="0.55" />
           <circle cx={x} cy="228" r="12" fill={`url(#${f})`} />
         </g>
       ))}
@@ -152,7 +152,7 @@ export function ClayLedger({ className }: Props) {
   return (
     <svg viewBox="0 0 400 320" className={className} aria-hidden="true">
       <defs>
-        <Clay id={g.cover} light="#9cc0ff" base="#5b8cff" dark="#2747b8" />
+        <Clay id={g.cover} light="#9be8dc" base="#2bb3a3" dark="#0b6e64" />
         <Clay id={g.page} light="#ffffff" base="#faf6ee" dark="#e2d8c6" />
         <Clay id={g.mark} light="#ffb7ab" base="#ff6b57" dark="#b8301d" />
       </defs>
@@ -179,7 +179,7 @@ export function ClayDial({ className, level = 2 }: Props & { level?: 0 | 1 | 2 |
     <svg viewBox="0 0 400 320" className={className} aria-hidden="true">
       <defs>
         <Clay id={g.plate} light="#fffaf0" base="#efe6d6" dark="#c9bba3" />
-        <Clay id={g.knob} light="#9cc0ff" base="#5b8cff" dark="#2747b8" />
+        <Clay id={g.knob} light="#9be8dc" base="#2bb3a3" dark="#0b6e64" />
         <Clay id={g.tick} light="#f4ff9e" base="#c9de2c" dark="#7f9200" />
       </defs>
       <Ground id={g.shadow} rx={130} />
@@ -192,7 +192,7 @@ export function ClayDial({ className, level = 2 }: Props & { level?: 0 | 1 | 2 |
       })}
       <g transform={`rotate(${angle} 200 160)`}>
         <circle cx="200" cy="160" r="56" fill={`url(#${g.knob})`} />
-        <rect x="195" y="108" width="10" height="34" rx="5" fill="#ebf2ff" />
+        <rect x="195" y="108" width="10" height="34" rx="5" fill="#e4f3ef" />
       </g>
     </svg>
   )

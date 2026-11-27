@@ -11,7 +11,7 @@ export default async function OnboardingPage() {
   if (!session) redirect('/login?next=/onboarding')
 
   return (
-    <AuthCard title="Create your workspace" subtitle="One workspace per team. You'll be its admin and can invite people next.">
+    <AuthCard title="Name your workspace" subtitle="One per team. You’ll be its admin, which mostly means you get the escalations.">
       <OnboardingForm />
     </AuthCard>
   )

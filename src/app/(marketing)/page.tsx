@@ -1,140 +1,144 @@
 import type { Metadata } from 'next'
-import { Check, GitPullRequest, ShieldCheck, ScrollText } from 'lucide-react'
 import { ButtonLink, Container, Panel, Tag, TONE, type Tone } from '@/components/marketing/primitives'
 import { ClayBell, ClayDial, ClayFunnel, ClayLedger, ClayQuestion, ClayStamp } from '@/components/marketing/clay'
 import { TriageDemo } from '@/components/marketing/TriageDemo'
 import { LoopTabs } from '@/components/marketing/LoopTabs'
 import { AutonomyLicense } from '@/components/marketing/AutonomyLicense'
 import { Reveal, RiseWords } from '@/components/marketing/Reveal'
-import { GithubIcon, SlackIcon } from '@/components/ui/brand-icons'
+import { Scribble } from '@/components/marketing/Scribble'
+import { HouseRules } from '@/components/marketing/HouseRules'
+import { StandupCalculator } from '@/components/marketing/StandupCalculator'
+import { AgentWeek } from '@/components/marketing/AgentWeek'
+import { RepoTryForm } from '@/components/marketing/RepoTryForm'
+import { EscalationArtifact, LogArtifact, QuestionArtifact, TicketArtifact } from '@/components/marketing/DecisionArtifacts'
 import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
-  title: 'Sprint Agent: the sprint operator you can audit',
-  description: 'Sprint Agent triages, assigns and rebalances the routine work in your sprint, and escalates the risky calls to people with the reasons written down.',
+  title: 'Sprint Agent: the sprint admin, handled',
+  description: 'An agent that triages, assigns and chases the routine sprint work, and hands the risky calls to a human with its reasoning attached.',
   openGraph: { title: 'Sprint Agent', description: 'Your sprint, run by an agent you can audit.', type: 'website' },
 }
 
 const DECISIONS: Array<{
-  tone: Tone; tag: string; title: [string, string]; body: string; facts: string[]; art: React.ComponentType<{ className?: string }>
+  tone: Tone; tag: string; title: [string, string]; body: string
+  artifact: React.ComponentType; art: React.ComponentType<{ className?: string }>
 }> = [
   {
-    tone: 'act', tag: 'Act', title: ['Clear work ships', 'without a meeting'], art: ClayStamp,
-    body: 'When a request is well specified, low risk and has no outside blockers, the agent assigns it to the best-fit person who has room, and shows how confident it is.',
-    facts: ['Assignment based on skills and current load', 'Every agent action can be undone', 'Your thresholds, not ours'],
+    tone: 'act', tag: 'Act', title: ['Clear work ships', 'without a meeting about it'], artifact: TicketArtifact, art: ClayStamp,
+    body: 'Well specified, low risk, nothing blocking it? The agent gives it to the person with the right skills and actual room in their week, and says how sure it is. Wrong call? One click undoes it.',
   },
   {
-    tone: 'ask', tag: 'Ask', title: ['Vague asks get', 'one sharp question'], art: ClayQuestion,
-    body: "Low clarity doesn't turn into a guess. The agent writes the one question that unblocks the work and proposes acceptance criteria for the PM to approve.",
-    facts: ['Specific question, not a form', 'Draft acceptance criteria', 'Approved criteria raise clarity'],
+    tone: 'ask', tag: 'Ask', title: ['Vague asks get', 'one good question'], artifact: QuestionArtifact, art: ClayQuestion,
+    body: '“Make it pop” is not a requirement. Instead of guessing, the agent asks the single question that unblocks the work, then drafts acceptance criteria for the PM to approve.',
   },
   {
-    tone: 'esc', tag: 'Escalate', title: ['Risky calls go to a human,', 'with the receipts'], art: ClayBell,
-    body: 'Scope creep, outside sign-offs and high-risk changes go to the right person with the reason and a recommendation: in the app, or in Slack.',
-    facts: ['Scope impact in story points', 'Capacity breaches flagged early', 'Nudges if nobody responds'],
+    tone: 'esc', tag: 'Escalate', title: ['Risky calls go to a human,', 'with the receipts'], artifact: EscalationArtifact, art: ClayBell,
+    body: 'Scope creep dressed up as a “quick change”, legal sign-offs, anything near payments: it goes to the right person with the reason and a recommendation, then follows up politely until someone decides.',
   },
   {
-    tone: 'agent', tag: 'Audit', title: ['Every decision,', 'on the record'], art: ClayLedger,
-    body: 'An append-only log of what the agent decided, why, and who overrode it. Bring it to the retro, or to a compliance review.',
-    facts: ['Rationale stored with each decision', 'Cannot be edited, even by admins', 'Role-based access enforced in the database'],
+    tone: 'agent', tag: 'Audit', title: ['Every decision,', 'on the record'], artifact: LogArtifact, art: ClayLedger,
+    body: 'What it decided, why, and who overruled it, written to a log nobody can edit, admins included. Useful in a retro. More useful in an audit.',
   },
 ]
 
 const AUTONOMY_STEPS = [
-  ['Shadow mode', 'For each kind of work, the agent first only predicts. People decide, and outcomes are recorded.'],
-  ['Scored against reality', 'Its predictions are compared with what people chose and what actually happened.'],
-  ['A license per task type', 'Observe → Suggest → Act with undo → Act. Promotion needs evidence, not a settings toggle.'],
-  ['Automatic demotion', 'If accuracy drifts or an action causes trouble, the level drops by itself.'],
+  ['It starts by watching', 'For each kind of work, the agent only predicts. Your team decides. Both get written down.'],
+  ['It gets marked', 'Predictions are scored against what people chose and how things turned out. It does not grade itself.'],
+  ['It earns a licence', 'Observe → Suggest → Act with undo → Act, per type of work. Bugs might graduate long before features do.'],
+  ['It can lose it', 'If accuracy drifts or an action causes trouble, the level drops on its own.'],
 ] as const
 
 export default function LandingPage() {
   return (
     <>
       {/* Hero */}
-      <Container className="grid gap-12 pb-20 pt-10 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pt-24">
+      <Container className="grid gap-12 pb-16 pt-12 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:pt-28">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-paper-2 px-3 py-1 text-xs font-medium text-ink-2 ring-1 ring-line-soft">
-            <span className="h-1.5 w-1.5 rounded-full bg-act-accent" aria-hidden /> For teams that ship every week
-          </p>
-          <RiseWords className="display-xl mt-6 text-ink" text="Your sprint, run by an agent" accent="you can audit." />
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-2">
-            Sprint Agent triages, assigns and rebalances the routine work in your sprint. The risky, vague and
-            political calls go to a person, and every decision comes with its reasons.
+          <RiseWords className="display-xl text-ink" text="Your sprint, run by an agent" accent="you can audit." />
+          <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-2">
+            It triages the backlog, assigns the obvious work, chases blockers and writes the status update nobody wanted
+            to write. Anything risky, vague or political goes to a person, with its reasoning attached so you can check its homework.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <ButtonLink href="/login" size="lg" arrow>Start free</ButtonLink>
-            <ButtonLink href="#how" size="lg" variant="lime" arrow>See how it works</ButtonLink>
+            <ButtonLink href="/try" size="lg" variant="outline">Try it on your repo</ButtonLink>
           </div>
-          <p className="mt-4 text-sm text-mute">Free for small teams. No credit card.</p>
+          <p className="mt-4 text-sm text-mute">No credit card. No 40-field setup form. No call with sales.</p>
         </div>
-        <Reveal delay={0.25}><TriageDemo /></Reveal>
+        <div className="relative">
+          <Scribble arrow="down-right" className="absolute -top-16 right-10 hidden items-end gap-1 xl:flex" arrowClassName="-mb-6 rotate-12">
+            the VP one is based on a true story
+          </Scribble>
+          <Reveal delay={0.25}><TriageDemo /></Reveal>
+        </div>
       </Container>
 
-      {/* Facts strip (no fake logos) */}
-      <Container>
-        <div className="grid gap-px overflow-hidden rounded-3xl bg-line-soft ring-1 ring-line-soft sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: GitPullRequest, k: '3 decisions', v: 'Act, Ask or Escalate, and nothing in between' },
-            { icon: ScrollText, k: 'Every decision logged', v: 'Append-only, with the reason attached' },
-            { icon: ShieldCheck, k: 'Least privilege', v: 'Viewer, contributor, PM, admin, enforced in the database' },
-          ].map(({ icon: Icon, k, v }) => (
-            <div key={k} className="bg-paper p-5 transition-colors hover:bg-paper-2">
-              <Icon size={18} className="text-mute" aria-hidden />
-              <p className="mt-3 font-display text-lg font-semibold tracking-tight text-ink">{k}</p>
-              <p className="mt-1 text-sm text-mute">{v}</p>
-            </div>
-          ))}
-          <div className="bg-paper p-5 transition-colors hover:bg-paper-2">
-            <div className="flex gap-2 text-ink" aria-hidden><GithubIcon size={18} /><SlackIcon size={18} /></div>
-            <p className="mt-3 font-display text-lg font-semibold tracking-tight text-ink">Works where you work</p>
-            <p className="mt-1 text-sm text-mute">GitHub and Slack today. Linear and Jira next.</p>
-          </div>
+      {/* House rules (replaces the generic stats strip) */}
+      <Container className="mt-12"><Reveal><HouseRules /></Reveal></Container>
+
+      {/* The problem, quantified */}
+      <Container className="mt-28">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <Reveal>
+            <h2 className="display-lg text-ink">Standups were meant to take 15 minutes. <span className="text-ask-accent">Yours didn’t.</span></h2>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-2">
+              Most sprint “process” is people telling each other things a computer already knows. The agent reads the
+              activity and writes the update, and only pulls people in when a decision actually needs one.
+            </p>
+          </Reveal>
+          <Reveal delay={0.1}><StandupCalculator /></Reveal>
         </div>
       </Container>
 
       {/* How it works */}
-      <Container className="mt-24">
+      <Container className="mt-28">
         <Reveal>
-        <Panel id="how" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
-            <div>
-              <Tag tone="agent">The loop</Tag>
-              <h2 className="display-lg mt-6 text-ink">One loop, <span className="text-agent-accent">all sprint long</span></h2>
+          <Panel id="how" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
+            <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
+              <div>
+                <Tag tone="agent">The loop</Tag>
+                <h2 className="display-lg mt-6 text-ink">One loop, <span className="text-agent-accent">all sprint long</span></h2>
+                <p className="mt-4 max-w-md text-lg text-ink-2">Five steps, running quietly in the background. You only notice the ones that need you.</p>
+              </div>
+              <ClayFunnel className="mx-auto h-auto w-full max-w-[360px] animate-float lg:ml-auto lg:mr-0" />
             </div>
-            <ClayFunnel className="mx-auto h-auto w-full max-w-[380px] animate-float lg:ml-auto lg:mr-0" />
-          </div>
-          <div className="mt-10"><LoopTabs /></div>
-        </Panel>
+            <div className="mt-10"><LoopTabs /></div>
+          </Panel>
         </Reveal>
       </Container>
 
-      {/* Decisions */}
-      <Container className="mt-6 space-y-6" >
+      {/* A week in the feed */}
+      <Container className="mt-28 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <h2 className="display-lg text-ink">A week in the agent’s feed</h2>
+          <p className="mt-3 font-hand text-xl text-mute -rotate-1">(lightly edited for drama)</p>
+          <p className="mt-5 max-w-sm text-lg leading-relaxed text-ink-2">It writes like a colleague, not a dashboard: short, specific, and it says when it’s unsure.</p>
+        </div>
+        <AgentWeek />
+      </Container>
+
+      {/* Decisions: each shows the real artifact it produces, alternating sides */}
+      <Container className="mt-28 space-y-6">
         <div id="decisions" className="scroll-mt-24" />
-        {DECISIONS.map((d) => (
+        {DECISIONS.map((d, idx) => (
           <Reveal key={d.tag}>
-          <Panel tone={d.tone} className="group px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
-            <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div>
-                <Tag tone={d.tone}>{d.tag}</Tag>
-                <h2 className={cn('display-lg mt-6', TONE[d.tone].ink)}>
-                  {d.title[0]} <span className={TONE[d.tone].accent}>{d.title[1]}</span>
-                </h2>
-                <p className={cn('mt-5 max-w-lg text-lg leading-relaxed opacity-85', TONE[d.tone].ink)}>{d.body}</p>
-                <ul className="mt-6 space-y-2.5">
-                  {d.facts.map((f) => (
-                    <li key={f} className={cn('flex items-center gap-2.5 text-[15px]', TONE[d.tone].ink)}>
-                      <span className={cn('flex h-5 w-5 items-center justify-center rounded-full text-paper', TONE[d.tone].solid)}><Check size={12} strokeWidth={3} aria-hidden /></span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+            <Panel tone={d.tone} className="group px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
+              <div className={cn('grid gap-10 lg:grid-cols-2 lg:items-center', idx % 2 === 1 && 'lg:[&>*:first-child]:order-2')}>
+                <div>
+                  <Tag tone={d.tone}>{d.tag}</Tag>
+                  <h2 className={cn('display-lg mt-6', TONE[d.tone].ink)}>
+                    {d.title[0]} <span className={TONE[d.tone].accent}>{d.title[1]}</span>
+                  </h2>
+                  <p className={cn('mt-5 max-w-lg text-lg leading-relaxed opacity-85', TONE[d.tone].ink)}>{d.body}</p>
+                </div>
+                <div className="relative flex min-h-[300px] items-center justify-center rounded-[1.75rem] bg-paper/60 p-6 sm:p-10">
+                  <d.art className="pointer-events-none absolute -right-4 -top-6 h-auto w-36 opacity-90 animate-float sm:w-44" />
+                  <div className="relative transition-transform duration-500 group-hover:-translate-y-1">
+                    <d.artifact />
+                  </div>
+                </div>
               </div>
-              <div className="rounded-[1.75rem] bg-gradient-to-b from-paper to-paper-3 p-6 sm:p-10">
-                <d.art className="mx-auto h-auto w-full max-w-[420px] animate-float transition-transform duration-500 group-hover:scale-[1.03]" />
-              </div>
-            </div>
-          </Panel>
+            </Panel>
           </Reveal>
         ))}
       </Container>
@@ -142,48 +146,55 @@ export default function LandingPage() {
       {/* Earned Autonomy */}
       <Container className="mt-6">
         <Reveal>
-        <Panel id="autonomy" tone="agent" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Tag tone="agent">Earned Autonomy</Tag>
-                <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-medium text-agent-accent ring-1 ring-agent-accent/20">Coming soon</span>
+          <Panel id="autonomy" tone="agent" className="scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16 lg:px-14">
+            <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Tag tone="agent">Earned Autonomy</Tag>
+                  <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-medium text-agent-accent ring-1 ring-agent-accent/20">Coming soon</span>
+                </div>
+                <h2 className="display-lg mt-6 text-agent-ink">Trust is earned, <span className="text-agent-accent">not toggled</span></h2>
+                <p className="mt-5 max-w-lg text-lg leading-relaxed text-agent-ink/85">
+                  Most AI tools ask how much you trust them on day one. That’s a strange thing to ask a stranger.
+                  Sprint Agent starts by watching, gets scored against what your team actually did, and earns autonomy
+                  one kind of work at a time.
+                </p>
+                <ol className="mt-8 divide-y divide-agent-accent/15 border-y border-agent-accent/15">
+                  {AUTONOMY_STEPS.map(([title, body], i) => (
+                    <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-x-3 py-4">
+                      <span className="font-display text-2xl font-semibold text-agent-accent">{i + 1}</span>
+                      <div>
+                        <p className="font-semibold text-agent-ink">{title}</p>
+                        <p className="mt-1 text-[15px] leading-relaxed text-agent-ink/75">{body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
               </div>
-              <h2 className="display-lg mt-6 text-agent-ink">Autonomy is earned, <span className="text-agent-accent">not configured</span></h2>
-              <p className="mt-5 max-w-lg text-lg leading-relaxed text-agent-ink/85">
-                Most AI tools ask you to choose how much to trust them. Sprint Agent works it out from evidence,
-                one kind of work at a time, and can lose that trust as easily as it earned it.
-              </p>
-              <ol className="mt-8 grid gap-4 sm:grid-cols-2">
-                {AUTONOMY_STEPS.map(([title, body], i) => (
-                  <li key={title} className="rounded-2xl bg-paper/70 p-4 ring-1 ring-agent-accent/10">
-                    <p className="font-mono text-xs text-agent-accent">0{i + 1}</p>
-                    <p className="mt-1 font-semibold text-agent-ink">{title}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-agent-ink/75">{body}</p>
-                  </li>
-                ))}
-              </ol>
+              <div className="relative">
+                <ClayDial level={2} className="mx-auto -mb-10 h-auto w-full max-w-[280px] animate-float" />
+                <AutonomyLicense />
+              </div>
             </div>
-            <div className="relative">
-              <ClayDial level={2} className="mx-auto -mb-10 h-auto w-full max-w-[300px] animate-float" />
-              <AutonomyLicense />
-            </div>
-          </div>
-        </Panel>
+          </Panel>
         </Reveal>
       </Container>
 
-      {/* Closing CTA */}
-      <Reveal>
-      <Container className="mt-24 text-center">
-        <h2 className="display-lg mx-auto max-w-3xl text-ink">What should your agent handle <span className="text-act-accent">first?</span></h2>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">Connect a repo, import your backlog and see where the agent lands on every item, before it changes anything.</p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <ButtonLink href="/login" size="lg" arrow>Start free</ButtonLink>
-          <ButtonLink href="/pricing" size="lg" variant="outline">See pricing</ButtonLink>
-        </div>
+      {/* Closing: do something, don't just read */}
+      <Container className="mt-28">
+        <Reveal>
+          <div className="grid gap-8 rounded-[2rem] bg-ink px-6 py-12 text-paper sm:rounded-panel sm:px-12 sm:py-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div>
+              <h2 className="display-lg">Point it at your backlog.</h2>
+              <p className="mt-4 max-w-md text-lg text-paper/75">Paste a public GitHub repo and watch every open issue get a decision, a score and a reason. Ten seconds, no signup.</p>
+            </div>
+            <div className="[&_form>div]:bg-paper [&_form>div]:ring-0">
+              <RepoTryForm compact />
+              <p className="mt-4 text-sm text-paper/60">Prefer the full thing? <a href="/login" className="underline underline-offset-4 hover:text-paper">Start free</a>. First sprint runs in shadow mode.</p>
+            </div>
+          </div>
+        </Reveal>
       </Container>
-      </Reveal>
     </>
   )
 }

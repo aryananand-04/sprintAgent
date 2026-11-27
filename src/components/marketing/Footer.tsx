@@ -3,7 +3,7 @@ import { Container, Logo } from './primitives'
 
 const COLUMNS = [
   { title: 'Product', links: [['How it works', '/#how'], ['Decisions', '/#decisions'], ['Earned Autonomy', '/#autonomy'], ['Pricing', '/pricing']] },
-  { title: 'Get started', links: [['Start free', '/login'], ['Log in', '/login'], ['Book a demo', '/pricing#enterprise']] },
+  { title: 'Get started', links: [['Try it on a repo', '/try'], ['Start free', '/login'], ['Log in', '/login']] },
 ]
 
 export function Footer() {
@@ -29,7 +29,7 @@ export function Footer() {
       </Container>
       <Container className="flex flex-col gap-2 border-t border-line-soft py-6 text-xs text-mute sm:flex-row sm:justify-between">
         <p>© {new Date().getFullYear()} Sprint Agent</p>
-        <p>Every agent decision is logged and explainable.</p>
+        <p>Made by people who have sat through too many standups.</p>
       </Container>
     </footer>
   )

@@ -20,7 +20,7 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
           It handles the routine middle of the sprint. <span className="text-agent-accent">You decide the edges.</span>
         </p>
         <ClayFunnel className="mx-auto h-auto w-full max-w-[460px]" />
-        <p className="text-sm text-agent-ink/70">Every agent decision is logged, explained and reversible.</p>
+        <p className="font-hand text-lg text-agent-ink/75">every decision logged, explained and undoable</p>
       </aside>
     </main>
   )
