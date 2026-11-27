@@ -13,8 +13,12 @@ export function generateBriefings(
   const blocked = tasks.filter((t) => t.status === 'blocked')
   const done = tasks.filter((t) => t.status === 'done')
   const openEsc = escalations.filter((e) => !e.resolved)
-  const completedPct = Math.round((sprint.completedPoints / sprint.committedPoints) * 100)
+  const completedPct = sprint.committedPoints > 0 ? Math.round((sprint.completedPoints / sprint.committedPoints) * 100) : 0
   const overloadedMembers = team.filter((m) => m.currentLoad > 85)
+  // Largest unresolved scope request competing with the sprint goal.
+  const tradeOff = tasks
+    .filter((t) => t.decision === 'ESCALATE' && (t.status === 'backlog' || t.status === 'triaged'))
+    .sort((a, b) => (b.storyPoints ?? 0) - (a.storyPoints ?? 0))[0]
 
   // Team Brief
   const teamBrief: BriefingView = {
@@ -69,7 +73,7 @@ export function generateBriefings(
         value: sprint.health === 'green'
           ? 'On track — no action needed'
           : sprint.health === 'yellow'
-            ? 'At risk — 2 escalations need PM decision within 24h'
+            ? `At risk — ${openEsc.length} escalation${openEsc.length === 1 ? '' : 's'} need a PM decision`
             : 'In jeopardy — immediate action required',
         severity: sprint.health === 'green' ? 'ok' : sprint.health === 'yellow' ? 'warn' : 'critical',
       },
@@ -92,8 +96,10 @@ export function generateBriefings(
       {
         icon: '💡',
         label: 'Trade-off',
-        value: `Apple Pay request (13 pts) vs sprint goal. Recommend deferring to Sprint 24.`,
-        severity: 'warn',
+        value: tradeOff
+          ? `${tradeOff.title.split(':')[0]} (${tradeOff.storyPoints ?? '?'} pts) vs sprint goal. Recommend deferring to next sprint.`
+          : 'No scope trade-offs pending',
+        severity: tradeOff ? 'warn' : 'ok',
       },
       {
         icon: '📊',
@@ -108,7 +114,7 @@ export function generateBriefings(
   const managerBrief: BriefingView = {
     type: 'manager',
     label: 'Manager Brief',
-    summary: `Sprint ${sprint.name} delivery at ${completedPct}% with ${sprint.daysRemaining} days remaining. ${overloadedMembers.length > 0 ? `${overloadedMembers.length} engineer(s) above 85% load.` : 'Team load healthy.'} Key milestone risk: auth compliance task blocked.`,
+    summary: `Sprint ${sprint.name} delivery at ${completedPct}% with ${sprint.daysRemaining} days remaining. ${overloadedMembers.length > 0 ? `${overloadedMembers.length} engineer(s) above 85% load.` : 'Team load healthy.'}${blocked.length > 0 ? ` Biggest risk: ${blocked[0].title.split(':')[0]} is blocked.` : ''}`,
     items: [
       {
         icon: '🚀',
@@ -120,7 +126,7 @@ export function generateBriefings(
         icon: '📉',
         label: 'Spillover Risk',
         value: blocked.length >= 2
-          ? `${blocked.length} tasks likely to spill — auth + promo code blocks unresolved`
+          ? `${blocked.length} tasks likely to spill: ${blocked.map((t) => t.title.split(':')[0]).join(', ')}`
           : 'Low spillover risk',
         severity: blocked.length >= 2 ? 'warn' : 'ok',
       },
@@ -135,8 +141,10 @@ export function generateBriefings(
       {
         icon: '🏁',
         label: 'Milestone Impact',
-        value: 'Auth compliance block may delay Q2 payment compliance milestone. Needs legal resolution.',
-        severity: 'critical',
+        value: blocked.length > 0
+          ? `${blocked[0].title.split(':')[0]} is blocked and may delay the sprint goal.`
+          : 'Nothing blocked is threatening the sprint goal',
+        severity: blocked.length === 0 ? 'ok' : sprint.daysRemaining <= 2 ? 'critical' : 'warn',
       },
       {
         icon: '📈',

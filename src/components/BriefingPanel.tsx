@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BarChart2, Users, Target, Briefcase, AlertCircle, CheckCircle, Coffee, Copy, Check } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import { generateBriefings } from '../logic/briefing'
-import { generateBriefingSummary } from '../logic/briefingAI'
+import { generateBriefingSummary } from '../services/briefingAI'
 
 const TAB_CONFIG = {
   team:    { icon: Users,     label: 'Team',    fullLabel: 'Team Brief',    description: 'Operational status for the engineering team' },

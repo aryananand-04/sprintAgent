@@ -8,7 +8,7 @@ import { useSprintStore } from '../store/useSprintStore'
 import { triageTask } from '../logic/triage'
 import { findBestAssignee } from '../logic/assign'
 import { NumberTicker } from './ui/NumberTicker'
-import { generateAcceptanceCriteria } from '../logic/acceptanceCriteria'
+import { generateAcceptanceCriteria } from '../services/acceptanceCriteria'
 import { Typewriter } from './ui/typewriter'
 import { GaugeCircle } from './ui/GaugeCircle'
 

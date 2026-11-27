@@ -32,3 +32,17 @@ describe('resolveAdHoc', () => {
     expect(resolveAdHoc(makeTask({ storyPoints: 8 }), sprint, team, []).resolution).toBe('escalate')
   })
 })
+
+describe('resolveAdHoc edge cases', () => {
+  it('escalates anything already triaged as ESCALATE', () => {
+    expect(resolveAdHoc(makeTask({ decision: 'ESCALATE' }), sprint, team, []).resolution).toBe('escalate')
+  })
+  it('assumes 2 points when a request is unestimated', () => {
+    const r = resolveAdHoc(makeTask({ storyPoints: undefined }), sprint, team, [])
+    expect(r.rationale).toContain('(2 pts)')
+  })
+  it('does not absorb when everyone is overloaded', () => {
+    const r = resolveAdHoc(makeTask({ storyPoints: 2 }), sprint, [makeMember({ currentLoad: 99 })], [])
+    expect(r.resolution).toBe('escalate')
+  })
+})

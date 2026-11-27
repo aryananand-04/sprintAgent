@@ -8,5 +8,13 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.ts', 'server/**/*.test.ts'],
     environment: 'node',
+    coverage: {
+      provider: 'v8',
+      include: ['src/logic/**/*.ts'],
+      exclude: ['**/*.test.ts'],
+      reporter: ['text-summary', 'json-summary', 'html'],
+      // src/logic is the pure decision engine: it must stay near-fully tested.
+      thresholds: { lines: 95, branches: 88, functions: 95, statements: 95 },
+    },
   },
 })

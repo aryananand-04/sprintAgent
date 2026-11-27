@@ -3,7 +3,7 @@
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import { z } from 'zod'
 import type { Task, TriageResult, AutonomyConfig } from '../types'
-import { DEFAULT_AUTONOMY_CONFIG } from './constants'
+import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
 import { chat } from '../lib/llm'
 
 const Dim = z.number().int().min(1).max(5)

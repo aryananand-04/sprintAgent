@@ -90,8 +90,11 @@ test('reduced motion: no autoplay, content fully visible', async ({ browser }) =
 test('standup calculator reacts to inputs', async ({ page }) => {
   await page.goto('/')
   const people = page.getByLabel('People in the meeting')
-  await people.fill('30')
-  await expect(page.getByText(/full-time engineer, standing in a circle/)).toBeVisible()
+  // Inputs filled before hydration are lost, so retry until React has picked up the change.
+  await expect(async () => {
+    await people.fill('30')
+    await expect(page.getByText(/full-time engineer, standing in a circle/)).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15_000 })
   await people.fill('2')
   await page.getByLabel('Minutes it actually takes').fill('5')
   await expect(page.getByText(/That’s reasonable/)).toBeVisible()

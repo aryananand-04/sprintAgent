@@ -11,12 +11,12 @@ import type {
 import { deriveBurndown } from '../logic/burndown'
 import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
 import { triageTask } from '../logic/triage'
-import { triageWithAI } from '../logic/triageAI'
+import { triageWithAI } from '../services/triageAI'
 import { findBestAssignee } from '../logic/assign'
 import { resolveAdHoc } from '../logic/adHoc'
 import { LOAD_ELIGIBILITY_THRESHOLD, LOAD_MAX, LOAD_BASELINE } from '../logic/constants'
 import { computeSprintRisk } from '../logic/scoring'
-import { scoreGoalAlignment } from '../logic/goalAlignment'
+import { scoreGoalAlignment } from '../services/goalAlignment'
 
 export type View = 'sprint' | 'intake' | 'triage' | 'escalations' | 'briefings' | 'autonomy' | 'timeline' | 'review' | 'rationale' | 'planner'
 
@@ -824,7 +824,7 @@ export const useSprintStore = create<SprintStore>()(
 
     const { slackWebhookUrl } = get()
     if (slackWebhookUrl) {
-      import('../logic/slack').then(({ postSlackEscalation }) => {
+      import('../services/slack').then(({ postSlackEscalation }) => {
         postSlackEscalation({ webhookUrl: slackWebhookUrl, taskTitle: esc.taskTitle, reason, recommendation, urgency, appUrl: window.location.href })
       })
     }

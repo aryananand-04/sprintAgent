@@ -6,7 +6,7 @@ import { Inbox, CheckCircle, Zap, AlertTriangle } from 'lucide-react'
 import { useSprintStore } from '../store/useSprintStore'
 import { TaskCard } from './TaskCard'
 import { GitHubImport } from './GitHubImport'
-import { checkForDuplicate, type DuplicateResult } from '../logic/duplicateDetection'
+import { checkForDuplicate, type DuplicateResult } from '../services/duplicateDetection'
 import type { UrgencyLevel } from '../types'
 
 const URGENCY_OPTIONS: { value: UrgencyLevel; label: string; color: string }[] = [

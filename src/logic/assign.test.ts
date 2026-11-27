@@ -24,3 +24,14 @@ describe('findBestAssignee', () => {
     expect(findBestAssignee(makeTask(), [team[0]], [])).toBeNull()
   })
 })
+
+describe('findBestAssignee dependencies', () => {
+  it('prefers whoever owns the task this one depends on', () => {
+    const a = makeMember({ id: 'a', name: 'A' }), b = makeMember({ id: 'b', name: 'B' })
+    const dep = makeTask({ id: 'dep', assigneeId: 'b', status: 'in-progress' })
+    expect(findBestAssignee(makeTask({ dependencies: ['dep'] }), [a, b], [dep])?.memberId).toBe('b')
+  })
+  it('returns null for escalated work', () => {
+    expect(findBestAssignee(makeTask({ decision: 'ESCALATE' }), [makeMember()], [])).toBeNull()
+  })
+})

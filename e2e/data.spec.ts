@@ -59,12 +59,14 @@ import AxeBuilder from '@axe-core/playwright'
 
 for (const theme of ['light', 'dark'] as const) {
   test(`a11y: dashboard (${theme}) has no WCAG AA violations`, async ({ browser }) => {
-    const ctx = await browser.newContext({ colorScheme: theme })
+    const ctx = await browser.newContext({ colorScheme: theme, reducedMotion: 'reduce' })
     await skipTour(ctx)
     const page = await ctx.newPage()
     await loginAs(page, 'pm')
     await expect(page.getByText('Checkout: Payment fails on iOS after promo code').first()).toBeVisible()
-    await page.waitForTimeout(800)
+    // Axe reads computed colours, so wait until no list item is mid-exit (half-faded text fails contrast).
+    await expect(page.locator('[data-motion-pop-id]')).toHaveCount(0)
+    await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'))
     const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
     expect(violations.map((v) => `${v.id}: ${v.nodes.length} × ${v.nodes[0]?.target.join(' ')}`)).toEqual([])
     await ctx.close()

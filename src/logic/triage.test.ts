@@ -39,3 +39,19 @@ describe('triageTask', () => {
     expect(r.dimensions).toEqual({ urgency: 4, impact: 4, effort: 2, risk: 2, clarity: 4 })
   })
 })
+
+describe('triage reasons name the actual cause', () => {
+  it.each([
+    [{ clarity: 1 }, /critically low/],
+    [{ risk: 5, effort: 4 }, /Maximum risk/],
+    [{ externalBlockers: ['legal'] }, /legal/],
+    [{ type: 'urgent' as const, effort: 5, risk: 1 }, /Scope-breaking/],
+    [{ clarity: 2 }, /clarity is low/],
+    [{ type: 'design' as const, clarity: 5 }, /Missing information|Clear requirements/],
+  ])('%o', (over, re) => {
+    expect(triageTask(makeTask(over)).reason).toMatch(re)
+  })
+  it('flags big, half-specified work when the PM raises the ACT bar', () => {
+    expect(triageTask(makeTask({ effort: 4, clarity: 3 }), { ...C, actMinClarity: 4 }).reason).toMatch(/High-effort/)
+  })
+})

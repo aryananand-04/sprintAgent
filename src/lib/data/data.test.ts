@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { describe, it, expect } from 'vitest'
 import { diffById, fieldsChanged } from './diff'
+import fc from 'fast-check'
+import { arbTask } from '../../test/arbitraries'
 import { taskFromRow, taskToUpdate, taskToInsert, escalationFromRow, calibrationFromRows, daysRemaining } from './mappers'
 import { makeTask } from '../../test/factories'
 import type { Tables } from '@/db/database.types'
@@ -25,6 +27,10 @@ describe('task mapping', () => {
     const upd = taskToUpdate(taskFromRow(row), 's')
     for (const [k, v] of Object.entries(upd)) expect(row[k as keyof typeof row]).toEqual(v)
   })
+  it('round-trips any task through a row (property)', () => fc.assert(fc.property(arbTask, (t) => {
+    const upd = taskToUpdate(t, 's')
+    expect(taskToUpdate(taskFromRow({ ...row, ...upd } as typeof row, t.dependencies), 's')).toEqual(upd)
+  })))
   it('never writes trigger-owned or identity columns on update', () => {
     const upd = taskToUpdate(makeTask(), null)
     expect(upd).not.toHaveProperty('completed_at')

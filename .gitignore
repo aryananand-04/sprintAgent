@@ -1,4 +1,4 @@
-# Claude Code / AI tooling
+# Local AI tooling
 .claude/
 .agents/
 skills-lock.json
@@ -38,3 +38,8 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Test reports
+.stryker-tmp/
+reports/
+coverage/

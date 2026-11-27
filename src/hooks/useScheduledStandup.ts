@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useEffect } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
-import { generateStandupText, postStandupToSlack } from '../logic/standupUtils'
+import { generateStandupText, postStandupToSlack } from '../services/standupUtils'
 
 const LS_KEY = 'agent-standup-posted-date'
 const STANDUP_HOUR = 9   // 9am

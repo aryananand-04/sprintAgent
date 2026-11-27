@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { useEffect } from 'react'
 import { useSprintStore } from '../store/useSprintStore'
-import { scoreGoalAlignment } from '../logic/goalAlignment'
-import { generateSprintNarrative } from '../logic/sprintNarrative'
+import { scoreGoalAlignment } from '../services/goalAlignment'
+import { generateSprintNarrative } from '../services/sprintNarrative'
 
 const SESSION_KEY    = 'sprint-agent-bootstrapped'
 const BURNDOWN_KEY   = 'sprint-agent-burndown-date'

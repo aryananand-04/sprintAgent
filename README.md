@@ -1,129 +1,55 @@
-# Sprint Agent — AI-Native Sprint Operator
+# Sprint Agent
 
-> An AI sprint operator that autonomously runs the boring middle of the sprint and escalates only when ambiguity, risk, or scope conflict makes human judgment cheaper than AI action.
+Sprint admin, done by an agent that has to earn the right to act.
 
-## What this is
+It triages incoming work, assigns what's clear, asks one good question when a ticket is vague, and escalates anything risky to a human, with the reasoning written down every time. Nobody writes a status update. Nobody grooms "make checkout feel premium" at 4pm on a Thursday.
 
-Sprint Agent is a high-fidelity prototype of an AI-powered sprint management system. It simulates an autonomous agent that handles the full sprint loop: intake → triage → assignment → tracking → briefing → escalation.
+## How it decides
 
-The core product thesis: **the agent owns the operational middle, not the strategic edges.** It assigns clear work, flags ambiguous work, and escalates risky or conflicting work to humans — always with a visible rationale.
+Every request lands in one of three lanes:
 
----
+- **ACT**: clear and low risk. The agent assigns it and tells you why.
+- **ASK**: something's missing. It asks the requester one specific question.
+- **ESCALATE**: risky, expensive or in conflict with sprint scope. A human decides.
 
-## Quick Start
+The rules are deterministic and readable (`src/logic`). AI helps with wording and edge cases, but it's optional. Without a key, the rule engine runs everything.
+
+## Run it
+
+You'll need Node 20+ and Docker.
 
 ```bash
 npm install
-npm run db:start             # local Supabase (requires Docker)
-npm run db:env               # writes local Supabase keys to .env.local
+npm run db:start   # local Supabase
+npm run db:env     # writes local keys to .env.local
 npm run dev
 ```
 
-AI calls go through a server-side route (`/api/chat`); the key never reaches the browser. Without a key, the deterministic rule engine handles everything.
+Demo logins use the password `password123`: `admin@`, `pm@`, `dev@` and `viewer@demo.sprintagent.dev`.
 
-Optional: add `GROQ_API_KEY` to `.env.local` to enable AI.
+To turn on AI, add `GROQ_API_KEY` to `.env.local`. It stays on the server.
 
-**Database:**
+## Checks
+
 ```bash
-npm run db:reset     # re-apply migrations + demo seed
-npm run db:test      # RLS / integrity tests (pgTAP)
-npm run test:e2e     # Playwright end-to-end (needs db:start)
-npm run db:generate  # new migration after editing src/db/schema.ts
-npm run db:types     # regenerate typed client definitions
-```
-Demo logins (local only, password `password123`): `admin@`, `pm@`, `dev@`, `viewer@demo.sprintagent.dev`.
-
-**Quality checks:**
-```bash
-npm run typecheck
-npm run lint
-npm test
+npm run typecheck && npm run lint && npm test
+npm run db:test    # row-level security tests
+npm run test:e2e   # end-to-end, needs the local database
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+## Under the hood
 
-**Build for production:**
-```bash
-npm run build
-npm run preview
-```
-
----
-
-## Demo Scenarios (click ⚡ Demo Scenarios button)
-
-These one-click triggers are designed for a Loom walkthrough:
-
-| Scenario | What it triggers |
-|----------|-----------------|
-| **Urgent Bug** | Critical production crash enters mid-sprint. Agent classifies as ESCALATE, adds to feed, creates escalation. |
-| **Design Blocked** | Checkout UI task blocked waiting for Priya's sign-off. Board updates, feed narrates. |
-| **Engineer Overloaded** | Dev Mehta hits 98% capacity. Agent flags, adds escalation, blocks new assignments. |
-| **Vague Request** | VP asks to "make checkout feel premium." Agent scores clarity=1, outputs ASK/ESCALATE decision. |
-| **Scope Creep** | "Quick" loyalty points request enters. Agent calculates real effort (8+ days), escalates to PM. |
-
----
-
-## Navigation Guide
-
-| View | What to show |
-|------|-------------|
-| **Sprint Board** | Kanban with 6 columns, sprint health, capacity metrics |
-| **Intake Inbox** | Submit new requests, see ad-hoc resolution decisions |
-| **Triage Queue** | Every task classified by decision (ACT / ASK / ESCALATE). Click any row. |
-| **Escalations** | 3 open escalations with full reason + recommendation |
-| **Briefings** | Team / PM / Manager briefings — role-tailored |
-| **Autonomy Framework** | The agent's ruleset — what it owns vs defers |
-| **Agent Timeline** | Full audit trail of every decision |
-
-**Click any task card → opens full Triage Analysis panel** (scoring breakdown, assignment recommendation, dependencies).
-
----
-
-## Architecture Summary
+Next.js, React, TypeScript, Tailwind, Supabase (Postgres, auth, realtime) and Drizzle, tested with Vitest, Playwright and pgTAP.
 
 ```
-src/
-  types/        — All TypeScript types (Task, Sprint, Team, Feed, etc.)
-  data/         — Seeded mock data (15 tasks, 5 team members, 1 sprint)
-  logic/        — Deterministic agent logic
-    triage.ts   — ACT/ASK/ESCALATE decision engine
-    assign.ts   — Skill+load-based assignment with confidence scoring
-    autonomy.ts — 12 named rules for the policy panel
-    adHoc.ts    — Mid-sprint absorb/swap/escalate handler
-    briefing.ts — Role-based briefing generator
-    scoring.ts  — Triage score, ticket quality, assignment confidence
-  store/        — Zustand store (central state + actions)
-  components/   — 10 React components
-  pages/        — Dashboard layout
+src/logic   decision engine: triage, scoring, assignment, autonomy
+src/app     pages and API routes
+src/db      schema; migrations live in supabase/
+server/     server-only AI code
 ```
-
----
-
-## What's Mocked vs Future-Ready
-
-| Feature | Current State | Future Integration |
-|---------|--------------|-------------------|
-| Task intake | Manual input + seed data | Slack events, GitHub webhooks, Jira API |
-| Triage decisions | Deterministic scoring rules | LLM classification with few-shot prompting |
-| Team assignments | Skill/load matrix | Calendar availability, PR review history |
-| Status feed | Computed from state changes | Real-time Slack messages to team channels |
-| Briefings | Template-based | LLM-generated with actual context window |
-| Sprint data | Local Zustand state | Linear/Jira/Plane API |
-
----
-
-## Tech Stack
-
-- **React 18 + TypeScript** — UI
-- **Vite** — Build tooling
-- **Tailwind CSS** — Utility styling with custom design system
-- **Framer Motion** — Transitions, board animations, panel reveals
-- **Lucide React** — Icons
-- **Zustand** — State management (no backend required)
-
-No external APIs. No auth. No database. Runs entirely in the browser.
 
 ## License
 
-Source-available under the [Functional Source License 1.1 (ALv2 future)](LICENSE): free to use, modify and self-host for anything except a competing product. Each version becomes Apache-2.0 two years after release. © 2026 Akchhya Singh & Aryan Anand. "Sprint Agent" is a trademark; see [TRADEMARKS.md](TRADEMARKS.md).
+Source-available under the [Functional Source License 1.1](LICENSE). Use it, change it and self-host it, as long as you don't build a competing product. Each release becomes Apache-2.0 after two years.
+
+© 2026 Akchhya Singh & Aryan Anand. "Sprint Agent" is a trademark; see [TRADEMARKS.md](TRADEMARKS.md).
