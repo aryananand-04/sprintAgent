@@ -29,3 +29,30 @@ jobs:
           if grep -rlE "groq|dangerouslyAllowBrowser|GROQ_API_KEY|js\.puter\.com" .next/static/; then
             echo "::error::Server-only code leaked into the client bundle"; exit 1
           fi
+
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Drizzle schema and migrations are in sync
+        run: |
+          npx drizzle-kit generate --name ci_drift_check
+          if [ -n "$(git status --porcelain supabase/migrations)" ]; then
+            echo "::error::src/db/schema.ts has changes without a migration. Run npm run db:generate"; exit 1
+          fi
+      - name: Seed is up to date with src/data
+        run: |
+          npm run db:seed:gen
+          git diff --exit-code --stat supabase/seed.sql || (echo "::error::Run npm run db:seed:gen"; exit 1)
+      - run: npx supabase db start
+      - run: npx supabase test db
+      - name: Generated types are up to date
+        run: |
+          npm run db:types
+          git diff --exit-code src/db/database.types.ts || (echo "::error::Run npm run db:types"; exit 1)

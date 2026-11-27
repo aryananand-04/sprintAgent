@@ -14,11 +14,23 @@ The core product thesis: **the agent owns the operational middle, not the strate
 
 ```bash
 npm install
-cp .env.example .env.local   # optional: add GROQ_API_KEY to enable AI
+npm run db:start             # local Supabase (requires Docker)
+npm run db:env               # writes local Supabase keys to .env.local
 npm run dev
 ```
 
 AI calls go through a server-side route (`/api/chat`); the key never reaches the browser. Without a key, the deterministic rule engine handles everything.
+
+Optional: add `GROQ_API_KEY` to `.env.local` to enable AI.
+
+**Database:**
+```bash
+npm run db:reset     # re-apply migrations + demo seed
+npm run db:test      # RLS / integrity tests (pgTAP)
+npm run db:generate  # new migration after editing src/db/schema.ts
+npm run db:types     # regenerate typed client definitions
+```
+Demo logins (local only, password `password123`): `admin@`, `pm@`, `dev@`, `viewer@demo.sprintagent.dev`.
 
 **Quality checks:**
 ```bash
