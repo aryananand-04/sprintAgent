@@ -18,3 +18,21 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: mutation-report, path: reports/mutation }
+  ai-eval:
+    # Runs only when the repo has a GROQ_API_KEY secret; compares AI triage with the golden labels.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Golden-set eval
+        run: |
+          if [ -z "$GROQ_API_KEY" ]; then echo "No GROQ_API_KEY secret; skipping."; exit 0; fi
+          npm run eval:triage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: eval-triage, path: reports/eval-triage.json, if-no-files-found: ignore }

@@ -11,6 +11,7 @@
     "arch": "depcruise src --config .dependency-cruiser.cjs",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
+    "eval:triage": "tsx --conditions=react-server scripts/eval-triage.ts",
     "spdx": "tsx scripts/spdx.ts",
     "spdx:check": "tsx scripts/spdx.ts --check",
     "test": "vitest run",
