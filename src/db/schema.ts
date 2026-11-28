@@ -394,3 +394,44 @@ export const autonomyLicenses = pgTable('autonomy_licenses', {
   check('licenses_levels', sql`${t.earnedLevel} between 0 and 3 and ${t.cap} between 0 and 3`),
   check('licenses_counts', sql`${t.agree} between 0 and ${t.n}`),
 ])
+
+/* ── Billing ──────────────────────────────────────────────────────────── */
+export const billingPlan = pgEnum('billing_plan', ['free', 'team', 'business', 'enterprise'])
+
+/** One per workspace once it has touched billing. Written only by the server (Stripe webhooks, checkout). */
+export const workspaceBilling = pgTable('workspace_billing', {
+  workspaceId: uuid('workspace_id').primaryKey().references(() => workspaces.id, { onDelete: 'cascade' }),
+  plan: billingPlan('plan').notNull().default('free'),
+  /** Stripe subscription status ('none' before any subscription). */
+  status: text('status').notNull().default('none'),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  stripeItemId: text('stripe_item_id'),
+  currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
+  trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
+  trialUsed: boolean('trial_used').notNull().default(false),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+  seats: integer('seats').notNull().default(0),
+  updatedAt: updatedAt(),
+}, (t) => [
+  uniqueIndex('workspace_billing_customer_key').on(t.stripeCustomerId),
+])
+
+/** AI calls per workspace per UTC month, counted atomically against the plan's allowance. */
+export const aiUsage = pgTable('ai_usage', {
+  workspaceId: workspaceId(),
+  month: text('month').notNull(),
+  calls: integer('calls').notNull().default(0),
+}, (t) => [
+  primaryKey({ columns: [t.workspaceId, t.month] }),
+  check('ai_usage_month', sql`${t.month} ~ '^[0-9]{4}-[0-9]{2}$'`),
+])
+
+/** Who counted as an active contributor in a month: assigned work, or changed a task. Kept by trigger. */
+export const contributorActivity = pgTable('contributor_activity', {
+  workspaceId: workspaceId(),
+  month: text('month').notNull(),
+  memberId: uuid('member_id').notNull().references(() => teamMembers.id, { onDelete: 'cascade' }),
+}, (t) => [
+  primaryKey({ columns: [t.workspaceId, t.month, t.memberId] }),
+])

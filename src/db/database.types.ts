@@ -43,6 +43,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"ai_usage": {
+                  Row: {
+                    "calls": number,"month": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "calls"?: number,"month": string,"workspace_id": string
+                  }
+                  Update: {
+                    "calls"?: number,"month"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ai_usage_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"autonomy_licenses": {
                   Row: {
                     "action": Database["public"]['Enums']["licensed_action"],"agree": number,"cap": number,"changed_at": string | null,"earned_level": number,"lower_bound": number,"n": number,"reason": string,"task_type": Database["public"]['Enums']["task_type"],"updated_at": string,"workspace_id": string
@@ -97,6 +117,32 @@ isOneToOne: true
                   Relationships: [
                     {
       foreignKeyName: "calibration_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"contributor_activity": {
+                  Row: {
+                    "member_id": string,"month": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "member_id": string,"month": string,"workspace_id": string
+                  }
+                  Update: {
+                    "member_id"?: string,"month"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contributor_activity_member_id_team_members_id_fk"
+      columns: ["member_id"]
+isOneToOne: false
+      referencedRelation: "team_members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contributor_activity_workspace_id_workspaces_id_fk"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -467,6 +513,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"workspace_billing": {
+                  Row: {
+                    "cancel_at_period_end": boolean,"current_period_end": string | null,"plan": Database["public"]['Enums']["billing_plan"],"seats": number,"status": string,"stripe_customer_id": string | null,"stripe_item_id": string | null,"stripe_subscription_id": string | null,"trial_ends_at": string | null,"trial_used": boolean,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cancel_at_period_end"?: boolean,"current_period_end"?: string | null,"plan"?: Database["public"]['Enums']["billing_plan"],"seats"?: number,"status"?: string,"stripe_customer_id"?: string | null,"stripe_item_id"?: string | null,"stripe_subscription_id"?: string | null,"trial_ends_at"?: string | null,"trial_used"?: boolean,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "cancel_at_period_end"?: boolean,"current_period_end"?: string | null,"plan"?: Database["public"]['Enums']["billing_plan"],"seats"?: number,"status"?: string,"stripe_customer_id"?: string | null,"stripe_item_id"?: string | null,"stripe_subscription_id"?: string | null,"trial_ends_at"?: string | null,"trial_used"?: boolean,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "workspace_billing_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: true
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"workspace_members": {
                   Row: {
                     "created_at": string,"role": Database["public"]['Enums']["workspace_role"],"user_id": string,"workspace_id": string
@@ -510,6 +576,9 @@ isOneToOne: false
             "claim_agent_cooldown":
 { Args: { "check_key": string,"cooldown_seconds": number,"ws": string }; Returns: boolean
                            },
+"consume_ai_call":
+{ Args: { "p_cap": number,"p_month": string,"p_ws": string }; Returns: boolean
+                           },
 "create_workspace":
 { Args: { "p_name": string,"p_slug": string }; Returns: string
                            },
@@ -533,7 +602,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override"|"license","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","licensed_action": "assign"|"rebalance","outbox_status": "pending"|"sent"|"dead","prediction_mode": "shadow"|"acted","prediction_outcome": "agree"|"disagree"|"expired","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","tracker_kind": "linear"|"jira","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
+            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","billing_plan": "free"|"team"|"business"|"enterprise","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override"|"license","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","licensed_action": "assign"|"rebalance","outbox_status": "pending"|"sent"|"dead","prediction_mode": "shadow"|"acted","prediction_outcome": "agree"|"disagree"|"expired","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","tracker_kind": "linear"|"jira","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -653,7 +722,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override", "license"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"licensed_action": ["assign", "rebalance"],"outbox_status": ["pending", "sent", "dead"],"prediction_mode": ["shadow", "acted"],"prediction_outcome": ["agree", "disagree", "expired"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"tracker_kind": ["linear", "jira"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
+            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"billing_plan": ["free", "team", "business", "enterprise"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override", "license"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"licensed_action": ["assign", "rebalance"],"outbox_status": ["pending", "sent", "dead"],"prediction_mode": ["shadow", "acted"],"prediction_outcome": ["agree", "disagree", "expired"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"tracker_kind": ["linear", "jira"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
           }
         }
 } as const

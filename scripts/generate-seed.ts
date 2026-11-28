@@ -176,5 +176,8 @@ join (values ${HISTORY.map((h) => `('${h.type}'::public.task_type, '${h.action}'
 where p.workspace_id = ${uid(WS)}
 group by p.task_type, p.action, v.earned;`)
 
+out.push(`-- The demo shows every feature: it is on Business (set by hand, as an Enterprise contract would be).
+insert into public.workspace_billing (workspace_id, plan, status) values (${uid(WS)}, 'business', 'active');`)
+
 writeFileSync('supabase/seed.sql', out.join('\n') + '\n')
 console.log(`seed.sql: ${TEAM.length} team, ${INITIAL_TASKS.length} tasks, ${INITIAL_ESCALATIONS.length} escalations, ${INITIAL_FEED.length} feed events`)

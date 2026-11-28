@@ -40,11 +40,11 @@ select pg_temp.logout();
 
 select pg_temp.login('pm@demo.sprintagent.dev');
 select throws_ok($q$update public.predictions set outcome = 'agree'$q$, '42501', null, 'PMs cannot mark predictions right');
-select is(pg_temp.affected($q$update public.autonomy_licenses set cap = 0$q$), 0, 'PMs cannot change the ceiling');
+select throws_ok($q$update public.autonomy_licenses set cap = 0$q$, '42501', null, 'PMs cannot change the ceiling');
 select pg_temp.logout();
 
 select pg_temp.login('admin@demo.sprintagent.dev');
-select is(pg_temp.affected($q$update public.autonomy_licenses set cap = 1 where task_type = 'ad-hoc'$q$), 1, 'admins can lower the ceiling');
+select throws_ok($q$update public.autonomy_licenses set cap = 1 where task_type = 'ad-hoc'$q$, '42501', null, 'ceilings change only through the server, which checks the plan');
 select throws_ok($q$update public.autonomy_licenses set earned_level = 3$q$, '42501', null, 'admins cannot grant autonomy that was not earned');
 
 -- ── Evidence comes from what people do ───────────────────────────────

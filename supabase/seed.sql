@@ -342,3 +342,5 @@ join (values ('bug'::public.task_type, 'assign'::public.licensed_action, 3), ('c
   on v.task_type = p.task_type and v.action = p.action
 where p.workspace_id = md5('demo-workspace')::uuid
 group by p.task_type, p.action, v.earned;
+-- The demo shows every feature: it is on Business (set by hand, as an Enterprise contract would be).
+insert into public.workspace_billing (workspace_id, plan, status) values (md5('demo-workspace')::uuid, 'business', 'active');
