@@ -31,6 +31,11 @@ export async function PUT(req: Request): Promise<Response> {
   if (!parsed.success) return Response.json({ error: 'INVALID_REQUEST' }, { status: 400 })
   const problem = checkWebhookUrl(parsed.data.kind, parsed.data.url)
   if (problem) return Response.json({ error: 'INVALID_URL', message: problem }, { status: 422 })
+  if (parsed.data.kind === 'slack_webhook') {
+    // A pasted webhook from another Slack app would carry our Resolve buttons to an app that can't answer them.
+    const { data: app } = await ctx.db.from('slack_installations').select('id').eq('workspace_id', ctx.ws).maybeSingle()
+    if (app) return Response.json({ error: 'SLACK_APP_INSTALLED', message: 'The Slack app is installed. Change the channel with “Change channel” under Slack app instead.' }, { status: 409 })
+  }
   const { error } = await ctx.db.from('integrations')
     .upsert({ workspace_id: ctx.ws, kind: parsed.data.kind, url: parsed.data.url, enabled: true }, { onConflict: 'workspace_id,kind' })
   if (error) return Response.json({ error: 'WRITE_FAILED' }, { status: 409 })
