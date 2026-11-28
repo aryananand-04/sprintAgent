@@ -22,6 +22,17 @@ export function standupDue(now: Date, timeZone: string, hour = STANDUP_HOUR): { 
   return { due: Number(get('hour')) >= hour, day: `${get('year')}-${get('month')}-${get('day')}` }
 }
 
+/**
+ * Whether this week's digest is due: Monday from the standup hour, workspace time. `week` is that
+ * Monday's local date, so a runner can claim it once per week.
+ */
+export function weeklyDue(now: Date, timeZone: string, hour = STANDUP_HOUR): { due: boolean; week: string } {
+  const tz = isTimeZone(timeZone) ? timeZone : 'UTC'
+  const weekday = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'short' }).format(now)
+  const { due, day } = standupDue(now, tz, hour)
+  return { due: due && weekday === 'Mon', week: day }
+}
+
 /** The plain-text (Slack mrkdwn) standup digest. Pure: the date and zone are passed in. */
 export function generateStandupText(
   tasks: Task[],

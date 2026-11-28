@@ -29,7 +29,8 @@
     "db:generate": "drizzle-kit generate",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
     "db:seed:gen": "tsx scripts/generate-seed.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "ledger:verify": "tsx scripts/verify-ledger.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

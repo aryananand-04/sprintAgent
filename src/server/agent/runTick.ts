@@ -11,6 +11,9 @@ import { enqueue } from '@/server/outbox'
 import { triageBacklog } from './triageBacklog'
 import { sendDmBriefings, type DmResult } from '@/server/slack/briefings'
 import { maybeRefreshJiraWebhooks } from '@/server/jira/sync'
+import { sendWeeklyDigest } from '@/server/autonomy/digest'
+import { LEVEL_NAMES, mayAct } from '@/logic/earnedAutonomy'
+import { expireStalePredictions, licenseLevel, loadLicenses, recomputeLicenses, recordPrediction, type License } from '@/server/autonomy/licenses'
 
 type Db = SupabaseClient<Database>
 
@@ -29,12 +32,17 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
   // Cooldowns are enforced at claim time; planning sees everything as eligible.
   const actions = planAgentTick({ tasks: snap.tasks, team, sprint: snap.sprint, escalations: snap.escalations, config: snap.autonomyConfig, now, canFire: () => true })
 
+  // Licences first, so this tick acts on today's evidence.
+  await expireStalePredictions(db, workspaceId, new Date(now))
+  await recomputeLicenses(db, workspaceId, new Date(now))
+  const licenses = await loadLicenses(db, workspaceId)
+
   let applied = 0
   for (const action of actions) {
     const { data: claimed, error } = await db.rpc('claim_agent_cooldown', { ws: workspaceId, check_key: action.key, cooldown_seconds: COOLDOWN_MS / 1000 })
     if (error) throw error
     if (!claimed) continue
-    await apply(db, workspaceId, action, snap.tasks)
+    await apply(db, workspaceId, action, snap.tasks, licenses)
     applied++
   }
   const triaged = await triageBacklog(db, workspaceId, { ...snap, team })
@@ -42,6 +50,7 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
   // DMs are a courtesy: a Slack outage must not fail the tick (and retry the work above).
   const dms = await sendDmBriefings(db, workspaceId, { ...snap, team }, new Date(now))
     .then((r) => r.result).catch((e) => { console.error('[slack] dms', e instanceof Error ? e.message : e); return undefined })
+  await sendWeeklyDigest(db, workspaceId, new Date(now)).catch((e) => console.error('[autonomy] digest', e instanceof Error ? e.message : e))
   // Jira's webhooks lapse after 30 days unless extended; a failure here retries next tick.
   await maybeRefreshJiraWebhooks(db, workspaceId).catch((e) => console.error('[jira] webhook refresh', e instanceof Error ? e.message : e))
   return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup, dms }
@@ -74,7 +83,7 @@ export async function postStandup(db: Db, ws: string, snap: Pick<Snapshot, 'task
   return 'posted'
 }
 
-async function apply(db: Db, ws: string, a: AgentAction, tasks: { id: string; title: string; status: string }[]) {
+async function apply(db: Db, ws: string, a: AgentAction, tasks: Snapshot['tasks'], licenses: License[]) {
   const feed = (row: { type: Database['public']['Enums']['feed_type']; message: string; task_id?: string | null; member_id?: string | null; decision?: 'ACT' | 'ASK' | 'ESCALATE' | null }) =>
     db.from('feed_events').insert({ workspace_id: ws, ...row })
   const audit = (row: { task_id: string | null; kind: Database['public']['Enums']['decision_kind']; decision: 'ACT' | 'ASK' | 'ESCALATE'; rationale: string; payload?: Record<string, unknown> }) =>
@@ -82,6 +91,17 @@ async function apply(db: Db, ws: string, a: AgentAction, tasks: { id: string; ti
 
   if (a.kind === 'reassign') {
     const task = tasks.find((t) => t.id === a.taskId)
+    // Earned Autonomy: moving work between people is licensed per task type.
+    const level = task ? licenseLevel(licenses, task.type, 'rebalance') : 0
+    if (task) await recordPrediction(db, ws, { taskId: task.id, taskType: task.type, action: 'rebalance', level, predictedMemberId: a.toMemberId, previousMemberId: task.assigneeId ?? null, rationale: a.message })
+    if (!mayAct(level)) {
+      if (level === 1) {
+        const message = `Would move "${task?.title ?? 'a task'}" to rebalance load. A person decides: ${task?.type ?? 'these'} moves are at “${LEVEL_NAMES[1]}”.`
+        await feed({ type: a.feedType, message, task_id: a.feedTaskId, member_id: a.toMemberId, decision: 'ACT' })
+        await audit({ task_id: a.taskId, kind: 'rebalance', decision: 'ACT', rationale: a.message, payload: { to: a.toMemberId, check: a.key, mode: 'shadow', level } })
+      }
+      return
+    }
     const status = task && (task.status === 'triaged' || task.status === 'backlog') ? 'assigned' : undefined
     await db.from('tasks').update({ assignee_id: a.toMemberId, decision_reason: a.message, ...(status && { status }) }).eq('id', a.taskId).eq('workspace_id', ws)
     await feed({ type: a.feedType, message: a.message, task_id: a.feedTaskId, member_id: a.toMemberId, decision: 'ACT' })

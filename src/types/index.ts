@@ -222,3 +222,30 @@ export interface TriageResult {
     clarity: number
   }
 }
+
+/** The agent's licence for one task type and action (Earned Autonomy). Levels: 0 Observe … 3 Act. */
+export interface AutonomyLicenseView {
+  taskType: TaskType
+  action: 'assign' | 'rebalance'
+  earned: 0 | 1 | 2 | 3
+  cap: 0 | 1 | 2 | 3
+  n: number
+  agree: number
+  lowerBound: number
+  reason: string
+  changedAt?: string
+}
+
+/** An open prediction: a suggestion waiting for a person (shadow), or an agent action that can still be undone (acted). */
+export interface AgentSuggestion {
+  id: string
+  taskId: string
+  action: 'assign' | 'rebalance'
+  mode: 'shadow' | 'acted'
+  memberId: string | null
+  previousMemberId: string | null
+  confidence: number | null
+  rationale: string
+  undoUntil?: string
+  createdAt: string
+}

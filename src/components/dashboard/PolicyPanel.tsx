@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+import { AutonomyLicenses } from './AutonomyLicenses'
 import { motion } from 'framer-motion'
 import { Shield, Zap, HelpCircle, AlertTriangle, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
@@ -122,6 +123,8 @@ export function PolicyPanel() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <AutonomyLicenses />
+
         {/* Philosophy */}
         <div style={{
           padding: '12px 14px', borderRadius: 5,

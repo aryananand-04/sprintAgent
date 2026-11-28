@@ -11,7 +11,7 @@ import { deriveBurndown } from '@/logic/burndown'
 import { diffById, fieldsChanged } from './diff'
 import {
   taskFromRow, taskToInsert, taskToUpdate, escalationFromRow, escalationToInsert, feedFromRow, feedToInsert,
-  sprintFromRow, sprintToUpdate, policyToUpdate, commentFromRow, teamFromRow,
+  sprintFromRow, sprintToUpdate, policyToUpdate, commentFromRow, teamFromRow, licenseFromRow, suggestionFromRow,
 } from './mappers'
 
 type State = ReturnType<typeof useSprintStore.getState>
@@ -271,6 +271,20 @@ export function startSync(ctx: SyncContext): () => void {
         tasks: s.tasks.map((t) => (t.id !== row.task_id || (t.comments ?? []).some((x) => x.id === c.id)
           ? t : { ...t, comments: [...(t.comments ?? []), c] })),
       }))
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'predictions', filter }, (p: RealtimePostgresChangesPayload<Tables<'predictions'>>) => {
+      if (p.eventType === 'DELETE') return
+      const row = p.new as Tables<'predictions'>
+      // Open predictions are suggestions (or undoable actions); resolved ones leave the board.
+      applyRemote((s) => {
+        const rest = s.suggestions.filter((x) => x.id !== row.id)
+        return { suggestions: row.outcome === null ? [...rest, suggestionFromRow(row)] : rest }
+      })
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'autonomy_licenses', filter }, (p: RealtimePostgresChangesPayload<Tables<'autonomy_licenses'>>) => {
+      if (p.eventType === 'DELETE') return
+      const l = licenseFromRow(p.new as Tables<'autonomy_licenses'>)
+      applyRemote((s) => ({ licenses: [...s.licenses.filter((x) => !(x.taskType === l.taskType && x.action === l.action)), l] }))
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'team_members', filter }, (p: RealtimePostgresChangesPayload<Tables<'team_members'>>) => {
       applyRemote((s) => {

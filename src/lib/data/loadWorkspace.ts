@@ -7,7 +7,7 @@ import type { Database } from '@/db/database.types'
 import type { WorkspaceSnapshot } from '@/store/useSprintStore'
 import {
   taskFromRow, teamFromRow, sprintFromRow, archiveFromRow, escalationFromRow, feedFromRow,
-  commentFromRow, policyFromRow, calibrationFromRows,
+  commentFromRow, policyFromRow, calibrationFromRows, licenseFromRow, suggestionFromRow,
 } from './mappers'
 import type { TaskComment } from '@/types'
 import { DEFAULT_AUTONOMY_CONFIG } from '@/logic/constants'
@@ -24,7 +24,7 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
   if (sprintErr) throw sprintErr
   if (!active) return null
 
-  const [tasks, team, archived, escalations, feed, policy, calibration] = await Promise.all([
+  const [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions] = await Promise.all([
     supabase.from('tasks').select('*').eq('workspace_id', workspaceId)
       .or(`sprint_id.eq.${active.id},sprint_id.is.null`).order('created_at'),
     supabase.from('team_members').select('*').eq('workspace_id', workspaceId).order('created_at'),
@@ -35,8 +35,10 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
       .order('created_at', { ascending: false }).limit(FEED_LIMIT),
     supabase.from('autonomy_policies').select('*').eq('workspace_id', workspaceId).maybeSingle(),
     supabase.from('calibration').select('*').eq('workspace_id', workspaceId),
+    supabase.from('autonomy_licenses').select('*').eq('workspace_id', workspaceId),
+    supabase.from('predictions').select('*').eq('workspace_id', workspaceId).is('outcome', null),
   ])
-  for (const r of [tasks, team, archived, escalations, feed, policy, calibration]) if (r.error) throw r.error
+  for (const r of [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions]) if (r.error) throw r.error
 
   const taskIds = (tasks.data ?? []).map((t) => t.id)
   const [deps, comments] = taskIds.length
@@ -63,5 +65,7 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
     feed: (feed.data ?? []).map(feedFromRow),
     autonomyConfig: policy.data ? policyFromRow(policy.data) : DEFAULT_AUTONOMY_CONFIG,
     calibration: calibrationFromRows(calibration.data ?? []),
+    licenses: (licenses.data ?? []).map(licenseFromRow),
+    suggestions: (suggestions.data ?? []).map(suggestionFromRow),
   }
 }

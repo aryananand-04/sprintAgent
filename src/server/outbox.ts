@@ -22,6 +22,8 @@ export const OutboxEvent = z.discriminatedUnion('type', [
     escalationId: z.guid().optional(),
   }),
   z.object({ type: z.literal('standup'), text: z.string().min(1).max(8_000) }),
+  /** Weekly "what I would've done" (Earned Autonomy). Server-written, like the standup. */
+  z.object({ type: z.literal('digest'), text: z.string().min(1).max(8_000) }),
   z.object({
     type: z.literal('decision'),
     taskTitle: z.string().min(1).max(300),
@@ -33,14 +35,16 @@ export type OutboxEvent = z.infer<typeof OutboxEvent>
 
 /** Which integration receives which event. Slack gets what a human should read; outbound gets everything. */
 const ROUTES: Record<IntegrationKind, OutboxEvent['type'][]> = {
-  slack_webhook: ['escalation', 'standup'],
-  outbound_webhook: ['escalation', 'standup', 'decision'],
+  slack_webhook: ['escalation', 'standup', 'digest'],
+  outbound_webhook: ['escalation', 'standup', 'decision', 'digest'],
 }
 
 /** `interactive`: the workspace's Slack channel belongs to our installed app, so buttons will reach us. */
 export function formatPayload(kind: IntegrationKind, e: OutboxEvent, appUrl?: string, interactive = false): unknown {
   if (kind === 'outbound_webhook') return { event: e.type, data: e, sentAt: new Date().toISOString() }
   if (e.type === 'standup') return { text: e.text, blocks: [{ type: 'section', text: { type: 'mrkdwn', text: slackEscape(e.text) } }] }
+  // The digest is built from escaped parts already (it contains our own *bold* and _italic_).
+  if (e.type === 'digest') return { text: e.text, blocks: [{ type: 'section', text: { type: 'mrkdwn', text: e.text.slice(0, 3_000) } }] }
   if (e.type === 'escalation') return escalationMessage(e, { appUrl, interactive })
   return { text: `${e.decision}: ${e.taskTitle}` }
 }

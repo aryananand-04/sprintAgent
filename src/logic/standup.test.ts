@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import { describe, it, expect } from 'vitest'
-import { generateStandupText, isTimeZone, standupDue } from './standup'
+import { generateStandupText, isTimeZone, standupDue, weeklyDue } from './standup'
 import { makeMember, makeSprint, makeTask } from '../test/factories'
 import type { EscalationItem } from '../types'
 
@@ -51,5 +51,14 @@ describe('generateStandupText', () => {
   })
   it('an empty sprint reads 0%, not NaN%', () => {
     expect(generateStandupText([], [], makeSprint({ committedPoints: 0, completedPoints: 0 }), [], now)).toContain('0% complete')
+  })
+})
+
+describe('weeklyDue', () => {
+  it('Monday from 9am local only', () => {
+    expect(weeklyDue(new Date('2026-11-30T09:00:00Z'), 'UTC')).toEqual({ due: true, week: '2026-11-30' }) // Monday
+    expect(weeklyDue(new Date('2026-11-30T08:00:00Z'), 'UTC').due).toBe(false)
+    expect(weeklyDue(new Date('2026-12-01T09:00:00Z'), 'UTC').due).toBe(false) // Tuesday
+    expect(weeklyDue(new Date('2026-11-30T22:00:00Z'), 'Australia/Sydney').due).toBe(false) // already Tuesday there
   })
 })

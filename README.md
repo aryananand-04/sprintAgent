@@ -14,6 +14,18 @@ Every request lands in one of three lanes:
 
 The rules are deterministic and readable (`src/logic`). AI helps with wording and edge cases, but it's optional. Without a key, the rule engine runs everything.
 
+## How it earns the right to act
+
+The agent doesn't get autonomy from a settings toggle. For each kind of work (bugs, features, chores…) and each action (assigning, moving work between people) it holds a licence:
+
+- **Suggest** (where every workspace starts): it says who it would pick, and a person decides.
+- **Act with undo**: it assigns, and anyone can undo it for four hours.
+- **Act**: it assigns.
+
+Every accepted or overridden suggestion is evidence. A licence goes up only when the evidence clears a published bar (for example, 20+ decisions with at least 80% agreement at 95% confidence) and comes down when recent decisions stop agreeing. Admins can lower any licence; nobody can raise one by hand. Every decision is written to a hash-chained log you can export and verify offline (`npm run ledger:verify -- export.json`).
+
+The rules are an open spec: [docs/earned-autonomy-spec.md](docs/earned-autonomy-spec.md) (CC BY 4.0).
+
 ## Run it
 
 You'll need Node 20+ and Docker.

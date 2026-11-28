@@ -20,8 +20,8 @@ export async function POST(req: Request): Promise<Response> {
 
   const parsed = OutboxEvent.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return Response.json({ error: 'INVALID_REQUEST' }, { status: 400 })
-  // The standup is written and sent by the server agent once a day; browsers can't post one.
-  if (parsed.data.type === 'standup') return Response.json({ error: 'SERVER_ONLY' }, { status: 400 })
+  // The standup and the weekly digest are written and sent by the server agent; browsers can't post them.
+  if (parsed.data.type === 'standup' || parsed.data.type === 'digest') return Response.json({ error: 'SERVER_ONLY' }, { status: 400 })
 
   const ws = session.current.workspace.id
   const db = createAdminClient()

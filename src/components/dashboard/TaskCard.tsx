@@ -10,6 +10,7 @@ import { useSprintStore } from '../../store/useSprintStore'
 import { findBestAssignee } from '../../logic/assign'
 import { GaugeCircle } from '../ui/GaugeCircle'
 import { loadColor } from '../../lib/loadColor'
+import { SuggestionStrip } from './SuggestionStrip'
 
 const TYPE_META: Record<string, { icon: React.ElementType; label: string }> = {
   bug:     { icon: AlertCircle, label: 'Bug' },
@@ -208,6 +209,8 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
                   {task.dependencies.length + task.externalBlockers.length > 0 && <GitBranch size={9} style={{ color: 'var(--t3)' }} />}
                 </div>
               </div>
+
+              <SuggestionStrip task={task} />
 
               {task.isAdHoc && task.adHocResolution && (
                 <div style={{ marginTop: 5, paddingTop: 5, borderTop: '1px solid var(--b0)' }}>

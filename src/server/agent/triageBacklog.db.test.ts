@@ -12,7 +12,7 @@ import { triageBacklog } from './triageBacklog'
 const db = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!, { auth: { persistSession: false } })
 let ws = ''
 const ids = { clear: randomUUID(), vague: randomUUID(), risky: randomUUID() }
-const all = Object.values(ids)
+const all: string[] = Object.values(ids)
 // A model that always wants to act: the rules must still hold ASK and ESCALATE back.
 const bold: Completer = async () => JSON.stringify({ decision: 'ACT', reason: 'Looks fine to me.' })
 
@@ -20,12 +20,13 @@ beforeAll(async () => {
   ws = (await db.from('workspaces').select('id').eq('slug', 'acme-demo').single()).data!.id
   const base = { workspace_id: ws, status: 'backlog' as const, urgency: 'medium' as const, source: 'PM', impact: 3 }
   await db.from('tasks').insert([
-    { ...base, id: ids.clear, title: 'BT: Fix date picker off-by-one', description: 'Expected 30 Nov, shows 29 Nov', type: 'bug', effort: 2, risk: 2, clarity: 5 },
+    { ...base, id: ids.clear, title: 'BT: Spike date picker off-by-one', description: 'Expected 30 Nov, shows 29 Nov', type: 'spike', effort: 2, risk: 2, clarity: 5 },
     { ...base, id: ids.vague, title: 'BT: Make onboarding nicer', description: 'feels off', type: 'feature', effort: 2, risk: 2, clarity: 2 },
     { ...base, id: ids.risky, title: 'BT: Swap payment provider', description: 'move billing', type: 'feature', effort: 5, risk: 5, clarity: 3 },
   ])
 })
 afterAll(async () => {
+  await db.from('autonomy_licenses').delete().eq('workspace_id', ws).eq('task_type', 'spike') // only what this test created
   await db.from('escalations').delete().in('task_id', all)
   await db.from('tasks').delete().in('id', all)
   await db.from('agent_cooldowns').delete().in('key', all.map((id) => `triage-${id}`))
@@ -40,8 +41,11 @@ describe('server backlog triage (database, model faked)', () => {
 
     const { data: tasks } = await db.from('tasks').select('id, decision, status, assignee_id, is_ai_triaged').in('id', all)
     const byId = Object.fromEntries(tasks!.map((t) => [t.id, t]))
-    expect(byId[ids.clear]).toMatchObject({ decision: 'ACT', status: 'assigned', is_ai_triaged: true })
-    expect(byId[ids.clear].assignee_id).toBeTruthy()
+    // No licence for spikes yet (Suggest): the agent predicts an owner but doesn't assign.
+    expect(byId[ids.clear]).toMatchObject({ decision: 'ACT', status: 'triaged', assignee_id: null, is_ai_triaged: true })
+    const { data: pred } = await db.from('predictions').select('mode, predicted_member_id, outcome').eq('task_id', ids.clear).single()
+    expect(pred).toMatchObject({ mode: 'shadow', outcome: null })
+    expect(pred!.predicted_member_id).toBeTruthy()
     expect(byId[ids.vague]).toMatchObject({ decision: 'ASK', status: 'triaged', assignee_id: null })
     expect(byId[ids.risky]).toMatchObject({ decision: 'ESCALATE', status: 'triaged' })
 
@@ -53,6 +57,20 @@ describe('server backlog triage (database, model faked)', () => {
 
     const { count } = await db.from('escalations').select('id', { count: 'exact', head: true }).eq('task_id', ids.risky)
     expect(count).toBe(1)
+  })
+
+  it('with an earned licence it acts, and leaves an undo window at "Act with undo"', async () => {
+    const id = randomUUID()
+    all.push(id)
+    await db.from('tasks').insert({ id, workspace_id: ws, title: 'BT: Spike tooltip clipping', description: 'Expected tooltip fully visible at 1280px; actual clipped by 8px', type: 'spike', status: 'backlog', urgency: 'medium', source: 'PM', impact: 3, effort: 2, risk: 2, clarity: 5 })
+    await db.from('autonomy_licenses').upsert({ workspace_id: ws, task_type: 'spike', action: 'assign', earned_level: 2 })
+    const snap = (await loadWorkspace(ws, db))!
+    expect(await triageBacklog(db, ws, snap, { apiKey: undefined, only: [id] })).toBe(1)
+    const { data: t } = await db.from('tasks').select('status, assignee_id').eq('id', id).single()
+    expect(t!.status).toBe('assigned')
+    const { data: pred } = await db.from('predictions').select('mode, undo_until, predicted_member_id').eq('task_id', id).single()
+    expect(pred).toMatchObject({ mode: 'acted', predicted_member_id: t!.assignee_id })
+    expect(new Date(pred!.undo_until!).getTime()).toBeGreaterThan(Date.now())
   })
 
   it('leaves triaged tickets alone on the next run', async () => {

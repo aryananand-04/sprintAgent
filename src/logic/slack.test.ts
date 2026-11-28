@@ -49,6 +49,7 @@ describe('intakeReply', () => {
   it('says what happened, one line each', () => {
     expect(intakeReply({ title: 'A', decision: 'ACT', assigneeName: 'Mei' })).toBe('Added “A”. Clear enough to start, so it’s with Mei.')
     expect(intakeReply({ title: 'A', decision: 'ACT' })).toMatch(/Nobody has room right now/)
+    expect(intakeReply({ title: 'A', decision: 'ACT', suggestedName: 'Mei' })).toBe('Added “A”. Clear enough to start. I’d give it to Mei; a person confirms on the board.')
     expect(intakeReply({ title: 'A', decision: 'ASK', question: 'Which page?' })).toBe('Added “A”. One question before anyone starts: Which page?')
     expect(intakeReply({ title: 'A', decision: 'ESCALATE' })).toMatch(/escalated/)
     expect(intakeReply({ title: '<b>', decision: null })).toBe('Added “&lt;b&gt;” to the backlog. It’ll be triaged on the next pass.')

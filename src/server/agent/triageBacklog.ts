@@ -10,6 +10,8 @@ import { TriageRequest, runTriage } from '@/server/ai/triage'
 import { groqCompleter, type Completer } from '@/server/llm'
 import { enqueue } from '@/server/outbox'
 import { requestWriteBack } from '@/server/trackers/jobs'
+import { LEVEL_NAMES, mayAct } from '@/logic/earnedAutonomy'
+import { licenseLevel, loadLicenses, recordPrediction } from '@/server/autonomy/licenses'
 
 type Db = SupabaseClient<Database>
 
@@ -59,11 +61,14 @@ export async function triageBacklog(
   const steps = planTriageSteps(outcomes, snap.tasks, snap.team)
 
   const applied: typeof steps = []
+  const licenses = await loadLicenses(db, ws)
   const feed = (row: Omit<Database['public']['Tables']['feed_events']['Insert'], 'workspace_id'>) => db.from('feed_events').insert({ workspace_id: ws, ...row })
   for (const [i, step] of steps.entries()) {
     const { task, outcome } = outcomes[i]
     const { decision, reason, score } = step.outcome
-    const assigned = step.assign
+    // Earned Autonomy: below "Act with undo" for this kind of work, the agent only predicts.
+    const level = step.assign ? licenseLevel(licenses, task.type, 'assign') : 0
+    const assigned = step.assign && mayAct(level) ? step.assign : undefined
     // Only if still untriaged: a person may have triaged it while the model was thinking.
     const { data: updated, error } = await db.from('tasks').update({
       decision, decision_reason: assigned?.rationale ?? reason, triage_score: score, is_ai_triaged: outcome.source === 'ai',
@@ -80,9 +85,18 @@ export async function triageBacklog(
     })
     if (outcome.audit?.overruled) await feed({ type: 'triage', task_id: task.id, decision, message: `Triaged "${task.title}" → ${decision}. The model wanted ${outcome.audit.ai}; the rules said no.` })
 
+    if (step.assign) {
+      await recordPrediction(db, ws, { taskId: task.id, taskType: task.type, action: 'assign', level, predictedMemberId: step.assign.memberId, previousMemberId: task.assigneeId ?? null, confidence: step.assign.confidence, rationale: step.assign.rationale })
+    }
+    if (step.assign && !assigned && level === 1) {
+      const who = snap.team.find((m) => m.id === step.assign!.memberId)?.name ?? 'someone'
+      const message = `Suggests ${who} for "${task.title}". A person decides: ${task.type} assignments are at “${LEVEL_NAMES[1]}”.`
+      await feed({ type: 'assign', message, task_id: task.id, member_id: step.assign.memberId, decision: 'ACT' })
+      await db.from('decisions').insert({ workspace_id: ws, task_id: task.id, kind: 'assign', source: 'rules', decision: null, rationale: step.assign.rationale, payload: { runner: 'server', mode: 'shadow', suggested: step.assign.memberId, confidence: step.assign.confidence, level } })
+    }
     if (assigned) {
       await feed({ type: 'assign', message: assigned.rationale, task_id: task.id, member_id: assigned.memberId, decision: 'ACT' })
-      await db.from('decisions').insert({ workspace_id: ws, task_id: task.id, kind: 'assign', source: 'rules', decision: 'ACT', rationale: assigned.rationale, payload: { runner: 'server', to: assigned.memberId, confidence: assigned.confidence } })
+      await db.from('decisions').insert({ workspace_id: ws, task_id: task.id, kind: 'assign', source: 'rules', decision: 'ACT', rationale: assigned.rationale, payload: { runner: 'server', mode: 'acted', to: assigned.memberId, confidence: assigned.confidence, level } })
       await enqueue(db, ws, { type: 'decision', taskTitle: task.title, decision: 'ACT', reason: assigned.rationale }).catch(() => 0)
     }
     if (step.escalation) {

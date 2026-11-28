@@ -4,6 +4,7 @@
 import type { Tables, TablesInsert, TablesUpdate } from '@/db/database.types'
 import type {
   Task, TeamMember, Sprint, EscalationItem, FeedEvent, AutonomyConfig, CalibrationData, SprintArchive, TaskComment,
+  AutonomyLicenseView, AgentSuggestion,
 } from '@/types'
 
 type TaskRow = Tables<'tasks'>
@@ -248,3 +249,13 @@ export function calibrationFromRows(rows: Tables<'calibration'>[]): CalibrationD
   }
   return { act: pick('ACT'), ask: pick('ASK'), escalate: pick('ESCALATE') }
 }
+
+export const licenseFromRow = (r: Tables<'autonomy_licenses'>): AutonomyLicenseView => ({
+  taskType: r.task_type, action: r.action, earned: r.earned_level as AutonomyLicenseView['earned'], cap: r.cap as AutonomyLicenseView['cap'],
+  n: r.n, agree: r.agree, lowerBound: r.lower_bound, reason: r.reason, changedAt: r.changed_at ?? undefined,
+})
+
+export const suggestionFromRow = (r: Tables<'predictions'>): AgentSuggestion => ({
+  id: r.id, taskId: r.task_id, action: r.action, mode: r.mode, memberId: r.predicted_member_id, previousMemberId: r.previous_member_id,
+  confidence: r.confidence, rationale: r.rationale, undoUntil: r.undo_until ?? undefined, createdAt: r.created_at,
+})

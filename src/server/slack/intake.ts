@@ -37,7 +37,9 @@ export async function intakeFromSlack(db: Db, ws: string, member: Member, rawTex
 
   const { data: row } = await db.from('tasks').select('decision, assignee_id').eq('id', task.id).single()
   const assignee = row?.assignee_id ? snap?.team.find((m) => m.id === row.assignee_id)?.name : null
+  const { data: suggestion } = row?.assignee_id ? { data: null } : await db.from('predictions').select('predicted_member_id').eq('task_id', task.id).eq('action', 'assign').is('outcome', null).maybeSingle()
+  const suggested = suggestion?.predicted_member_id ? snap?.team.find((m) => m.id === suggestion.predicted_member_id)?.name : null
   const ask = row?.decision === 'ASK'
-  const reply = intakeReply({ title: task.title, decision: row?.decision ?? null, assigneeName: assignee, question: ask ? askQuestion(task) : null })
+  const reply = intakeReply({ title: task.title, decision: row?.decision ?? null, assigneeName: assignee, suggestedName: suggested, question: ask ? askQuestion(task) : null })
   return ask ? withAnswerButtons(reply, [{ taskId: task.id, label: 'Answer it now' }]) : { text: reply }
 }

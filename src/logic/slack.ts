@@ -66,8 +66,9 @@ export function slackToPlain(text: string): string {
 export const INTAKE_HELP = 'Describe the work after the command, e.g. `/sprint Checkout fails on Safari 17 after applying a promo code`. I’ll add it to the backlog and triage it.'
 
 /** The answer to whoever filed a request: what happened to it, and the one question if it's an ASK. */
-export function intakeReply(r: { title: string; decision: 'ACT' | 'ASK' | 'ESCALATE' | null; assigneeName?: string | null; question?: string | null }): string {
+export function intakeReply(r: { title: string; decision: 'ACT' | 'ASK' | 'ESCALATE' | null; assigneeName?: string | null; suggestedName?: string | null; question?: string | null }): string {
   const t = `“${slackEscape(r.title)}”`
+  if (r.decision === 'ACT' && !r.assigneeName && r.suggestedName) return `Added ${t}. Clear enough to start. I’d give it to ${slackEscape(r.suggestedName)}; a person confirms on the board.`
   if (r.decision === 'ACT') return r.assigneeName ? `Added ${t}. Clear enough to start, so it’s with ${slackEscape(r.assigneeName)}.` : `Added ${t}. Clear enough to start. Nobody has room right now, so it’s waiting in the backlog.`
   if (r.decision === 'ASK') return `Added ${t}. One question before anyone starts: ${slackEscape(r.question ?? 'what does done look like?')}`
   if (r.decision === 'ESCALATE') return `Added ${t}. It needs a PM’s decision, so I’ve escalated it.`

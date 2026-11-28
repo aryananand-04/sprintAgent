@@ -6,7 +6,7 @@ import type {
   Task, TeamMember, Sprint, FeedEvent, EscalationItem,
   TaskStatus, UrgencyLevel,
   AutonomyConfig, SprintArchive, BurndownSnapshot,
-  CalibrationData, AgentActionSnapshot,
+  CalibrationData, AgentActionSnapshot, AutonomyLicenseView, AgentSuggestion,
 } from '../types'
 import { deriveBurndown } from '../logic/burndown'
 import { DEFAULT_AUTONOMY_CONFIG } from '../logic/constants'
@@ -33,6 +33,8 @@ export interface WorkspaceSnapshot {
   autonomyConfig: AutonomyConfig
   sprintHistory: SprintArchive[]
   calibration: CalibrationData
+  licenses: AutonomyLicenseView[]
+  suggestions: AgentSuggestion[]
 }
 
 const EMPTY_SPRINT: Sprint = {
@@ -64,6 +66,9 @@ interface SprintStore {
   sprintHistory: SprintArchive[]
   burndownSnapshots: BurndownSnapshot[]
   calibration: CalibrationData
+  /** Earned Autonomy: licences per task type/action, and open agent predictions (suggestions, undoable actions). */
+  licenses: AutonomyLicenseView[]
+  suggestions: AgentSuggestion[]
   actionHistory: AgentActionSnapshot[]
   sprintNarrative: string // undo stack (last 10)
 
@@ -75,6 +80,8 @@ interface SprintStore {
 
   triageTaskById: (taskId: string) => Promise<void>
   assignTaskById: (taskId: string, memberId?: string) => void
+  /** Puts back what the agent changed (its assignment or move). Counts as disagreement in its evidence. */
+  undoAgentAssignment: (taskId: string, previousMemberId: string | null) => void
   updateTaskStatus: (taskId: string, status: TaskStatus) => void
   addAdHocTask: (title: string, description: string, urgency?: UrgencyLevel) => void
   addTaskToColumn: (title: string, status: TaskStatus, assigneeId?: string) => void
@@ -142,6 +149,8 @@ export const useSprintStore = create<SprintStore>()(
   sprintHistory: [],
   burndownSnapshots: [],
   calibration: { act: { correct: 0, total: 0 }, ask: { correct: 0, total: 0 }, escalate: { correct: 0, total: 0 } },
+  licenses: [],
+  suggestions: [],
   actionHistory: [],
   sprintNarrative: '',
   feed: [],
@@ -166,6 +175,8 @@ export const useSprintStore = create<SprintStore>()(
     autonomyConfig: snap.autonomyConfig,
     sprintHistory: snap.sprintHistory,
     calibration: snap.calibration,
+    licenses: snap.licenses,
+    suggestions: snap.suggestions,
     burndownSnapshots: deriveBurndown(snap.sprint, snap.tasks),
     actionHistory: [],
   }),
@@ -266,6 +277,18 @@ export const useSprintStore = create<SprintStore>()(
         category,
       )
     }
+  },
+
+  undoAgentAssignment: (taskId, previousMemberId) => {
+    const task = get().tasks.find((t) => t.id === taskId)
+    if (!task) return
+    set((s) => {
+      const tasks = s.tasks.map((t) => (t.id === taskId
+        ? { ...t, assigneeId: previousMemberId ?? undefined, status: previousMemberId ? t.status : ('triaged' as const) }
+        : t))
+      return { tasks, team: computeLoadsFromTasks(tasks, s.team), suggestions: s.suggestions.filter((x) => x.taskId !== taskId) }
+    })
+    get().addFeedEvent({ type: 'assign', message: `Undid the agent's change to "${task.title}". Noted against its licence.`, taskId })
   },
 
   assignTaskById: (taskId, forceMemberId) => {
@@ -446,9 +469,9 @@ export const useSprintStore = create<SprintStore>()(
     setTimeout(() => {
       get().triageTaskById(finalTask.id).then(() => {
         const updated = useSprintStore.getState().tasks.find(t => t.id === finalTask.id)
-        // If ACT and unassigned, auto-assign — agent acts end-to-end
+        // ACT and unassigned: the server agent assigns or suggests an owner, within its earned licence.
         if (updated?.decision === 'ACT' && !updated.assigneeId) {
-          setTimeout(() => get().assignTaskById(finalTask.id), 800)
+          setTimeout(() => { void fetch('/api/agent/propose', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ taskId: finalTask.id }) }).catch(() => {}) }, 1_500)
         }
       })
     }, 400)

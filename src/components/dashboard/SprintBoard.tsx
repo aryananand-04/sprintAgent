@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+import { SuggestionStrip } from './SuggestionStrip'
 import { avatarColor } from '../../lib/avatarColors'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -210,6 +211,8 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
                 )
               })()}
             </div>
+
+            <SuggestionStrip task={task} aboveFooter />
 
             {/* Footer */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 7, borderTop: '1px solid var(--border)' }}>
