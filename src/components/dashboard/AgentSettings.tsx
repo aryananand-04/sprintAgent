@@ -6,6 +6,7 @@ import { X, Settings, RefreshCw } from 'lucide-react'
 import { IntegrationsSettings } from './IntegrationsSettings'
 import { GitHubSettings } from './GitHubSettings'
 import { SlackSettings } from './SlackSettings'
+import { TrackerSettings } from './TrackerSettings'
 import { useSprintStore } from '../../store/useSprintStore'
 import type { TaskType } from '../../types'
 import { useCan } from '../auth/SessionProvider'
@@ -89,6 +90,8 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
           <SlackSettings isAdmin={canEditPolicy} />
           <IntegrationsSettings canEdit={canEditPolicy} />
           <GitHubSettings isAdmin={canEditPolicy} />
+          <TrackerSettings kind="linear" isAdmin={canEditPolicy} />
+          <TrackerSettings kind="jira" isAdmin={canEditPolicy} />
 
           {/* Autonomy thresholds */}
           <div>

@@ -9,7 +9,7 @@ import { needsTriage, planTriageSteps, triageSummary, type TriageOutcome } from 
 import { TriageRequest, runTriage } from '@/server/ai/triage'
 import { groqCompleter, type Completer } from '@/server/llm'
 import { enqueue } from '@/server/outbox'
-import { requestWriteBack } from '@/server/github/jobs'
+import { requestWriteBack } from '@/server/trackers/jobs'
 
 type Db = SupabaseClient<Database>
 
@@ -97,6 +97,6 @@ export async function triageBacklog(
 
   const summary = triageSummary(applied)
   if (summary) await feed({ type: 'status', message: summary })
-  await requestWriteBack(ws, applied.map((s) => s.taskId)).catch((e) => console.error('[github] write-back request', e))
+  await requestWriteBack(ws, applied.map((s) => s.taskId)).catch((e) => console.error('[trackers] write-back request', e))
   return applied.length
 }

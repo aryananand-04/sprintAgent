@@ -7,6 +7,7 @@ import type { AgentDecision } from '@/types'
 import { DEFAULT_AUTONOMY_CONFIG } from '@/logic/constants'
 import { retriageWithAnswer } from '@/logic/github'
 import { policyFromRow, taskFromRow } from '@/lib/data/mappers'
+import { enqueue } from '@/server/outbox'
 
 type Db = SupabaseClient<Database>
 
@@ -19,7 +20,7 @@ export interface Answer {
   authorId?: string | null
   body: string
   /** Where it came from, for the decision log and the feed line. */
-  via: 'github' | 'slack'
+  via: 'github' | 'slack' | 'linear' | 'jira'
   /** Who, as the feed should say it ("@mei", "Mei"). */
   who: string
 }
@@ -49,11 +50,17 @@ export async function applyAnswer(db: Db, ws: string, row: Tables<'tasks'>, a: A
   if (error) throw error
   if (r.decision === 'ASK') return { result: 'recorded', ...same, decision: 'ASK' } // clearer, but still needs an answer
 
-  const where = a.via === 'github' ? 'on GitHub' : 'in Slack'
+  const where = { github: 'on GitHub', slack: 'in Slack', linear: 'in Linear', jira: 'in Jira' }[a.via]
   await db.from('decisions').insert({
     workspace_id: ws, task_id: row.id, kind: 'triage', source: 'rules', decision: r.decision, rationale: r.reason, actor_id: a.authorId ?? null,
     payload: { runner: 'server', trigger: `${a.via}-answer`, from: 'ASK', clarity: { before: row.clarity, after: r.clarity } },
   })
   await db.from('feed_events').insert({ workspace_id: ws, type: 'triage', message: `${a.who} answered ${where}. ${row.title} is now ${r.decision}.`, task_id: row.id, decision: r.decision })
+  if (r.decision === 'ESCALATE') {
+    // Same as any escalation: a PM must see it, and it goes out to the team's channels.
+    const recommendation = 'Review the answer and decide whether the agent may proceed.'
+    const { data: esc } = await db.from('escalations').insert({ workspace_id: ws, task_id: row.id, task_title: row.title, reason: r.reason, recommendation, urgency: row.urgency, category: 'ambiguous' }).select('id').single()
+    await enqueue(db, ws, { type: 'escalation', taskTitle: row.title, reason: r.reason, recommendation, urgency: row.urgency, escalationId: esc?.id }).catch(() => 0)
+  }
   return { result: 'retriaged', ...same, decision: r.decision }
 }

@@ -5,7 +5,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vites
 import { generateKeyPairSync, randomUUID } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/db/database.types'
-import { writeBack } from './writeback'
+import { relayAnswer, writeBack } from './writeback'
 
 const db = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!, { auth: { persistSession: false } })
 const REF = 'https://github.com/wbtest/repo/issues/77'
@@ -58,9 +58,16 @@ describe('GitHub write-back (database, GitHub faked)', () => {
     expect(calls.some((c) => c.path.endsWith('/comments'))).toBe(false)
   })
 
+  it('relays a Slack answer onto the issue, mentions defused', async () => {
+    expect(await relayAnswer(db, ws, taskId, 'Mei', 'Done when @octocat signs off')).toBe('posted')
+    const c = calls.find((x) => x.path.endsWith('/issues/77/comments'))!
+    expect(JSON.parse(c.body!).body).toMatch(/^\*\*Mei\*\* answered in Slack:\n\n> Done when @\u200boctocat signs off/)
+  })
+
   it('does nothing while write-back is off', async () => {
     await db.from('github_installations').update({ write_back: false }).eq('installation_id', INSTALL)
     expect(await writeBack(db, ws, taskId)).toBe('off')
+    expect(await relayAnswer(db, ws, taskId, 'Mei', 'x')).toBe('off')
     expect(calls).toEqual([])
   })
 })

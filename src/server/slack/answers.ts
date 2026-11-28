@@ -7,7 +7,8 @@ import { answerModal, answerOutcome } from '@/logic/slack'
 import { askQuestion } from '@/logic/textSignals'
 import { taskFromRow } from '@/lib/data/mappers'
 import { applyAnswer } from '@/server/agent/answer'
-import { requestWriteBack } from '@/server/github/jobs'
+import { relayAnswer, requestWriteBack, trackersConfigured } from '@/server/trackers/jobs'
+import { afterResponse } from '@/server/background'
 import { slackApi } from './api'
 import type { SlackLink } from './install'
 import type { Member } from './actions'
@@ -43,7 +44,10 @@ export async function submitAnswer(db: Db, link: SlackLink, member: Member, task
   const row = await openAsk(db, link.workspaceId, taskId)
   if (!row) return { ok: false, error: NOT_OPEN }
   const out = await applyAnswer(db, link.workspaceId, row, { authorName: `${member.name} (Slack)`, authorId: member.userId, body: text, via: 'slack', who: member.name })
-  if (out.result === 'retriaged') await requestWriteBack(link.workspaceId, [out.taskId]).catch((e) => console.error('[github] write-back request', e))
+  if (out.result === 'retriaged') await requestWriteBack(link.workspaceId, [out.taskId]).catch((e) => console.error('[trackers] write-back request', e))
+  if (trackersConfigured()) {
+    await afterResponse(() => relayAnswer(db, link.workspaceId, taskId, member.name, text).catch((e) => console.error('[trackers] relay answer', e instanceof Error ? e.message : e)))
+  }
   const after = out.decision === 'ASK' ? await openAsk(db, link.workspaceId, taskId) : null
   return { ok: true, reply: answerOutcome({ title: out.title, decision: out.decision, question: after ? questionFor(after) : null }) }
 }

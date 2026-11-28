@@ -3,7 +3,7 @@
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(52);
+select plan(56);
 
 -- Fixtures: a second workspace + outsider user
 insert into auth.users (id, email, aud, role) values
@@ -188,6 +188,20 @@ select throws_ok($q$select * from public.member_by_email(md5('demo-workspace')::
 select pg_temp.logout();
 select pg_temp.login('dev@demo.sprintagent.dev');
 select is((select count(*)::int from public.slack_installations), 0, 'contributors do not see the Slack link');
+select pg_temp.logout();
+
+-- ── Linear/Jira links: PMs see the link, nobody sees tokens ─────────
+insert into public.tracker_connections (workspace_id, kind, external_id, name, site_url, access_token_sealed)
+  values (md5('demo-workspace')::uuid, 'jira', 'cloud-pgtap', 'Acme Jira', 'https://acme.atlassian.net', 'v1.sealed');
+select pg_temp.login('pm@demo.sprintagent.dev');
+select is((select name from public.tracker_connections), 'Acme Jira', 'PM sees the linked tracker');
+select throws_ok('select access_token_sealed from public.tracker_connections', '42501', null, 'PM cannot read tracker tokens');
+select pg_temp.logout();
+select pg_temp.login('admin@demo.sprintagent.dev');
+select throws_ok($q$update public.tracker_connections set write_back = true$q$, '42501', null, 'admins change trackers through the server only');
+select pg_temp.logout();
+select pg_temp.login('dev@demo.sprintagent.dev');
+select is((select count(*)::int from public.tracker_connections), 0, 'contributors do not see tracker links');
 select pg_temp.logout();
 
 select * from finish();

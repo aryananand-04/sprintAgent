@@ -3,7 +3,7 @@
 import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/db/database.types'
-import { DECISION_LABELS, askComment, parseIssueUrl } from '@/logic/github'
+import { DECISION_LABELS, askComment, parseIssueUrl, relayedAnswerComment } from '@/logic/github'
 import { askQuestion } from '@/logic/textSignals'
 import { GitHubError, asInstallation } from './app'
 
@@ -58,4 +58,20 @@ export async function writeBack(db: Db, ws: string, taskId: string): Promise<Wri
   if (!first) return 'labelled'
   await asInstallation(id, `${repoPath}/issues/${ref.number}/comments`, { method: 'POST', body: JSON.stringify({ body: askComment(question) }) })
   return 'labelled+asked'
+}
+
+/**
+ * Mirrors an answer given in Slack onto the task's GitHub issue, so people working on GitHub see it.
+ * Only for GitHub-sourced tasks in workspaces that turned write-back on.
+ */
+export async function relayAnswer(db: Db, ws: string, taskId: string, who: string, body: string): Promise<'posted' | 'off' | 'not-github' | 'no-installation'> {
+  const { data: task } = await db.from('tasks').select('external_ref').eq('workspace_id', ws).eq('id', taskId).maybeSingle()
+  const ref = parseIssueUrl(task?.external_ref)
+  if (!ref) return 'not-github'
+  const { data: installs } = await db.from('github_installations').select('installation_id, account_login, write_back').eq('workspace_id', ws)
+  const install = installs?.find((i) => i.account_login.toLowerCase() === ref.owner.toLowerCase())
+  if (!install) return 'no-installation'
+  if (!install.write_back) return 'off'
+  await asInstallation(install.installation_id, `/repos/${ref.owner}/${ref.repo}/issues/${ref.number}/comments`, { method: 'POST', body: JSON.stringify({ body: relayedAnswerComment(who, 'Slack', body) }) })
+  return 'posted'
 }

@@ -5,7 +5,7 @@ import { verifyWebhook } from '@/server/github/app'
 import { syncIssue, workspaceForInstallation } from '@/server/github/sync'
 import { isPullRequest, type GhComment, type GhIssue } from '@/logic/github'
 import { handleIssueComment } from '@/server/github/answers'
-import { requestWriteBack } from '@/server/github/jobs'
+import { requestWriteBack } from '@/server/trackers/jobs'
 
 interface Payload {
   action?: string

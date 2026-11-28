@@ -301,3 +301,32 @@ export const slackInstallations = pgTable('slack_installations', {
   uniqueIndex('slack_installations_team_key').on(t.teamId),
   uniqueIndex('slack_installations_workspace_key').on(t.workspaceId),
 ])
+
+export const trackerKind = pgEnum('tracker_kind', ['linear', 'jira'])
+
+/**
+ * A Linear organization or Jira site linked to a workspace (one of each kind per workspace; one
+ * workspace per external org). OAuth tokens are sealed by the server and never readable by users.
+ */
+export const trackerConnections = pgTable('tracker_connections', {
+  id: id(),
+  workspaceId: workspaceId(),
+  kind: trackerKind('kind').notNull(),
+  /** Linear organization id / Jira cloud id. */
+  externalId: text('external_id').notNull(),
+  name: text('name').notNull(),
+  /** Linear: https://linear.app/<urlKey>; Jira: https://<site>.atlassian.net. */
+  siteUrl: text('site_url').notNull(),
+  accessTokenSealed: text('access_token_sealed').notNull(),
+  refreshTokenSealed: text('refresh_token_sealed'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  /** Post triage labels and ASK questions back. Visible to everyone in the tracker, so off by default. */
+  writeBack: boolean('write_back').notNull().default(false),
+  /** Provider bookkeeping (Jira webhook ids and their refresh time). */
+  meta: jsonb('meta').notNull().default(sql`'{}'::jsonb`),
+  connectedBy: uuid('connected_by').references(() => authUsers.id, { onDelete: 'set null' }),
+  createdAt: createdAt(),
+}, (t) => [
+  uniqueIndex('tracker_connections_external_key').on(t.kind, t.externalId),
+  uniqueIndex('tracker_connections_workspace_key').on(t.workspaceId, t.kind),
+])

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import { describe, it, expect } from 'vitest'
-import { issueToTask, nextPageUrl, isPullRequest, parseIssueUrl, askComment, isHumanAnswer, retriageWithAnswer, type GhIssue, type GhComment } from './github'
+import { issueToTask, nextPageUrl, isPullRequest, parseIssueUrl, askComment, isHumanAnswer, retriageWithAnswer, relayedAnswerComment, type GhIssue, type GhComment } from './github'
 
 const issue = (over: Partial<GhIssue> = {}): GhIssue => ({
   number: 42, title: 'Login fails on Safari', body: 'Steps to reproduce: open /login in Safari 17, click Sign in. Expected: redirect. Actual: nothing.',
@@ -80,5 +80,14 @@ describe('retriageWithAnswer', () => {
   })
   it('an unhelpful reply never lowers clarity and changes nothing', () => {
     expect(retriageWithAnswer(vague, 'idk')).toBeNull()
+  })
+})
+
+describe('relayedAnswerComment', () => {
+  it('quotes the answer, defuses mentions, and is not mistaken for a human answer', () => {
+    const c = relayedAnswerComment('Mei', 'Slack', 'Done when @octocat approves\nsecond line')
+    expect(c).toContain('**Mei** answered in Slack:')
+    expect(c).toContain('> Done when @\u200boctocat approves\n> second line')
+    expect(isHumanAnswer({ id: 1, body: c, user: { login: 'x', type: 'User' } })).toBe(false)
   })
 })

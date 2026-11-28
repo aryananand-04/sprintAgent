@@ -383,6 +383,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"tracker_connections": {
+                  Row: {
+                    "access_token_sealed": string,"connected_by": string | null,"created_at": string,"expires_at": string | null,"external_id": string,"id": string,"kind": Database["public"]['Enums']["tracker_kind"],"meta": NonNullable<Json>,"name": string,"refresh_token_sealed": string | null,"site_url": string,"workspace_id": string,"write_back": boolean
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "access_token_sealed": string,"connected_by"?: string | null,"created_at"?: string,"expires_at"?: string | null,"external_id": string,"id"?: string,"kind": Database["public"]['Enums']["tracker_kind"],"meta"?: NonNullable<Json>,"name": string,"refresh_token_sealed"?: string | null,"site_url": string,"workspace_id": string,"write_back"?: boolean
+                  }
+                  Update: {
+                    "access_token_sealed"?: string,"connected_by"?: string | null,"created_at"?: string,"expires_at"?: string | null,"external_id"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["tracker_kind"],"meta"?: NonNullable<Json>,"name"?: string,"refresh_token_sealed"?: string | null,"site_url"?: string,"workspace_id"?: string,"write_back"?: boolean
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tracker_connections_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"workspace_members": {
                   Row: {
                     "created_at": string,"role": Database["public"]['Enums']["workspace_role"],"user_id": string,"workspace_id": string
@@ -444,7 +464,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","outbox_status": "pending"|"sent"|"dead","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
+            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","outbox_status": "pending"|"sent"|"dead","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","tracker_kind": "linear"|"jira","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -564,7 +584,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"outbox_status": ["pending", "sent", "dead"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
+            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"outbox_status": ["pending", "sent", "dead"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"tracker_kind": ["linear", "jira"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
           }
         }
 } as const

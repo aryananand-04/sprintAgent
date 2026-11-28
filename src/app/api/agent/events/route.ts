@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { can, type Role } from '@/lib/permissions'
-import { requestWriteBack } from '@/server/github/jobs'
+import { requestWriteBack } from '@/server/trackers/jobs'
 
 const Decision = z.enum(['ACT', 'ASK', 'ESCALATE'])
 const Counts = z.object({ correct: z.number().int().min(0), total: z.number().int().min(0) })
@@ -61,7 +61,7 @@ export async function POST(req: Request): Promise<Response> {
     if (error) return Response.json({ error: 'WRITE_FAILED' }, { status: 409 })
     // Triage made in the app is mirrored to GitHub issues (if the workspace opted in).
     const triaged = [...new Set(decisions.filter((d) => d.kind === 'triage' && d.taskId).map((d) => d.taskId as string))]
-    await requestWriteBack(workspaceId, triaged).catch((e) => console.error('[github] write-back request', e))
+    await requestWriteBack(workspaceId, triaged).catch((e) => console.error('[trackers] write-back request', e))
   }
 
   if (calibration) {

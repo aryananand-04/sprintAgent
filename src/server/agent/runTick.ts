@@ -10,6 +10,7 @@ import { generateStandupText, standupDue } from '@/logic/standup'
 import { enqueue } from '@/server/outbox'
 import { triageBacklog } from './triageBacklog'
 import { sendDmBriefings, type DmResult } from '@/server/slack/briefings'
+import { maybeRefreshJiraWebhooks } from '@/server/jira/sync'
 
 type Db = SupabaseClient<Database>
 
@@ -41,6 +42,8 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
   // DMs are a courtesy: a Slack outage must not fail the tick (and retry the work above).
   const dms = await sendDmBriefings(db, workspaceId, { ...snap, team }, new Date(now))
     .then((r) => r.result).catch((e) => { console.error('[slack] dms', e instanceof Error ? e.message : e); return undefined })
+  // Jira's webhooks lapse after 30 days unless extended; a failure here retries next tick.
+  await maybeRefreshJiraWebhooks(db, workspaceId).catch((e) => console.error('[jira] webhook refresh', e instanceof Error ? e.message : e))
   return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup, dms }
 }
 
@@ -60,7 +63,11 @@ export async function postStandup(db: Db, ws: string, snap: Pick<Snapshot, 'task
   if (!first) return 'already'
 
   const text = generateStandupText(snap.tasks, snap.team, snap.sprint, snap.escalations, now, tz)
-  const queued = await enqueue(db, ws, { type: 'standup', text })
+  // If queueing fails, give the day back so the next run (or the retry) can post it.
+  const queued = await enqueue(db, ws, { type: 'standup', text }).catch(async (e) => {
+    await db.from('agent_cooldowns').delete().eq('workspace_id', ws).eq('key', `standup-${day}`)
+    throw e
+  })
   if (!queued) return 'no-integration'
   const weekday = now.toLocaleDateString('en-US', { weekday: 'long', timeZone: tz })
   await db.from('feed_events').insert({ workspace_id: ws, type: 'status', message: `Standup sent for ${weekday}: ${snap.team.length} people, ${snap.sprint.daysRemaining} days left. Nobody had to stand.` })

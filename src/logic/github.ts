@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
-import type { AgentDecision, AutonomyConfig, Task, TaskType, UrgencyLevel } from '../types'
-import { analyzeRequest, answerClarityGain } from './textSignals'
+import type { AgentDecision, AutonomyConfig, Task } from '../types'
+import { trackerTask } from './trackerTask'
+import { answerClarityGain } from './textSignals'
 import { triageTask } from './triage'
 
 /** The fields we read from GitHub's issue payloads. */
@@ -25,45 +26,15 @@ export function nextPageUrl(link: string | null): string | null {
 
 const labelNames = (i: GhIssue) => i.labels.map((l) => (typeof l === 'string' ? l : l.name ?? '')).filter(Boolean)
 
-function typeFromLabels(labels: string[]): TaskType | null {
-  if (labels.some((l) => /bug|error|regression/i.test(l))) return 'bug'
-  if (labels.some((l) => /design|ux|ui\b/i.test(l))) return 'design'
-  if (labels.some((l) => /spike|research|investigat/i.test(l))) return 'spike'
-  if (labels.some((l) => /chore|maintenance|refactor|dependenc/i.test(l))) return 'chore'
-  if (labels.some((l) => /feature|enhancement/i.test(l))) return 'feature'
-  return null
-}
-
-function urgencyFromLabels(labels: string[]): UrgencyLevel | null {
-  if (labels.some((l) => /critical|p0|sev ?1|blocker|urgent/i.test(l))) return 'critical'
-  if (labels.some((l) => /high|p1|important/i.test(l))) return 'high'
-  if (labels.some((l) => /low|p3|nice.to.have|good first issue/i.test(l))) return 'low'
-  return null
-}
-
 /**
  * Turns a GitHub issue into a triaged task. Text heuristics estimate the dimensions; the repo's own
  * labels win for type and urgency. `id` is supplied by the caller (existing task id on re-sync).
  */
 export function issueToTask(issue: GhIssue, repoFullName: string, id: string): Task {
-  const labels = labelNames(issue)
-  const { task } = analyzeRequest(`${issue.title}\n${issue.body ?? ''}`)
-  const base: Task = {
-    ...task,
-    id,
-    title: `#${issue.number}: ${issue.title}`.slice(0, 300),
-    description: (issue.body ?? '').slice(0, 4_000),
-    type: typeFromLabels(labels) ?? task.type,
-    urgency: urgencyFromLabels(labels) ?? task.urgency,
-    status: issue.state === 'closed' ? 'done' : 'backlog',
-    dependencies: [],
-    source: `GitHub / ${repoFullName}`,
-    externalRef: issue.html_url,
-    tags: labels.slice(0, 5),
-    createdAt: issue.created_at,
-  }
-  const t = triageTask(base)
-  return { ...base, decision: t.decision, decisionReason: t.reason, triageScore: t.score }
+  return trackerTask({
+    id, key: `#${issue.number}`, title: issue.title, body: issue.body ?? '', url: issue.html_url,
+    source: `GitHub / ${repoFullName}`, labels: labelNames(issue), createdAt: issue.created_at, closed: issue.state === 'closed',
+  })
 }
 
 export const isPullRequest = (i: GhIssue) => i.pull_request !== undefined
@@ -81,7 +52,11 @@ export const DECISION_LABELS = {
 } as const
 
 /** Marker in our own comments, so the answer handler never treats the agent's question as an answer. */
-const ASK_FOOTER = 'Asked by Sprint Agent while triaging this issue.'
+const AGENT_MARK = 'by Sprint Agent while triaging this issue.'
+const ASK_FOOTER = `Asked ${AGENT_MARK}`
+
+/** Text the agent itself posted (its question, or a relayed answer), on any tracker. */
+export const isAgentText = (body: string | null | undefined) => !!body?.includes(AGENT_MARK)
 
 /** The comment posted on an ASK issue. Plain, specific, and says who is asking. */
 export function askComment(question: string): string {
@@ -98,7 +73,7 @@ export interface GhComment {
 /** A comment a person wrote (not a bot, not an app, not our own question, not empty). */
 export function isHumanAnswer(c: GhComment): boolean {
   const body = c.body?.trim() ?? ''
-  return !!c.user && c.user.type === 'User' && !c.performed_via_github_app && body.length > 0 && !body.includes(ASK_FOOTER)
+  return !!c.user && c.user.type === 'User' && !c.performed_via_github_app && body.length > 0 && !body.includes(AGENT_MARK)
 }
 
 export interface Retriage { clarity: number; decision: AgentDecision; reason: string; score: number }
@@ -112,4 +87,14 @@ export function retriageWithAnswer(task: Task, answer: string, config?: Autonomy
   const t = triageTask({ ...task, clarity }, config)
   if (clarity === task.clarity && t.decision === task.decision) return null
   return { clarity, decision: t.decision, reason: t.reason, score: t.score }
+}
+
+/**
+ * An answer given elsewhere (Slack), mirrored onto the issue. Quoted, capped, and with @mentions
+ * defused so relaying someone's words never pings people on GitHub.
+ */
+export function relayedAnswerComment(who: string, where: string, body: string): string {
+  const defuse = (t: string) => t.replace(/@(?=[\w-])/g, '@\u200b')
+  const quoted = defuse(body.trim().slice(0, 3_000)).split('\n').map((l) => `> ${l}`).join('\n')
+  return `**${defuse(who)}** answered in ${where}:\n\n${quoted}\n\n<sub>Relayed ${AGENT_MARK}</sub>`
 }

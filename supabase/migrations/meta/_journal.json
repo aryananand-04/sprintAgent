@@ -120,6 +120,20 @@
       "when": 1795838801421,
       "tag": "20261128040641_slack_dm_briefings_security",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795839801298,
+      "tag": "20261128042321_tracker_connections",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795839803108,
+      "tag": "20261128042323_tracker_connections_security",
+      "breakpoints": true
     }
   ]
 }
