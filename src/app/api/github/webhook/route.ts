@@ -3,13 +3,15 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhook } from '@/server/github/app'
 import { syncIssue, workspaceForInstallation } from '@/server/github/sync'
-import type { GhIssue } from '@/logic/github'
+import { isPullRequest, type GhComment, type GhIssue } from '@/logic/github'
+import { handleIssueComment } from '@/server/github/answers'
 import { requestWriteBack } from '@/server/github/jobs'
 
 interface Payload {
   action?: string
   installation?: { id: number }
   issue?: GhIssue
+  comment?: GhComment
   repository?: { full_name: string }
 }
 
@@ -41,6 +43,11 @@ export async function POST(req: Request): Promise<Response> {
       const { data } = await db.from('tasks').select('id').eq('workspace_id', ws).eq('external_ref', p.issue.html_url).maybeSingle()
       if (data) await requestWriteBack(ws, [data.id])
     }
+    return Response.json({ ok: true, result })
+  }
+  if (event === 'issue_comment' && p.action === 'created' && p.issue && p.comment && !isPullRequest(p.issue)) {
+    const { result, taskId } = await handleIssueComment(db, ws, p.issue.html_url, p.comment)
+    if (taskId) await requestWriteBack(ws, [taskId])
     return Response.json({ ok: true, result })
   }
   return Response.json({ ok: true, ignored: event })

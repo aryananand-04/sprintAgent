@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import { describe, it, expect } from 'vitest'
-import { issueToTask, nextPageUrl, isPullRequest, parseIssueUrl, askComment, type GhIssue } from './github'
+import { issueToTask, nextPageUrl, isPullRequest, parseIssueUrl, askComment, isHumanAnswer, retriageWithAnswer, type GhIssue, type GhComment } from './github'
 
 const issue = (over: Partial<GhIssue> = {}): GhIssue => ({
   number: 42, title: 'Login fails on Safari', body: 'Steps to reproduce: open /login in Safari 17, click Sign in. Expected: redirect. Actual: nothing.',
@@ -53,5 +53,32 @@ describe('parseIssueUrl', () => {
 describe('askComment', () => {
   it('includes the question and an attribution line', () => {
     expect(askComment('What does done look like?')).toMatch(/^What does done look like\?\n\n<sub>Asked by Sprint Agent/)
+  })
+})
+
+describe('isHumanAnswer', () => {
+  const c = (over: Partial<GhComment> = {}): GhComment => ({ id: 1, body: 'Expected: the export finishes under 5s.', user: { login: 'mei', type: 'User' }, ...over })
+  it('accepts a person', () => expect(isHumanAnswer(c())).toBe(true))
+  it('ignores bots, apps, empty bodies and our own question', () => {
+    expect(isHumanAnswer(c({ user: { login: 'ci[bot]', type: 'Bot' } }))).toBe(false)
+    expect(isHumanAnswer(c({ performed_via_github_app: { id: 1 } }))).toBe(false)
+    expect(isHumanAnswer(c({ body: '   ' }))).toBe(false)
+    expect(isHumanAnswer(c({ user: null }))).toBe(false)
+    expect(isHumanAnswer(c({ body: askComment('What does done look like?') }))).toBe(false)
+  })
+})
+
+describe('retriageWithAnswer', () => {
+  const vague = issueToTask(issue({ title: 'Make it nicer', body: 'the settings page feels off', labels: ['enhancement'] }), 'o/r', 'x')
+  it('a concrete answer lifts clarity and can clear the ASK', () => {
+    expect(vague.decision).toBe('ASK')
+    const r = retriageWithAnswer(vague, 'Done when the chart labels no longer overlap at 1280px. Expected: 12px gap, see screenshot in #41.')
+    expect(r).not.toBeNull()
+    expect(r!.clarity).toBeGreaterThan(vague.clarity)
+    expect(r!.decision).not.toBe('ASK')
+    expect(r!.reason).toBeTruthy()
+  })
+  it('an unhelpful reply never lowers clarity and changes nothing', () => {
+    expect(retriageWithAnswer(vague, 'idk')).toBeNull()
   })
 })

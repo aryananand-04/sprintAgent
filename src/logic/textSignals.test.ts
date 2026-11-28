@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import { describe, it, expect } from 'vitest'
-import { analyzeRequest } from './textSignals'
+import { analyzeRequest, answerClarityGain } from './textSignals'
 import { triageTask } from './triage'
 import { makeTask } from '../test/factories'
 
@@ -49,5 +49,13 @@ describe('askQuestion', () => {
   })
   it('stays quiet when nothing needs asking', () => {
     expect(askQuestion(analyzeRequest('Typo on pricing page: “recieve” should be “receive”. Steps: open /pricing, see FAQ 2.').task)).toBeNull()
+  })
+})
+
+describe('answerClarityGain', () => {
+  it('scores the reply alone', () => {
+    expect(answerClarityGain('idk')).toBe(0)
+    expect(answerClarityGain('It should keep the filter')).toBe(1)
+    expect(answerClarityGain('Done when export takes under 5s')).toBe(2)
   })
 })

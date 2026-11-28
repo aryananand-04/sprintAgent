@@ -95,6 +95,14 @@ export function analyzeRequest(raw: string): TextAnalysis {
 }
 
 /**
+ * How much clearer a reply makes a request: +1 if it states expected behaviour, +1 for concrete
+ * details. Judged on the reply alone, so "idk" or "+1" earns nothing just by adding words.
+ */
+export function answerClarityGain(answer: string): number {
+  return (CRITERIA.test(answer) ? 1 : 0) + (SPECIFIC.test(answer) ? 1 : 0)
+}
+
+/**
  * The one question the agent asks when it can't act. Targets the weakest dimension, in plain words.
  */
 export function askQuestion(task: TextAnalysis['task']): string | null {

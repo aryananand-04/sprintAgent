@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 // Provenance: sprintagent-prov-7c1e94d2b85a
-import type { Task, TaskType, UrgencyLevel } from '../types'
-import { analyzeRequest } from './textSignals'
+import type { AgentDecision, AutonomyConfig, Task, TaskType, UrgencyLevel } from '../types'
+import { analyzeRequest, answerClarityGain } from './textSignals'
 import { triageTask } from './triage'
 
 /** The fields we read from GitHub's issue payloads. */
@@ -80,7 +80,36 @@ export const DECISION_LABELS = {
   ESCALATE: { name: 'sprint-agent: ESCALATE', color: 'ff6b57', description: 'Needs a human decision' },
 } as const
 
+/** Marker in our own comments, so the answer handler never treats the agent's question as an answer. */
+const ASK_FOOTER = 'Asked by Sprint Agent while triaging this issue.'
+
 /** The comment posted on an ASK issue. Plain, specific, and says who is asking. */
 export function askComment(question: string): string {
-  return `${question}\n\n<sub>Asked by Sprint Agent while triaging this issue. An answer here helps whoever picks it up.</sub>`
+  return `${question}\n\n<sub>${ASK_FOOTER} An answer here helps whoever picks it up.</sub>`
+}
+
+export interface GhComment {
+  id: number
+  body: string | null
+  user: { login: string; type: string } | null
+  performed_via_github_app?: unknown
+}
+
+/** A comment a person wrote (not a bot, not an app, not our own question, not empty). */
+export function isHumanAnswer(c: GhComment): boolean {
+  const body = c.body?.trim() ?? ''
+  return !!c.user && c.user.type === 'User' && !c.performed_via_github_app && body.length > 0 && !body.includes(ASK_FOOTER)
+}
+
+export interface Retriage { clarity: number; decision: AgentDecision; reason: string; score: number }
+
+/**
+ * Re-triages a task after someone answered on its issue. The answer can only add clarity (a reply
+ * never makes the request vaguer); everything else stays as triaged. Null when nothing changes.
+ */
+export function retriageWithAnswer(task: Task, answer: string, config?: AutonomyConfig): Retriage | null {
+  const clarity = Math.min(5, task.clarity + answerClarityGain(answer))
+  const t = triageTask({ ...task, clarity }, config)
+  if (clarity === task.clarity && t.decision === task.decision) return null
+  return { clarity, decision: t.decision, reason: t.reason, score: t.score }
 }
