@@ -45,11 +45,18 @@ export class SlackError extends Error {
   constructor(public code: string) { super(`Slack: ${code}`) }
 }
 
-/** Calls a Web API method with a bot token. Slack answers 200 with `ok: false` on errors, so check both. */
-export async function slackApi<T = Record<string, unknown>>(method: string, token: string, body: Record<string, unknown>): Promise<T> {
+/** Form-encodes Web API arguments; nested values (blocks) go as JSON strings, as Slack expects. */
+export const formBody = (args: Record<string, unknown>) =>
+  new URLSearchParams(Object.entries(args).filter(([, v]) => v !== undefined).map(([k, v]) => [k, typeof v === 'string' ? v : JSON.stringify(v)]))
+
+/**
+ * Calls a Web API method with a bot token. Form-encoded, because read methods (users.info,
+ * users.lookupByEmail) reject JSON bodies. Slack answers 200 with `ok: false` on errors, so check both.
+ */
+export async function slackApi<T = Record<string, unknown>>(method: string, token: string, args: Record<string, unknown>): Promise<T> {
   const res = await fetch(`${API}/${method}`, {
-    method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify(body), signal: AbortSignal.timeout(10_000),
+    method: 'POST', headers: { Authorization: `Bearer ${token}` },
+    body: formBody(args), signal: AbortSignal.timeout(10_000),
   })
   if (!res.ok) throw new SlackError(`HTTP_${res.status}`)
   const data = (await res.json()) as { ok: boolean; error?: string } & T

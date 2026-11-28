@@ -30,7 +30,7 @@ beforeAll(async () => {
   vi.stubGlobal('fetch', async (url: string, init: RequestInit = {}) => {
     const u = String(url)
     if (u === 'https://slack.com/api/users.info') {
-      const user = JSON.parse(init.body as string).user as string
+      const user = (init.body as URLSearchParams).get('user')!
       return Response.json({ ok: true, user: { profile: { email: EMAILS[user] } } })
     }
     if (u.startsWith('https://hooks.slack.com/')) { replies.push(JSON.parse(init.body as string)); return new Response('ok') }

@@ -33,7 +33,7 @@ beforeAll(async () => {
     const u = String(url)
     if (u.startsWith('https://slack.com/api/')) {
       const method = u.split('/').pop()!
-      const body = JSON.parse(init.body as string)
+      const body = Object.fromEntries(init.body as URLSearchParams)
       if (method === 'users.info') return Response.json({ ok: true, user: { profile: { email: EMAILS[body.user] } } })
       posted.push({ method, body })
       return Response.json({ ok: true })

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { describe, it, expect, beforeAll } from 'vitest'
 import { createHmac, randomBytes } from 'node:crypto'
-import { authorizeUrl, readState, signState, slackConfigured, verifySlackRequest } from './api'
+import { authorizeUrl, formBody, readState, signState, slackConfigured, verifySlackRequest } from './api'
 
 const SECRET = 'signing-secret'
 const sign = (raw: string, ts: number) => `v0=${createHmac('sha256', SECRET).update(`v0:${ts}:${raw}`).digest('hex')}`
@@ -39,5 +39,14 @@ describe('install round-trip', () => {
     expect(u.searchParams.get('scope')).toContain('incoming-webhook')
     expect(u.searchParams.get('redirect_uri')).toBe('https://app.example/api/slack/oauth')
     expect(readState(signState({ ws: 'w', uid: 'u' }))).toEqual({ ws: 'w', uid: 'u' })
+  })
+})
+
+describe('formBody', () => {
+  it('flattens strings and JSON-encodes nested values', () => {
+    const b = formBody({ channel: 'C1', blocks: [{ type: 'section' }], skip: undefined })
+    expect(b.get('channel')).toBe('C1')
+    expect(JSON.parse(b.get('blocks')!)).toEqual([{ type: 'section' }])
+    expect(b.has('skip')).toBe(false)
   })
 })
