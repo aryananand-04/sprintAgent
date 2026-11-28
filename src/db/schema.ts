@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { sql } from 'drizzle-orm'
 import {
-  pgTable, pgEnum, uuid, text, integer, bigint, smallint, boolean, timestamp, date, jsonb,
+  pgTable, pgEnum, uuid, text, integer, bigint, smallint, boolean, timestamp, date, jsonb, real,
   primaryKey, index, uniqueIndex, check,
 } from 'drizzle-orm/pg-core'
 import { authUsers } from 'drizzle-orm/supabase'
@@ -21,7 +21,7 @@ export const escalationCategory = pgEnum('escalation_category', [
   'missing-criteria', 'scope-conflict', 'blocker', 'capacity', 'ambiguous', 'stakeholder',
 ])
 export const feedType = pgEnum('feed_type', ['assign', 'escalate', 'triage', 'status', 'risk', 'adHoc', 'resolve', 'intake'])
-export const decisionKind = pgEnum('decision_kind', ['triage', 'assign', 'rebalance', 'escalate', 'ad-hoc', 'override'])
+export const decisionKind = pgEnum('decision_kind', ['triage', 'assign', 'rebalance', 'escalate', 'ad-hoc', 'override', 'license'])
 export const decisionSource = pgEnum('decision_source', ['ai', 'rules', 'human'])
 
 const id = () => uuid('id').primaryKey().defaultRandom()
@@ -189,7 +189,20 @@ export const decisions = pgTable('decisions', {
   payload: jsonb('payload').notNull().default(sql`'{}'::jsonb`),
   actorId: uuid('actor_id').references(() => authUsers.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
-}, (t) => [index('decisions_ws_created_idx').on(t.workspaceId, t.createdAt)])
+  /**
+   * Trust ledger (set by trigger): immutable copies of the task and actor ids (the FKs above are nulled
+   * when a task or user is deleted), the position in the workspace's chain, and sha256 over the
+   * previous hash + this row.
+   */
+  subjectId: uuid('subject_id'),
+  actorRef: uuid('actor_ref'),
+  chainIndex: bigint('chain_index', { mode: 'number' }),
+  prevHash: text('prev_hash'),
+  hash: text('hash'),
+}, (t) => [
+  index('decisions_ws_created_idx').on(t.workspaceId, t.createdAt),
+  uniqueIndex('decisions_chain_key').on(t.workspaceId, t.chainIndex),
+])
 
 export const feedEvents = pgTable('feed_events', {
   id: id(),
@@ -329,4 +342,55 @@ export const trackerConnections = pgTable('tracker_connections', {
 }, (t) => [
   uniqueIndex('tracker_connections_external_key').on(t.kind, t.externalId),
   uniqueIndex('tracker_connections_workspace_key').on(t.workspaceId, t.kind),
+])
+
+/* ── Earned Autonomy (P5) ─────────────────────────────────────────────── */
+export const licensedAction = pgEnum('licensed_action', ['assign', 'rebalance'])
+export const predictionMode = pgEnum('prediction_mode', ['shadow', 'acted'])
+export const predictionOutcome = pgEnum('prediction_outcome', ['agree', 'disagree', 'expired'])
+
+/**
+ * What the agent would do (shadow) or did (acted) for one task, and what people then did. Resolved by
+ * a trigger on tasks when a person assigns or moves the work, so evidence can't be faked by the client.
+ */
+export const predictions = pgTable('predictions', {
+  id: id(),
+  workspaceId: workspaceId(),
+  taskId: uuid('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
+  taskType: taskType('task_type').notNull(),
+  action: licensedAction('action').notNull(),
+  mode: predictionMode('mode').notNull(),
+  predictedMemberId: uuid('predicted_member_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  previousMemberId: uuid('previous_member_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  confidence: smallint('confidence'),
+  rationale: text('rationale').notNull(),
+  /** L2: people can undo until then without it counting as an incident... it still counts as a disagreement. */
+  undoUntil: timestamp('undo_until', { withTimezone: true }),
+  outcome: predictionOutcome('outcome'),
+  actualMemberId: uuid('actual_member_id').references(() => teamMembers.id, { onDelete: 'set null' }),
+  resolvedBy: uuid('resolved_by').references(() => authUsers.id, { onDelete: 'set null' }),
+  resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+  createdAt: createdAt(),
+}, (t) => [
+  index('predictions_ws_resolved_idx').on(t.workspaceId, t.resolvedAt),
+  uniqueIndex('predictions_open_key').on(t.taskId, t.action).where(sql`${t.outcome} is null`),
+])
+
+/** The agent's licence per task type and action: earned from evidence, capped by an admin. */
+export const autonomyLicenses = pgTable('autonomy_licenses', {
+  workspaceId: workspaceId(),
+  taskType: taskType('task_type').notNull(),
+  action: licensedAction('action').notNull(),
+  earnedLevel: smallint('earned_level').notNull().default(1),
+  cap: smallint('cap').notNull().default(3),
+  n: integer('n').notNull().default(0),
+  agree: integer('agree').notNull().default(0),
+  lowerBound: real('lower_bound').notNull().default(0),
+  reason: text('reason').notNull().default('No evidence yet: the agent is still watching.'),
+  changedAt: timestamp('changed_at', { withTimezone: true }),
+  updatedAt: updatedAt(),
+}, (t) => [
+  primaryKey({ columns: [t.workspaceId, t.taskType, t.action] }),
+  check('licenses_levels', sql`${t.earnedLevel} between 0 and 3 and ${t.cap} between 0 and 3`),
+  check('licenses_counts', sql`${t.agree} between 0 and ${t.n}`),
 ])

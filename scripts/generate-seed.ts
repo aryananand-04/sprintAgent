@@ -145,5 +145,36 @@ values (${uid(f.id)}, ${uid(WS)}, '${f.type}', ${q(f.message)}, ${f.taskId && ta
   )
 }
 
+/* ── Earned Autonomy history ────────────────────────────────────────── */
+// A few sprints of evidence, so the demo shows licences at different levels with the numbers behind
+// them: bug assignment fully earned, chores with an undo window, features and design still suggesting.
+const HISTORY: Array<{ type: string; action: 'assign' | 'rebalance'; n: number; disagree: number; earned: number }> = [
+  { type: 'bug', action: 'assign', n: 64, disagree: 1, earned: 3 },
+  { type: 'chore', action: 'assign', n: 26, disagree: 1, earned: 2 },
+  { type: 'bug', action: 'rebalance', n: 30, disagree: 1, earned: 2 },
+  { type: 'feature', action: 'assign', n: 14, disagree: 3, earned: 1 },
+  { type: 'design', action: 'assign', n: 6, disagree: 2, earned: 1 },
+]
+out.push('')
+const anyTask = uid(INITIAL_TASKS[0].id)
+for (const h of HISTORY) {
+  // Disagreements spread through the history (every k-th), not bunched at the end.
+  const k = Math.floor(h.n / (h.disagree + 1))
+  out.push(
+    `insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select ${uid(WS)}, ${anyTask}, '${h.type}', '${h.action}', 'shadow', ${uid(TEAM[0].id)}, 'Earlier sprint', case when g % ${k} = 0 and g / ${k} <= ${h.disagree} then 'disagree' else 'agree' end::public.prediction_outcome,
+  ${uid(TEAM[0].id)}, now() - ((${h.n} - g) * interval '9 hours') - interval '1 day', now() - ((${h.n} - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, ${h.n}) g;`,
+  )
+}
+out.push(`-- Licence rows are recomputed by the agent tick; these match the history above.
+insert into public.autonomy_licenses (workspace_id, task_type, action, earned_level, n, agree, lower_bound, reason, changed_at)
+select ${uid(WS)}, p.task_type, p.action, v.earned, count(*), count(*) filter (where p.outcome = 'agree'), 0, 'Seeded history', now() - interval '3 days'
+from public.predictions p
+join (values ${HISTORY.map((h) => `('${h.type}'::public.task_type, '${h.action}'::public.licensed_action, ${h.earned})`).join(', ')}) v(task_type, action, earned)
+  on v.task_type = p.task_type and v.action = p.action
+where p.workspace_id = ${uid(WS)}
+group by p.task_type, p.action, v.earned;`)
+
 writeFileSync('supabase/seed.sql', out.join('\n') + '\n')
 console.log(`seed.sql: ${TEAM.length} team, ${INITIAL_TASKS.length} tasks, ${INITIAL_ESCALATIONS.length} escalations, ${INITIAL_FEED.length} feed events`)

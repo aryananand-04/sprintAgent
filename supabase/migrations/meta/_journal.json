@@ -134,6 +134,20 @@
       "when": 1795839803108,
       "tag": "20261128042323_tracker_connections_security",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795856223673,
+      "tag": "20261128085703_earned_autonomy",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795856225515,
+      "tag": "20261128085705_earned_autonomy_security",
+      "breakpoints": true
     }
   ]
 }

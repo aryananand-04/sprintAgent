@@ -43,6 +43,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"autonomy_licenses": {
+                  Row: {
+                    "action": Database["public"]['Enums']["licensed_action"],"agree": number,"cap": number,"changed_at": string | null,"earned_level": number,"lower_bound": number,"n": number,"reason": string,"task_type": Database["public"]['Enums']["task_type"],"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": Database["public"]['Enums']["licensed_action"],"agree"?: number,"cap"?: number,"changed_at"?: string | null,"earned_level"?: number,"lower_bound"?: number,"n"?: number,"reason"?: string,"task_type": Database["public"]['Enums']["task_type"],"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "action"?: Database["public"]['Enums']["licensed_action"],"agree"?: number,"cap"?: number,"changed_at"?: string | null,"earned_level"?: number,"lower_bound"?: number,"n"?: number,"reason"?: string,"task_type"?: Database["public"]['Enums']["task_type"],"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "autonomy_licenses_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"autonomy_policies": {
                   Row: {
                     "act_min_clarity": number,"ask_max_clarity": number,"blocked_hours_threshold": number,"capacity_breach_threshold": number,"esc_nudge_hours": number,"escalate_if_critical_unassigned_hours": number,"never_auto_assign_types": (Database["public"]['Enums']["task_type"])[],"updated_at": string,"updated_by": string | null,"velocity_deficit_pts": number,"workspace_id": string
@@ -85,14 +105,14 @@ isOneToOne: false
                   ]
                 },"decisions": {
                   Row: {
-                    "actor_id": string | null,"created_at": string,"decision": Database["public"]['Enums']["agent_decision"] | null,"id": string,"kind": Database["public"]['Enums']["decision_kind"],"payload": NonNullable<Json>,"rationale": string,"source": Database["public"]['Enums']["decision_source"],"task_id": string | null,"workspace_id": string
+                    "actor_id": string | null,"actor_ref": string | null,"chain_index": number | null,"created_at": string,"decision": Database["public"]['Enums']["agent_decision"] | null,"hash": string | null,"id": string,"kind": Database["public"]['Enums']["decision_kind"],"payload": NonNullable<Json>,"prev_hash": string | null,"rationale": string,"source": Database["public"]['Enums']["decision_source"],"subject_id": string | null,"task_id": string | null,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "actor_id"?: string | null,"created_at"?: string,"decision"?: Database["public"]['Enums']["agent_decision"] | null,"id"?: string,"kind": Database["public"]['Enums']["decision_kind"],"payload"?: NonNullable<Json>,"rationale": string,"source": Database["public"]['Enums']["decision_source"],"task_id"?: string | null,"workspace_id": string
+                    "actor_id"?: string | null,"actor_ref"?: string | null,"chain_index"?: number | null,"created_at"?: string,"decision"?: Database["public"]['Enums']["agent_decision"] | null,"hash"?: string | null,"id"?: string,"kind": Database["public"]['Enums']["decision_kind"],"payload"?: NonNullable<Json>,"prev_hash"?: string | null,"rationale": string,"source": Database["public"]['Enums']["decision_source"],"subject_id"?: string | null,"task_id"?: string | null,"workspace_id": string
                   }
                   Update: {
-                    "actor_id"?: string | null,"created_at"?: string,"decision"?: Database["public"]['Enums']["agent_decision"] | null,"id"?: string,"kind"?: Database["public"]['Enums']["decision_kind"],"payload"?: NonNullable<Json>,"rationale"?: string,"source"?: Database["public"]['Enums']["decision_source"],"task_id"?: string | null,"workspace_id"?: string
+                    "actor_id"?: string | null,"actor_ref"?: string | null,"chain_index"?: number | null,"created_at"?: string,"decision"?: Database["public"]['Enums']["agent_decision"] | null,"hash"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["decision_kind"],"payload"?: NonNullable<Json>,"prev_hash"?: string | null,"rationale"?: string,"source"?: Database["public"]['Enums']["decision_source"],"subject_id"?: string | null,"task_id"?: string | null,"workspace_id"?: string
                   }
                   Relationships: [
                     {
@@ -227,6 +247,50 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "outbox_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"predictions": {
+                  Row: {
+                    "action": Database["public"]['Enums']["licensed_action"],"actual_member_id": string | null,"confidence": number | null,"created_at": string,"id": string,"mode": Database["public"]['Enums']["prediction_mode"],"outcome": Database["public"]['Enums']["prediction_outcome"] | null,"predicted_member_id": string | null,"previous_member_id": string | null,"rationale": string,"resolved_at": string | null,"resolved_by": string | null,"task_id": string,"task_type": Database["public"]['Enums']["task_type"],"undo_until": string | null,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": Database["public"]['Enums']["licensed_action"],"actual_member_id"?: string | null,"confidence"?: number | null,"created_at"?: string,"id"?: string,"mode": Database["public"]['Enums']["prediction_mode"],"outcome"?: Database["public"]['Enums']["prediction_outcome"] | null,"predicted_member_id"?: string | null,"previous_member_id"?: string | null,"rationale": string,"resolved_at"?: string | null,"resolved_by"?: string | null,"task_id": string,"task_type": Database["public"]['Enums']["task_type"],"undo_until"?: string | null,"workspace_id": string
+                  }
+                  Update: {
+                    "action"?: Database["public"]['Enums']["licensed_action"],"actual_member_id"?: string | null,"confidence"?: number | null,"created_at"?: string,"id"?: string,"mode"?: Database["public"]['Enums']["prediction_mode"],"outcome"?: Database["public"]['Enums']["prediction_outcome"] | null,"predicted_member_id"?: string | null,"previous_member_id"?: string | null,"rationale"?: string,"resolved_at"?: string | null,"resolved_by"?: string | null,"task_id"?: string,"task_type"?: Database["public"]['Enums']["task_type"],"undo_until"?: string | null,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "predictions_actual_member_id_team_members_id_fk"
+      columns: ["actual_member_id"]
+isOneToOne: false
+      referencedRelation: "team_members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "predictions_predicted_member_id_team_members_id_fk"
+      columns: ["predicted_member_id"]
+isOneToOne: false
+      referencedRelation: "team_members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "predictions_previous_member_id_team_members_id_fk"
+      columns: ["previous_member_id"]
+isOneToOne: false
+      referencedRelation: "team_members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "predictions_task_id_tasks_id_fk"
+      columns: ["task_id"]
+isOneToOne: false
+      referencedRelation: "tasks"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "predictions_workspace_id_workspaces_id_fk"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -461,10 +525,15 @@ isOneToOne: false
                            },
 "start_new_sprint":
 { Args: { "p_committed": number,"p_end": string,"p_goal": string,"p_name": string,"p_snapshot"?: Json,"p_start": string,"p_velocity": number,"p_workspace": string }; Returns: string
+                           },
+"verify_decision_chain":
+{ Args: { "ws": string }; Returns: {
+              "broken_at": string,"checked": number,"ok": boolean
+            }[]
                            }
           }
           Enums: {
-            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","outbox_status": "pending"|"sent"|"dead","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","tracker_kind": "linear"|"jira","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
+            "ad_hoc_resolution": "absorb"|"swap"|"escalate","agent_decision": "ACT"|"ASK"|"ESCALATE","decision_kind": "triage"|"assign"|"rebalance"|"escalate"|"ad-hoc"|"override"|"license","decision_source": "ai"|"rules"|"human","escalation_category": "missing-criteria"|"scope-conflict"|"blocker"|"capacity"|"ambiguous"|"stakeholder","feed_type": "assign"|"escalate"|"triage"|"status"|"risk"|"adHoc"|"resolve"|"intake","integration_kind": "slack_webhook"|"outbound_webhook","licensed_action": "assign"|"rebalance","outbox_status": "pending"|"sent"|"dead","prediction_mode": "shadow"|"acted","prediction_outcome": "agree"|"disagree"|"expired","sprint_health": "green"|"yellow"|"red","sprint_status": "planned"|"active"|"archived","task_status": "backlog"|"triaged"|"assigned"|"in-progress"|"blocked"|"done","task_type": "bug"|"feature"|"spike"|"design"|"urgent"|"ad-hoc"|"chore","tracker_kind": "linear"|"jira","urgency": "critical"|"high"|"medium"|"low","workspace_role": "viewer"|"contributor"|"pm"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -584,7 +653,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"outbox_status": ["pending", "sent", "dead"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"tracker_kind": ["linear", "jira"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
+            "ad_hoc_resolution": ["absorb", "swap", "escalate"],"agent_decision": ["ACT", "ASK", "ESCALATE"],"decision_kind": ["triage", "assign", "rebalance", "escalate", "ad-hoc", "override", "license"],"decision_source": ["ai", "rules", "human"],"escalation_category": ["missing-criteria", "scope-conflict", "blocker", "capacity", "ambiguous", "stakeholder"],"feed_type": ["assign", "escalate", "triage", "status", "risk", "adHoc", "resolve", "intake"],"integration_kind": ["slack_webhook", "outbound_webhook"],"licensed_action": ["assign", "rebalance"],"outbox_status": ["pending", "sent", "dead"],"prediction_mode": ["shadow", "acted"],"prediction_outcome": ["agree", "disagree", "expired"],"sprint_health": ["green", "yellow", "red"],"sprint_status": ["planned", "active", "archived"],"task_status": ["backlog", "triaged", "assigned", "in-progress", "blocked", "done"],"task_type": ["bug", "feature", "spike", "design", "urgent", "ad-hoc", "chore"],"tracker_kind": ["linear", "jira"],"urgency": ["critical", "high", "medium", "low"],"workspace_role": ["viewer", "contributor", "pm", "admin"]
           }
         }
 } as const

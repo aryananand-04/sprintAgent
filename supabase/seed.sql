@@ -313,3 +313,32 @@ insert into public.feed_events (id, workspace_id, type, message, task_id, member
 values (md5('feed-9')::uuid, md5('demo-workspace')::uuid, 'status', 'Sprint progress: 34/68 committed pts done. 5 days remaining. 3 open escalations require PM attention.', null,
   null,
   'ASK', now() - interval '2 minutes');
+
+insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select md5('demo-workspace')::uuid, md5('task-1')::uuid, 'bug', 'assign', 'shadow', md5('ananya')::uuid, 'Earlier sprint', case when g % 32 = 0 and g / 32 <= 1 then 'disagree' else 'agree' end::public.prediction_outcome,
+  md5('ananya')::uuid, now() - ((64 - g) * interval '9 hours') - interval '1 day', now() - ((64 - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, 64) g;
+insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select md5('demo-workspace')::uuid, md5('task-1')::uuid, 'chore', 'assign', 'shadow', md5('ananya')::uuid, 'Earlier sprint', case when g % 13 = 0 and g / 13 <= 1 then 'disagree' else 'agree' end::public.prediction_outcome,
+  md5('ananya')::uuid, now() - ((26 - g) * interval '9 hours') - interval '1 day', now() - ((26 - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, 26) g;
+insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select md5('demo-workspace')::uuid, md5('task-1')::uuid, 'bug', 'rebalance', 'shadow', md5('ananya')::uuid, 'Earlier sprint', case when g % 15 = 0 and g / 15 <= 1 then 'disagree' else 'agree' end::public.prediction_outcome,
+  md5('ananya')::uuid, now() - ((30 - g) * interval '9 hours') - interval '1 day', now() - ((30 - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, 30) g;
+insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select md5('demo-workspace')::uuid, md5('task-1')::uuid, 'feature', 'assign', 'shadow', md5('ananya')::uuid, 'Earlier sprint', case when g % 3 = 0 and g / 3 <= 3 then 'disagree' else 'agree' end::public.prediction_outcome,
+  md5('ananya')::uuid, now() - ((14 - g) * interval '9 hours') - interval '1 day', now() - ((14 - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, 14) g;
+insert into public.predictions (workspace_id, task_id, task_type, action, mode, predicted_member_id, rationale, outcome, actual_member_id, resolved_at, created_at)
+select md5('demo-workspace')::uuid, md5('task-1')::uuid, 'design', 'assign', 'shadow', md5('ananya')::uuid, 'Earlier sprint', case when g % 2 = 0 and g / 2 <= 2 then 'disagree' else 'agree' end::public.prediction_outcome,
+  md5('ananya')::uuid, now() - ((6 - g) * interval '9 hours') - interval '1 day', now() - ((6 - g) * interval '9 hours') - interval '2 days'
+from generate_series(1, 6) g;
+-- Licence rows are recomputed by the agent tick; these match the history above.
+insert into public.autonomy_licenses (workspace_id, task_type, action, earned_level, n, agree, lower_bound, reason, changed_at)
+select md5('demo-workspace')::uuid, p.task_type, p.action, v.earned, count(*), count(*) filter (where p.outcome = 'agree'), 0, 'Seeded history', now() - interval '3 days'
+from public.predictions p
+join (values ('bug'::public.task_type, 'assign'::public.licensed_action, 3), ('chore'::public.task_type, 'assign'::public.licensed_action, 2), ('bug'::public.task_type, 'rebalance'::public.licensed_action, 2), ('feature'::public.task_type, 'assign'::public.licensed_action, 1), ('design'::public.task_type, 'assign'::public.licensed_action, 1)) v(task_type, action, earned)
+  on v.task_type = p.task_type and v.action = p.action
+where p.workspace_id = md5('demo-workspace')::uuid
+group by p.task_type, p.action, v.earned;
