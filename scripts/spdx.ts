@@ -8,7 +8,7 @@
  * canary-watch workflow searches for on GitHub.
  */
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { CANARY } from '../src/lib/provenance'
 
 const ID = 'SPDX-License-Identifier: FSL-1.1-ALv2'
@@ -26,7 +26,7 @@ function linesFor(file: string) {
 }
 
 const files = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8' })
-  .split('\n').filter((f) => EXT.test(f) && !SKIP.some((r) => r.test(f)))
+  .split('\n').filter((f) => EXT.test(f) && !SKIP.some((r) => r.test(f)) && existsSync(f)) // deleted but not yet committed
 
 const check = process.argv.includes('--check')
 const missing: string[] = []
