@@ -293,6 +293,8 @@ export const slackInstallations = pgTable('slack_installations', {
   /** Channel chosen at install for escalations and the standup. */
   channelId: text('channel_id'),
   channelName: text('channel_name'),
+  /** Daily 9am DM to each linked person with their own work. Off until an admin turns it on. */
+  dmBriefings: boolean('dm_briefings').notNull().default(false),
   connectedBy: uuid('connected_by').references(() => authUsers.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
 }, (t) => [

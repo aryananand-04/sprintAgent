@@ -11,7 +11,7 @@ export async function GET(): Promise<Response> {
   const session = await getSession()
   if (!session?.current) return Response.json({ error: 'UNAUTHENTICATED' }, { status: 401 })
   const db = await createClient()
-  const { data } = await db.from('slack_installations').select('team_name, channel_name, created_at').eq('workspace_id', session.current.workspace.id).maybeSingle()
+  const { data } = await db.from('slack_installations').select('team_name, channel_name, created_at, dm_briefings').eq('workspace_id', session.current.workspace.id).maybeSingle()
   return Response.json({ configured: slackConfigured(), installation: data ?? null })
 }
 

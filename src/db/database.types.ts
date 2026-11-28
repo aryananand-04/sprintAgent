@@ -235,14 +235,14 @@ isOneToOne: false
                   ]
                 },"slack_installations": {
                   Row: {
-                    "bot_token_sealed": string,"bot_user_id": string,"channel_id": string | null,"channel_name": string | null,"connected_by": string | null,"created_at": string,"id": string,"team_id": string,"team_name": string,"workspace_id": string
+                    "bot_token_sealed": string,"bot_user_id": string,"channel_id": string | null,"channel_name": string | null,"connected_by": string | null,"created_at": string,"dm_briefings": boolean,"id": string,"team_id": string,"team_name": string,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "bot_token_sealed": string,"bot_user_id": string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"team_id": string,"team_name": string,"workspace_id": string
+                    "bot_token_sealed": string,"bot_user_id": string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"dm_briefings"?: boolean,"id"?: string,"team_id": string,"team_name": string,"workspace_id": string
                   }
                   Update: {
-                    "bot_token_sealed"?: string,"bot_user_id"?: string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"team_id"?: string,"team_name"?: string,"workspace_id"?: string
+                    "bot_token_sealed"?: string,"bot_user_id"?: string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"dm_briefings"?: boolean,"id"?: string,"team_id"?: string,"team_name"?: string,"workspace_id"?: string
                   }
                   Relationships: [
                     {
@@ -432,6 +432,11 @@ isOneToOne: false
 "member_by_email":
 { Args: { "member_email": string,"ws": string }; Returns: {
               "role": Database["public"]['Enums']["workspace_role"],"user_id": string
+            }[]
+                           },
+"member_emails":
+{ Args: { "ws": string }; Returns: {
+              "email": string,"user_id": string
             }[]
                            },
 "start_new_sprint":

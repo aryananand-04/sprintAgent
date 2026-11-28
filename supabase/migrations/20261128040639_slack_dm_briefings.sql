@@ -1,0 +1,1 @@
+ALTER TABLE "slack_installations" ADD COLUMN "dm_briefings" boolean DEFAULT false NOT NULL;

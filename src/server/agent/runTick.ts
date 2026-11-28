@@ -9,11 +9,12 @@ import { computeLoadsFromTasks } from '@/logic/load'
 import { generateStandupText, standupDue } from '@/logic/standup'
 import { enqueue } from '@/server/outbox'
 import { triageBacklog } from './triageBacklog'
+import { sendDmBriefings, type DmResult } from '@/server/slack/briefings'
 
 type Db = SupabaseClient<Database>
 
 export type StandupResult = 'not-due' | 'already' | 'posted' | 'no-integration'
-export interface TickResult { workspaceId: string; planned: number; applied: number; skipped: number; triaged?: number; standup?: StandupResult }
+export interface TickResult { workspaceId: string; planned: number; applied: number; skipped: number; triaged?: number; standup?: StandupResult; dms?: DmResult['result'] }
 
 /**
  * One server-side agent pass for a workspace: plan from the database, then apply each action
@@ -37,7 +38,10 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
   }
   const triaged = await triageBacklog(db, workspaceId, { ...snap, team })
   const standup = await postStandup(db, workspaceId, { ...snap, team }, new Date(now))
-  return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup }
+  // DMs are a courtesy: a Slack outage must not fail the tick (and retry the work above).
+  const dms = await sendDmBriefings(db, workspaceId, { ...snap, team }, new Date(now))
+    .then((r) => r.result).catch((e) => { console.error('[slack] dms', e instanceof Error ? e.message : e); return undefined })
+  return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup, dms }
 }
 
 type Snapshot = NonNullable<Awaited<ReturnType<typeof loadWorkspace>>>
