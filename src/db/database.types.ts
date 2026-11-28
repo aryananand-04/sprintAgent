@@ -385,14 +385,14 @@ isOneToOne: false
                   ]
                 },"workspaces": {
                   Row: {
-                    "created_at": string,"created_by": string | null,"id": string,"name": string,"slug": string
+                    "created_at": string,"created_by": string | null,"id": string,"name": string,"slug": string,"timezone": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"name": string,"slug": string
+                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"name": string,"slug": string,"timezone"?: string
                   }
                   Update: {
-                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"name"?: string,"slug"?: string
+                    "created_at"?: string,"created_by"?: string | null,"id"?: string,"name"?: string,"slug"?: string,"timezone"?: string
                   }
                   Relationships: [
                     

@@ -3,15 +3,36 @@
 // Provenance: sprintagent-prov-7c1e94d2b85a
 import type { Task, TeamMember, Sprint, EscalationItem } from '../types'
 
-/** Generates the plain-text standup digest — extracted so it can be used in Slack posting. */
+/** Local hour at which the daily standup goes out. */
+export const STANDUP_HOUR = 9
+
+/** True if `tz` is an IANA time zone this runtime knows. */
+export function isTimeZone(tz: string): boolean {
+  try { new Intl.DateTimeFormat('en-US', { timeZone: tz }); return true } catch { return false }
+}
+
+/**
+ * Whether today's standup is due in the workspace's time zone, and which day it belongs to
+ * (`YYYY-MM-DD`, local), so a runner can claim it once per day. Unknown zones fall back to UTC.
+ */
+export function standupDue(now: Date, timeZone: string, hour = STANDUP_HOUR): { due: boolean; day: string } {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: isTimeZone(timeZone) ? timeZone : 'UTC', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' })
+    .formatToParts(now)
+  const get = (t: string) => parts.find((p) => p.type === t)!.value
+  return { due: Number(get('hour')) >= hour, day: `${get('year')}-${get('month')}-${get('day')}` }
+}
+
+/** The plain-text (Slack mrkdwn) standup digest. Pure: the date and zone are passed in. */
 export function generateStandupText(
   tasks: Task[],
   team: TeamMember[],
   sprint: Sprint,
   escalations: EscalationItem[],
+  now: Date = new Date(),
+  timeZone = 'UTC',
 ): string {
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
-  const pct = Math.round((sprint.completedPoints / sprint.committedPoints) * 100)
+  const today = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: isTimeZone(timeZone) ? timeZone : 'UTC' })
+  const pct = sprint.committedPoints > 0 ? Math.round((sprint.completedPoints / sprint.committedPoints) * 100) : 0
   const openEsc = escalations.filter(e => !e.resolved)
   const blocked = tasks.filter(t => t.status === 'blocked')
   const lines: string[] = []
@@ -51,4 +72,3 @@ export function generateStandupText(
   return lines.join('\n')
 }
 
-/** Posts the standup text to Slack as a formatted message. */

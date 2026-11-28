@@ -6,11 +6,14 @@ import type { Database } from '@/db/database.types'
 import { loadWorkspace } from '@/lib/data/loadWorkspace'
 import { COOLDOWN_MS, planAgentTick, type AgentAction } from '@/logic/agentLoop'
 import { computeLoadsFromTasks } from '@/logic/load'
+import { generateStandupText, standupDue } from '@/logic/standup'
 import { enqueue } from '@/server/outbox'
+import { triageBacklog } from './triageBacklog'
 
 type Db = SupabaseClient<Database>
 
-export interface TickResult { workspaceId: string; planned: number; applied: number; skipped: number }
+export type StandupResult = 'not-due' | 'already' | 'posted' | 'no-integration'
+export interface TickResult { workspaceId: string; planned: number; applied: number; skipped: number; triaged?: number; standup?: StandupResult }
 
 /**
  * One server-side agent pass for a workspace: plan from the database, then apply each action
@@ -32,7 +35,32 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
     await apply(db, workspaceId, action, snap.tasks)
     applied++
   }
-  return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied }
+  const triaged = await triageBacklog(db, workspaceId, { ...snap, team })
+  const standup = await postStandup(db, workspaceId, { ...snap, team }, new Date(now))
+  return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup }
+}
+
+type Snapshot = NonNullable<Awaited<ReturnType<typeof loadWorkspace>>>
+
+/**
+ * The daily standup, written from the database and sent to the workspace's integrations at 9am in its
+ * time zone. Claimed per local day, so it goes out once however many runners or PMs there are.
+ */
+export async function postStandup(db: Db, ws: string, snap: Pick<Snapshot, 'tasks' | 'team' | 'sprint' | 'escalations'>, now: Date): Promise<StandupResult> {
+  const { data: w } = await db.from('workspaces').select('timezone').eq('id', ws).single()
+  const tz = w?.timezone ?? 'UTC'
+  const { due, day } = standupDue(now, tz)
+  if (!due) return 'not-due'
+  const { data: first, error } = await db.rpc('claim_agent_cooldown', { ws, check_key: `standup-${day}`, cooldown_seconds: 2 * 86_400 })
+  if (error) throw error
+  if (!first) return 'already'
+
+  const text = generateStandupText(snap.tasks, snap.team, snap.sprint, snap.escalations, now, tz)
+  const queued = await enqueue(db, ws, { type: 'standup', text })
+  if (!queued) return 'no-integration'
+  const weekday = now.toLocaleDateString('en-US', { weekday: 'long', timeZone: tz })
+  await db.from('feed_events').insert({ workspace_id: ws, type: 'status', message: `Standup sent for ${weekday}: ${snap.team.length} people, ${snap.sprint.daysRemaining} days left. Nobody had to stand.` })
+  return 'posted'
 }
 
 async function apply(db: Db, ws: string, a: AgentAction, tasks: { id: string; title: string; status: string }[]) {

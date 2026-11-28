@@ -21,7 +21,6 @@ import { ROLE_LABEL } from '../../lib/permissions'
 import { AgentSettings } from './AgentSettings'
 import { SmartHelp } from './SmartHelp'
 import { useAgentBootstrap } from '../../hooks/useAgentBootstrap'
-import { useScheduledStandup } from '../../hooks/useScheduledStandup'
 
 const VIEW_LABELS: Record<string, string> = {
   sprint:      'Sprint Board',
@@ -271,7 +270,6 @@ function ArchiveBanner() {
 export default function App() {
   const agentEnabled = useCan('task:manage')
   useAgentBootstrap(agentEnabled)
-  useScheduledStandup(agentEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Back from installing the GitHub App: say what happened, then tidy the URL.

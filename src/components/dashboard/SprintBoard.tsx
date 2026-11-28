@@ -529,7 +529,7 @@ function KanbanCard({ task, columnId }: { task: Task; columnId: string }) {
 
 /* ── Main SprintBoard ── */
 export function SprintBoard() {
-  const { tasks, sprint, team, updateTaskStatus, addTaskToColumn, sprintNarrative, isBootstrapping } = useSprintStore()
+  const { tasks, sprint, team, updateTaskStatus, addTaskToColumn, sprintNarrative } = useSprintStore()
   const [dragOver, setDragOver]       = useState<string | null>(null)
   const [addingToCol, setAddingToCol] = useState<string | null>(null)
   const [newTitle, setNewTitle]       = useState('')
@@ -572,13 +572,7 @@ export function SprintBoard() {
             <p data-tour-step="1" style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)', lineHeight: 1.38, letterSpacing: '-0.012em' }}>
               {sprint.goal}
             </p>
-            {isBootstrapping && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--act)', display: 'inline-block', animation: 'pulseDot 1.4s ease-in-out infinite' }} />
-                <span style={{ fontSize: 11, color: 'var(--act)', fontWeight: 600 }}>Reading the backlog…</span>
-              </div>
-            )}
-            {!isBootstrapping && sprintNarrative && (
+            {sprintNarrative && (
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
                 <Sparkles size={9} style={{ color: 'var(--act)', flexShrink: 0, marginTop: 2 }} strokeWidth={1.5} />
                 <p style={{ fontSize: 11, color: 'var(--muted-foreground)', lineHeight: 1.5, fontStyle: 'italic', margin: 0 }}>

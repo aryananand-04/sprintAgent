@@ -28,8 +28,10 @@ export async function requestWriteBack(workspaceId: string, taskIds: string[]) {
     await inngest.send(taskIds.map((taskId) => ({ name: 'github/writeback.requested', data: { workspaceId, taskId } })))
     return
   }
-  after(async () => {
+  const run = async () => {
     const db = createAdminClient()
     for (const id of taskIds) await writeBack(db, workspaceId, id).catch((e) => console.error('[github] write-back', e))
-  })
+  }
+  // After the response when there is one; inline when called from a scheduled run with no request.
+  try { after(run) } catch { await run() }
 }

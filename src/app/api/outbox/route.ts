@@ -20,17 +20,12 @@ export async function POST(req: Request): Promise<Response> {
 
   const parsed = OutboxEvent.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return Response.json({ error: 'INVALID_REQUEST' }, { status: 400 })
+  // The standup is written and sent by the server agent once a day; browsers can't post one.
+  if (parsed.data.type === 'standup') return Response.json({ error: 'SERVER_ONLY' }, { status: 400 })
 
   const ws = session.current.workspace.id
   const db = createAdminClient()
 
-  // One standup per workspace per day, however many PMs have the board open.
-  if (parsed.data.type === 'standup') {
-    const since = new Date(); since.setUTCHours(0, 0, 0, 0)
-    const { count } = await db.from('outbox').select('id', { count: 'exact', head: true })
-      .eq('workspace_id', ws).eq('event', 'standup').gte('created_at', since.toISOString())
-    if (count) return Response.json({ queued: 0, duplicate: true })
-  }
 
   const queued = await enqueue(db, ws, parsed.data, `${await siteOrigin()}/app`).catch(() => -1)
   if (queued < 0) return Response.json({ error: 'WRITE_FAILED' }, { status: 500 })

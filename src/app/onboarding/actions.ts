@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { WORKSPACE_COOKIE } from '@/lib/session'
+import { isTimeZone } from '@/logic/standup'
 
 export interface OnboardingState {
   error?: string
@@ -26,6 +27,9 @@ export async function createWorkspace(_prev: OnboardingState, form: FormData): P
   if (error) {
     return { error: error.code === '23505' ? 'That URL is taken — try another.' : 'Could not create the workspace.' }
   }
+  // Best effort: the creator is admin, and a missing zone just means UTC.
+  const tz = String(form.get('timezone') ?? '')
+  if (tz.length <= 64 && isTimeZone(tz) && tz !== 'UTC') await supabase.from('workspaces').update({ timezone: tz }).eq('id', id)
 
   ;(await cookies()).set(WORKSPACE_COOKIE, id, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 60 * 60 * 24 * 365 })
   redirect('/app')

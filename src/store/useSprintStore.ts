@@ -59,7 +59,6 @@ interface SprintStore {
   isDemoOpen: boolean
   triagingTaskId: string | null
   triageError: string | null
-  isBootstrapping: boolean
 
   autonomyConfig: AutonomyConfig
   sprintHistory: SprintArchive[]
@@ -154,7 +153,6 @@ export const useSprintStore = create<SprintStore>()(
   isDemoOpen: false,
   triagingTaskId: null,
   triageError: null,
-  isBootstrapping: false,
 
   hydrate: (snap) => set({
     workspaceId: snap.workspaceId,

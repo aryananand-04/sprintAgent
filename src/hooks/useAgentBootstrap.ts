@@ -9,22 +9,16 @@ const SESSION_KEY    = 'sprint-agent-bootstrapped'
 const BURNDOWN_KEY   = 'sprint-agent-burndown-date'
 
 /**
- * Runs ONCE per browser session (not per React render).
- * Uses sessionStorage so Strict Mode double-invoke is harmless.
+ * Once per browser session (sessionStorage, so Strict Mode's double-invoke is harmless), for PM+ only:
+ * burndown snapshot, sprint narrative and goal-alignment scores. Triage happens on the server.
  */
-/** Runs only for roles that may act on the board (PM+); other roles just watch. */
 export function useAgentBootstrap(enabled = true) {
   useEffect(() => {
     if (!enabled) return
     if (sessionStorage.getItem(SESSION_KEY)) return
     sessionStorage.setItem(SESSION_KEY, '1')
 
-    useSprintStore.setState({ isBootstrapping: true })
-
-    const {
-      tasks, triageTaskById, assignTaskById, addFeedEvent,
-      recordBurndownSnapshot, setSprintNarrative, setGoalAlignment,
-    } = useSprintStore.getState()
+    const { recordBurndownSnapshot, setSprintNarrative, setGoalAlignment } = useSprintStore.getState()
 
     // ── 1. Daily burndown snapshot ────────────────────────────────────────
     const todayKey = new Date().toISOString().slice(0, 10)
@@ -52,46 +46,5 @@ export function useAgentBootstrap(enabled = true) {
         } catch { break /* AI unavailable — stop the loop */ }
       }
     }, 8_000)
-
-    // ── 4. Triage unprocessed backlog tasks ───────────────────────────────
-    const unprocessed = tasks.filter(
-      t => (t.status === 'backlog' || t.status === 'triaged') && !t.isAITriaged
-    )
-
-    if (unprocessed.length === 0) {
-      useSprintStore.setState({ isBootstrapping: false })
-      return
-    }
-
-    addFeedEvent({
-      type: 'status',
-      message: `Agent online. Processing ${unprocessed.length} unanalyzed task${unprocessed.length > 1 ? 's' : ''}.`,
-    })
-
-    // The AI queue paces requests (concurrency + backoff), so no fixed stagger or cap is needed here.
-    const triageOne = async (task: (typeof unprocessed)[number]) => {
-      addFeedEvent({ type: 'triage', message: `Analyzing: "${task.title.slice(0, 60)}"`, taskId: task.id })
-      await triageTaskById(task.id)
-      const updated = useSprintStore.getState().tasks.find(t => t.id === task.id)
-      if (updated?.decision === 'ACT' && !updated.assigneeId) assignTaskById(task.id)
-    }
-
-    // Post a summary once every triage has settled
-    void Promise.allSettled(unprocessed.map(triageOne)).then(() => {
-      const state = useSprintStore.getState()
-      const results = unprocessed.map(t => state.tasks.find(tt => tt.id === t.id)?.decision)
-      const actN = results.filter(d => d === 'ACT').length
-      const askN = results.filter(d => d === 'ASK').length
-      const escN = results.filter(d => d === 'ESCALATE').length
-      const parts: string[] = []
-      if (actN > 0) parts.push(`${actN} ACT — assigned autonomously`)
-      if (askN > 0) parts.push(`${askN} ASK — awaiting clarification`)
-      if (escN > 0) parts.push(`${escN} ESCALATE — needs your review`)
-      state.addFeedEvent({
-        type: 'status',
-        message: `Bootstrap complete. Processed ${unprocessed.length} task${unprocessed.length > 1 ? 's' : ''}: ${parts.join(', ')}.`,
-      })
-      useSprintStore.setState({ isBootstrapping: false })
-    })
   }, [enabled])
 }

@@ -11,6 +11,8 @@ export default defineConfig({
     // *.db.test.ts need a running local Supabase: npm run test:db
     exclude: ['**/node_modules/**', ...(process.env.VITEST_DB ? [] : ['**/*.db.test.ts'])],
     setupFiles: process.env.VITEST_DB ? ['./src/test/loadEnv.ts'] : [],
+    // DB tests share the seeded demo workspace (integrations, cooldowns), so they run one file at a time.
+    fileParallelism: !process.env.VITEST_DB,
     environment: 'node',
     coverage: {
       provider: 'v8',

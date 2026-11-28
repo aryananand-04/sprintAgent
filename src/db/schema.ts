@@ -36,6 +36,8 @@ export const workspaces = pgTable('workspaces', {
   id: id(),
   name: text('name').notNull(),
   slug: text('slug').notNull(),
+  /** IANA zone for local-time work (the 9am standup). Validated by the app; unknown zones act as UTC. */
+  timezone: text('timezone').notNull().default('UTC'),
   createdBy: uuid('created_by').references(() => authUsers.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
 }, (t) => [

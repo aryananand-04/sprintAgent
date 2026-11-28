@@ -2,14 +2,19 @@
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, useSyncExternalStore } from 'react'
 import { createWorkspace, type OnboardingState } from './actions'
 import { inputClass, primaryButtonClass } from '@/components/auth/AuthCard'
 
 const slugify = (s: string) =>
   s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/[\s_]+/g, '-').replace(/-+/g, '-').slice(0, 48)
 
+const noSubscribe = () => () => {}
+/** The browser's zone, so the 9am standup lands at 9am for whoever set the workspace up. */
+const useBrowserTimeZone = () => useSyncExternalStore(noSubscribe, () => Intl.DateTimeFormat().resolvedOptions().timeZone, () => '')
+
 export function OnboardingForm() {
+  const timeZone = useBrowserTimeZone()
   const [state, action, pending] = useActionState<OnboardingState, FormData>(createWorkspace, {})
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
@@ -17,6 +22,7 @@ export function OnboardingForm() {
 
   return (
     <form action={action} className="space-y-4">
+      <input type="hidden" name="timezone" value={timeZone} />
       <label className="block">
         <span className="mb-1.5 block text-xs font-medium text-mute">Team or company name</span>
         <input name="name" required maxLength={60} placeholder="Acme Payments" className={inputClass} value={name}
