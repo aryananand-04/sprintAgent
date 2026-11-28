@@ -96,7 +96,7 @@ export function SprintPlanner() {
       setGenerated(tasks)
     } catch (e) {
       const msg = e instanceof Error ? e.message : ''
-      setError(msg === 'AI_DISABLED' ? 'AI is not configured on the server — using offline mode.' : 'Generation failed. Please try again.')
+      setError(msg === 'AI_DISABLED' ? 'AI isn’t available on this workspace right now, so this plan uses the rule engine.' : 'Generation failed. Please try again.')
     } finally {
       setGenerating(false)
     }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
+import type { Plan } from '../logic/billing'
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type {
@@ -35,6 +36,7 @@ export interface WorkspaceSnapshot {
   calibration: CalibrationData
   licenses: AutonomyLicenseView[]
   suggestions: AgentSuggestion[]
+  plan: Plan
 }
 
 const EMPTY_SPRINT: Sprint = {
@@ -69,6 +71,8 @@ interface SprintStore {
   /** Earned Autonomy: licences per task type/action, and open agent predictions (suggestions, undoable actions). */
   licenses: AutonomyLicenseView[]
   suggestions: AgentSuggestion[]
+  /** The workspace's billing plan (gates a few admin features in the UI; the server enforces them). */
+  plan: Plan
   actionHistory: AgentActionSnapshot[]
   sprintNarrative: string // undo stack (last 10)
 
@@ -151,6 +155,7 @@ export const useSprintStore = create<SprintStore>()(
   calibration: { act: { correct: 0, total: 0 }, ask: { correct: 0, total: 0 }, escalate: { correct: 0, total: 0 } },
   licenses: [],
   suggestions: [],
+  plan: 'free',
   actionHistory: [],
   sprintNarrative: '',
   feed: [],
@@ -177,6 +182,7 @@ export const useSprintStore = create<SprintStore>()(
     calibration: snap.calibration,
     licenses: snap.licenses,
     suggestions: snap.suggestions,
+    plan: snap.plan,
     burndownSnapshots: deriveBurndown(snap.sprint, snap.tasks),
     actionHistory: [],
   }),

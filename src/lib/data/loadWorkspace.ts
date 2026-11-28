@@ -11,6 +11,7 @@ import {
 } from './mappers'
 import type { TaskComment } from '@/types'
 import { DEFAULT_AUTONOMY_CONFIG } from '@/logic/constants'
+import { effectivePlan } from '@/logic/billing'
 
 const FEED_LIMIT = 100
 
@@ -24,7 +25,7 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
   if (sprintErr) throw sprintErr
   if (!active) return null
 
-  const [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions] = await Promise.all([
+  const [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions, billing] = await Promise.all([
     supabase.from('tasks').select('*').eq('workspace_id', workspaceId)
       .or(`sprint_id.eq.${active.id},sprint_id.is.null`).order('created_at'),
     supabase.from('team_members').select('*').eq('workspace_id', workspaceId).order('created_at'),
@@ -37,8 +38,9 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
     supabase.from('calibration').select('*').eq('workspace_id', workspaceId),
     supabase.from('autonomy_licenses').select('*').eq('workspace_id', workspaceId),
     supabase.from('predictions').select('*').eq('workspace_id', workspaceId).is('outcome', null),
+    supabase.from('workspace_billing').select('plan, status').eq('workspace_id', workspaceId).maybeSingle(),
   ])
-  for (const r of [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions]) if (r.error) throw r.error
+  for (const r of [tasks, team, archived, escalations, feed, policy, calibration, licenses, suggestions, billing]) if (r.error) throw r.error
 
   const taskIds = (tasks.data ?? []).map((t) => t.id)
   const [deps, comments] = taskIds.length
@@ -67,5 +69,6 @@ export async function loadWorkspace(workspaceId: string, client?: SupabaseClient
     calibration: calibrationFromRows(calibration.data ?? []),
     licenses: (licenses.data ?? []).map(licenseFromRow),
     suggestions: (suggestions.data ?? []).map(suggestionFromRow),
+    plan: effectivePlan(billing.data),
   }
 }

@@ -4,6 +4,9 @@ import type { Metadata } from 'next'
 import { Check } from 'lucide-react'
 import { ButtonLink, Container, Tag } from '@/components/marketing/primitives'
 import { cn } from '@/lib/utils'
+import { ENTITLEMENTS, TRIAL_DAYS } from '@/logic/billing'
+
+const n = (x: number) => x.toLocaleString('en-US')
 
 export const metadata: Metadata = {
   title: 'Pricing · Sprint Agent',
@@ -15,15 +18,15 @@ const SALES_EMAIL = process.env.NEXT_PUBLIC_SALES_EMAIL
 const TIERS = [
   {
     name: 'Free', price: '$0', unit: 'forever', blurb: 'Try the agent on a real sprint.', cta: 'Start free', href: '/login',
-    features: ['1 sprint board', '1 integration (GitHub or Slack)', 'Rule-based triage', 'Up to 5 active contributors'],
+    features: ['1 sprint board', '1 connected tool (GitHub, Slack, Linear or Jira)', 'Rule-based triage', `Up to ${ENTITLEMENTS.free.activeContributors} active contributors`, 'Earned autonomy and the verifiable decision log'],
   },
   {
     name: 'Team', price: '$16', unit: 'per active contributor / month', blurb: 'For a team running real sprints.', cta: 'Start free trial', href: '/login', featured: true,
-    features: ['Unlimited integrations', 'AI-assisted triage (usage cap)', 'Role-based briefings', 'Escalation workflow', 'Sprint history & archive'],
+    features: ['Every connected tool', `AI-assisted triage (${n(ENTITLEMENTS.team.aiCallsPerMonth)} AI calls / month)`, 'Role-based briefings', 'Escalation workflow', 'Sprint history & archive', `${TRIAL_DAYS}-day trial, no card`],
   },
   {
     name: 'Business', price: '$36', unit: 'per active contributor / month', blurb: 'Several teams, one standard.', cta: 'Start free trial', href: '/login',
-    features: ['Everything in Team', 'Autonomy policy per task type', 'Decision audit export', 'SSO', 'Multi-team rollups'],
+    features: ['Everything in Team', `${n(ENTITLEMENTS.business.aiCallsPerMonth)} AI calls / month`, 'Autonomy ceiling per task type', 'Decision log export (CSV, JSON)', 'SSO (coming soon)', 'Multi-team rollups (coming soon)'],
   },
   {
     name: 'Enterprise', price: 'Custom', unit: 'annual', blurb: 'Regulated or large organisations.', cta: SALES_EMAIL ? 'Talk to us' : 'Coming soon', href: SALES_EMAIL ? `mailto:${SALES_EMAIL}` : '#enterprise',
@@ -34,6 +37,7 @@ const TIERS = [
 const FAQ = [
   ['Who counts as an active contributor?', 'Anyone who was assigned work or changed a task during the billing month. Viewers and stakeholders who only read briefings never count.'],
   ['Does the free plan use AI?', 'No. Free uses the deterministic rule engine, which handles the full Act / Ask / Escalate flow. AI-assisted triage starts on Team.'],
+  ['What happens when the AI allowance runs out?', 'Triage carries on with the rule engine until the 1st of the month. Nothing stops, nothing is charged extra.'],
   ['Can the agent change things without us knowing?', 'Every agent decision is written to an append-only log with its reason, and every agent action can be undone.'],
   ['Can we start with our existing backlog?', 'Yes. Import from GitHub and the agent triages the backlog before it touches anything. You can also try it on a public repo right now, no signup.'],
   ['Will it replace our PM?', 'No. It replaces the parts of the PM job nobody went to PM school for: chasing updates, re-asking the same question, moving tickets between columns.'],

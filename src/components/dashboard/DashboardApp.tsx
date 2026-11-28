@@ -256,6 +256,49 @@ function SyncBanner() {
   )
 }
 
+const RETURN_MESSAGES: Record<string, Record<string, string>> = {
+  github: {
+    connected: 'GitHub connected. Importing open issues now; new ones will be triaged as they arrive.',
+    taken: 'That GitHub installation is already linked to another workspace.',
+    denied: 'GitHub connection wasn’t completed. Only workspace admins can connect GitHub.',
+  },
+  billing: {
+    success: 'Subscription started. The new plan applies as soon as Stripe confirms it, usually within a minute.',
+    updated: 'Billing updated.',
+    cancelled: 'Checkout cancelled. Nothing was charged.',
+  },
+}
+const PLAN_LIMIT = 'Free includes one connected tool. Upgrade to Team in Settings → Plan to connect more.'
+
+/** Back from a connect flow or Stripe: say what happened once, then tidy the URL. */
+function ReturnNotice() {
+  const [text, setText] = useState<string | null>(null)
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const key = ['github', 'slack', 'linear', 'jira', 'billing'].find((k) => q.has(k))
+    if (!key) return
+    const result = q.get(key)!
+    const name = key[0].toUpperCase() + key.slice(1)
+    const generic: Record<string, string> = {
+      'plan-limit': PLAN_LIMIT,
+      connected: `${name} connected.`,
+      taken: `That ${name} account is already linked to another workspace.`,
+      denied: `${name} connection wasn’t completed. Only workspace admins can connect tools.`,
+      cancelled: `${name} connection cancelled.`,
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL on mount
+    setText(RETURN_MESSAGES[key]?.[result] ?? generic[result] ?? `${name}: that didn’t go through. Try again from Settings.`)
+    window.history.replaceState(null, '', window.location.pathname)
+  }, [])
+  if (!text) return null
+  return (
+    <div role="status" className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-1.5 text-xs text-foreground">
+      <span>{text}</span>
+      <button type="button" onClick={() => setText(null)} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss">✕</button>
+    </div>
+  )
+}
+
 function ArchiveBanner() {
   const viewingArchive = useSprintStore(s => s.viewingArchive)
   if (!viewingArchive) return null
@@ -272,18 +315,6 @@ export default function App() {
   useAgentBootstrap(agentEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  // Back from installing the GitHub App: say what happened, then tidy the URL.
-  useEffect(() => {
-    const result = new URLSearchParams(window.location.search).get('github')
-    if (!result) return
-    const messages: Record<string, string> = {
-      connected: 'GitHub connected. Importing open issues now; new ones will be triaged as they arrive.',
-      taken: 'That GitHub installation is already linked to another workspace.',
-      denied: 'GitHub connection wasn’t completed. Only workspace admins can connect GitHub.',
-    }
-    useSprintStore.getState().addFeedEvent({ type: 'status', message: messages[result] ?? 'GitHub connection didn’t work. Try again from Settings.' })
-    window.history.replaceState(null, '', window.location.pathname)
-  }, [])
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -305,6 +336,7 @@ export default function App() {
           onSidebarToggle={() => setSidebarOpen(v => !v)}
         />
         <SyncBanner />
+        <ReturnNotice />
         <ArchiveBanner />
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           <Dashboard />

@@ -12,6 +12,7 @@ import { triageBacklog } from './triageBacklog'
 import { sendDmBriefings, type DmResult } from '@/server/slack/briefings'
 import { maybeRefreshJiraWebhooks } from '@/server/jira/sync'
 import { sendWeeklyDigest } from '@/server/autonomy/digest'
+import { dailySeatSync } from '@/server/billing/plan'
 import { LEVEL_NAMES, mayAct } from '@/logic/earnedAutonomy'
 import { expireStalePredictions, licenseLevel, loadLicenses, recomputeLicenses, recordPrediction, type License } from '@/server/autonomy/licenses'
 
@@ -51,6 +52,7 @@ export async function runAgentTick(db: Db, workspaceId: string, now = Date.now()
   const dms = await sendDmBriefings(db, workspaceId, { ...snap, team }, new Date(now))
     .then((r) => r.result).catch((e) => { console.error('[slack] dms', e instanceof Error ? e.message : e); return undefined })
   await sendWeeklyDigest(db, workspaceId, new Date(now)).catch((e) => console.error('[autonomy] digest', e instanceof Error ? e.message : e))
+  await dailySeatSync(db, workspaceId, new Date(now)).catch((e) => console.error('[billing] seats', e instanceof Error ? e.message : e))
   // Jira's webhooks lapse after 30 days unless extended; a failure here retries next tick.
   await maybeRefreshJiraWebhooks(db, workspaceId).catch((e) => console.error('[jira] webhook refresh', e instanceof Error ? e.message : e))
   return { workspaceId, planned: actions.length, applied, skipped: actions.length - applied, triaged, standup, dms }

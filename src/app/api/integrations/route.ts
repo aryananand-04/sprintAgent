@@ -3,6 +3,8 @@
 import { z } from 'zod'
 import { getSession } from '@/lib/session'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { canConnect, planLimitResponse } from '@/server/billing/plan'
 import { checkWebhookUrl, maskUrl } from '@/logic/delivery'
 
 const Kind = z.enum(['slack_webhook', 'outbound_webhook'])
@@ -34,6 +36,7 @@ export async function PUT(req: Request): Promise<Response> {
   if (parsed.data.kind === 'slack_webhook') {
     // A pasted webhook from another Slack app would carry our Resolve buttons to an app that can't answer them.
     const { data: app } = await ctx.db.from('slack_installations').select('id').eq('workspace_id', ctx.ws).maybeSingle()
+    if (!(await canConnect(createAdminClient(), ctx.ws, 'slack'))) return planLimitResponse()
     if (app) return Response.json({ error: 'SLACK_APP_INSTALLED', message: 'The Slack app is installed. Change the channel with “Change channel” under Slack app instead.' }, { status: 409 })
   }
   const { error } = await ctx.db.from('integrations')

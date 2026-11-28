@@ -21,7 +21,8 @@ export async function triageWithAI(task: Task, config: AutonomyConfig = DEFAULT_
     }).catch(() => { throw new AiError('NETWORK') })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {
-      if (data.error === 'AI_DISABLED') disabled = true
+      // Off on the server, or this month's allowance is used up: either way, rules for the rest of the session.
+      if (data.error === 'AI_DISABLED' || data.error === 'AI_QUOTA') { disabled = true; throw new AiError('AI_DISABLED') }
       throw new AiError(data.error ?? `HTTP_${res.status}`, Number(res.headers.get('Retry-After') ?? 0) * 1000)
     }
     const { decision, score, reason, dimensions, ai, rules, disagreed, overruled, suspicious } = data

@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { canConnect } from '@/server/billing/plan'
 import { asApp, readState } from '@/server/github/app'
 import { startImport } from '@/server/github/jobs'
 
@@ -24,6 +25,7 @@ export async function GET(req: Request): Promise<Response> {
   if (!inst) return back('invalid')
 
   const db = createAdminClient()
+  if (!(await canConnect(db, state.ws, 'github'))) return back('plan-limit')
   const { error } = await db.from('github_installations')
     .insert({ workspace_id: state.ws, installation_id: inst.id, account_login: inst.account.login, connected_by: session.user.id })
   if (error?.code === '23505') {

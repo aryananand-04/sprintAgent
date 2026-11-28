@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { handleChat } from '@/server/llm'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/session'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { aiQuotaResponse, consumeAi } from '@/server/billing/plan'
 
 export async function POST(req: Request): Promise<Response> {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
-  if (!data?.claims?.sub) return Response.json({ error: 'UNAUTHENTICATED' }, { status: 401 })
+  const session = await getSession()
+  if (!session?.current) return Response.json({ error: 'UNAUTHENTICATED' }, { status: 401 })
 
+  const apiKey = process.env.GROQ_API_KEY
   const body = await req.json().catch(() => null)
-  const res = await handleChat(body, process.env.GROQ_API_KEY)
+  if (apiKey && !(await consumeAi(createAdminClient(), session.current.workspace.id))) return aiQuotaResponse()
+  const res = await handleChat(body, apiKey)
   return Response.json(res.body, { status: res.status })
 }

@@ -5,6 +5,8 @@ import { can } from '@/lib/permissions'
 import { groqCompleter } from '@/server/llm'
 import { TriageRequest, runTriage } from '@/server/ai/triage'
 import { createRateLimiter } from '@/server/rateLimit'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { aiQuotaResponse, consumeAi } from '@/server/billing/plan'
 
 // 30 AI triages per user per minute: a backlog bootstrap fits, a runaway loop doesn't.
 const limit = createRateLimiter({ limit: 30, windowMs: 60_000 })
@@ -22,6 +24,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const parsed = TriageRequest.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return Response.json({ error: 'INVALID_REQUEST' }, { status: 400 })
+  if (!(await consumeAi(createAdminClient(), session.current!.workspace.id))) return aiQuotaResponse()
 
   try {
     return Response.json(await runTriage(parsed.data, apiKey, groqCompleter))

@@ -12,6 +12,7 @@ import { enqueue } from '@/server/outbox'
 import { requestWriteBack } from '@/server/trackers/jobs'
 import { LEVEL_NAMES, mayAct } from '@/logic/earnedAutonomy'
 import { licenseLevel, loadLicenses, recordPrediction } from '@/server/autonomy/licenses'
+import { consumeAi } from '@/server/billing/plan'
 
 type Db = SupabaseClient<Database>
 
@@ -25,8 +26,9 @@ export interface BacklogOptions { apiKey?: string; complete?: Completer; max?: n
 type Outcome = TriageOutcome & { source: 'ai' | 'rules'; audit?: TriageAudit }
 
 /** Model first when configured (bounded by the rules), rules alone otherwise or on any failure. */
-async function decide(task: Task, config: AutonomyConfig, apiKey: string | undefined, complete: Completer): Promise<Outcome> {
-  if (apiKey) {
+async function decide(db: Db, ws: string, task: Task, config: AutonomyConfig, apiKey: string | undefined, complete: Completer): Promise<Outcome> {
+  // The plan's AI allowance is checked last, so a missing key never uses it up.
+  if (apiKey && await consumeAi(db, ws).catch(() => false)) {
     const req = TriageRequest.safeParse({ task, config })
     if (req.success) {
       try {
@@ -57,7 +59,7 @@ export async function triageBacklog(
   if (!claimed.length) return 0
 
   const outcomes: Array<{ task: Task; outcome: Outcome }> = []
-  for (const task of claimed) outcomes.push({ task, outcome: await decide(task, snap.autonomyConfig, apiKey, complete) })
+  for (const task of claimed) outcomes.push({ task, outcome: await decide(db, ws, task, snap.autonomyConfig, apiKey, complete) })
   const steps = planTriageSteps(outcomes, snap.tasks, snap.team)
 
   const applied: typeof steps = []

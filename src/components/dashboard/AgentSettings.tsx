@@ -7,6 +7,7 @@ import { IntegrationsSettings } from './IntegrationsSettings'
 import { GitHubSettings } from './GitHubSettings'
 import { SlackSettings } from './SlackSettings'
 import { TrackerSettings } from './TrackerSettings'
+import { BillingSettings } from './BillingSettings'
 import { useSprintStore } from '../../store/useSprintStore'
 import type { TaskType } from '../../types'
 import { useCan } from '../auth/SessionProvider'
@@ -87,6 +88,7 @@ export function AgentSettings({ onClose }: { onClose: () => void }) {
             </p>
           )}
           <fieldset disabled={!canEditPolicy} style={{ display: 'contents' }}>
+          <BillingSettings isAdmin={canEditPolicy} />
           <SlackSettings isAdmin={canEditPolicy} />
           <IntegrationsSettings canEdit={canEditPolicy} />
           <GitHubSettings isAdmin={canEditPolicy} />

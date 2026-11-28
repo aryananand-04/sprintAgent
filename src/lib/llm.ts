@@ -23,7 +23,8 @@ export async function chat(opts: ChatOptions): Promise<string> {
     body: JSON.stringify(opts),
   })
   const data = (await res.json().catch(() => ({}))) as { text?: string; error?: string }
-  if (data.error === 'AI_DISABLED') disabled = true
+  // Off on the server, or this month's allowance is used up: either way, callers fall back to rules.
+  if (data.error === 'AI_DISABLED' || data.error === 'AI_QUOTA') { disabled = true; throw new Error('AI_DISABLED') }
   if (!res.ok || typeof data.text !== 'string') throw new Error(data.error ?? `HTTP_${res.status}`)
   return data.text
 }

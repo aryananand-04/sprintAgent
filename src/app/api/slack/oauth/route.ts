@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { siteOrigin } from '@/lib/origin'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { canConnect } from '@/server/billing/plan'
 import { exchangeCode, readState } from '@/server/slack/api'
 import { saveInstall } from '@/server/slack/install'
 
@@ -19,6 +20,7 @@ export async function GET(req: Request): Promise<Response> {
   const session = await getSession()
   const state = readState(url.searchParams.get('state'))
   if (!session?.current || !state || state.uid !== session.user.id || state.ws !== session.current.workspace.id || session.current.role !== 'admin') return back('denied')
+  if (!(await canConnect(createAdminClient(), state.ws, 'slack'))) return back('plan-limit')
   const code = url.searchParams.get('code')
   if (!code || code.length > 200) return back('invalid')
 

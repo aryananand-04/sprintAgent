@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import type { AutonomyLicenseView, TaskType } from '../../types'
 import { useSprintStore } from '../../store/useSprintStore'
-import { useCan, useSession } from '../auth/SessionProvider'
-import { createClient } from '../../lib/supabase/client'
+import { useCan } from '../auth/SessionProvider'
+import { ENTITLEMENTS, PLAN_NAMES, planWith } from '../../logic/billing'
 import {
   ACTIONS, DEFAULT_LEVEL, LEVEL_NAMES, PROMOTION, TASK_TYPES, decisionsNeeded,
   type Level, type LicensedAction,
@@ -33,6 +33,7 @@ function nextStep(l: AutonomyLicenseView): string | null {
 /** The decision log is hash-chained; PMs can recheck it and take it away as CSV/JSON. */
 function TrustLedger() {
   const canAudit = useCan('task:manage')
+  const canExport = useSprintStore((s) => ENTITLEMENTS[s.plan].auditExport)
   const [state, setState] = useState<{ busy?: boolean; text?: string; bad?: boolean }>({})
   if (!canAudit) return null
   const verify = async () => {
@@ -47,8 +48,14 @@ function TrustLedger() {
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
       <span className="font-semibold text-[var(--t1)]">Decision log</span>
       <button type="button" className="btn btn-secondary !px-2 !py-0.5 !text-[10px]" onClick={verify} disabled={state.busy}>Verify</button>
-      <a className="underline underline-offset-2 text-[var(--t2)]" href="/api/audit/export?format=csv">Export CSV</a>
-      <a className="underline underline-offset-2 text-[var(--t2)]" href="/api/audit/export?format=json">JSON</a>
+      {canExport ? (
+        <>
+          <a className="underline underline-offset-2 text-[var(--t2)]" href="/api/audit/export?format=csv">Export CSV</a>
+          <a className="underline underline-offset-2 text-[var(--t2)]" href="/api/audit/export?format=json">JSON</a>
+        </>
+      ) : (
+        <span className="text-[var(--t3)]">Export (CSV, JSON) is on {PLAN_NAMES[planWith('auditExport')]}.</span>
+      )}
       <span role="status" className={state.bad ? 'text-[var(--esc)]' : 'text-[var(--t3)]'}>{state.text ?? ''}</span>
     </div>
   )
@@ -60,23 +67,38 @@ function TrustLedger() {
  */
 export function AutonomyLicenses() {
   const licenses = useSprintStore((s) => s.licenses)
-  const workspaceId = useSession().current.workspace.id
   const isAdmin = useCan('policy:edit')
+  const perType = useSprintStore((s) => ENTITLEMENTS[s.plan].perTypePolicy)
   const [saving, setSaving] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const get = (t: TaskType, a: LicensedAction) => licenses.find((l) => l.taskType === t && l.action === a) ?? fallback(t, a)
 
-  const setCap = async (l: AutonomyLicenseView, cap: Level) => {
-    const key = `${l.taskType}:${l.action}`
+  // One ceiling for all work (every plan) or one per task type and action (Business). The server checks
+  // the plan and writes the change to the decision log; realtime brings the rows back.
+  const setCap = async (cap: Level, l?: AutonomyLicenseView) => {
+    const key = l ? `${l.taskType}:${l.action}` : 'all'
     setSaving(key); setError(null)
-    // Admin RLS allows changing only the ceiling.
-    const { data, error: e } = await createClient().from('autonomy_licenses').update({ cap }).eq('workspace_id', workspaceId)
-      .eq('task_type', l.taskType).eq('action', l.action).select('cap')
-    if (e || !data?.length) setError('Couldn’t change that ceiling. Try again in a moment.')
-    else useSprintStore.setState((s) => ({ licenses: s.licenses.map((x) => (x.taskType === l.taskType && x.action === l.action ? { ...x, cap } : x)) }))
+    const res = await fetch('/api/autonomy/ceiling', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(l ? { cap, taskType: l.taskType, action: l.action } : { cap }),
+    }).catch(() => null)
+    if (!res?.ok) setError((await res?.json().catch(() => null))?.message ?? 'Couldn’t change the ceiling. Try again in a moment.')
+    else {
+      const hit = (x: AutonomyLicenseView) => !l || (x.taskType === l.taskType && x.action === l.action)
+      useSprintStore.setState((s) => {
+        const known = s.licenses.map((x) => (hit(x) ? { ...x, cap } : x))
+        // Rows the server just created for "all work" (no evidence yet) appear with the new ceiling.
+        const added = l ? [] : TASK_TYPES.flatMap((t) => (Object.keys(ACTIONS) as LicensedAction[])
+          .filter((a) => !known.some((x) => x.taskType === t && x.action === a)).map((a) => ({ ...fallback(t, a), cap })))
+        return { licenses: [...known, ...added] }
+      })
+    }
     setSaving(null)
   }
+  const caps = TASK_TYPES.flatMap((t) => (Object.keys(ACTIONS) as LicensedAction[]).map((a) => get(t, a).cap))
+  const allCap = caps[0] as Level
+  const uniform = caps.every((c) => c === allCap)
 
   return (
     <section aria-labelledby="licences-heading" className="flex flex-col gap-3">
@@ -86,6 +108,23 @@ export function AutonomyLicenses() {
           What the agent may do on its own, per kind of work. It starts by suggesting; each suggestion a person accepts or overrides is evidence. {LEVEL_NAMES[2]} needs {PROMOTION[2].minN}+ decisions with at least {PROMOTION[2].minLower * 100}% agreement at 95% confidence; {LEVEL_NAMES[3]} needs {PROMOTION[3].minN}+ at {PROMOTION[3].minLower * 100}%. Levels come down when recent decisions stop agreeing, and admins can set a lower ceiling at any time.
         </p>
       </div>
+
+      {isAdmin && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[var(--t2)]">
+          <label className="flex items-center gap-1.5">
+            <span className="font-semibold text-[var(--t1)]">Ceiling for all work</span>
+            <select className="rounded border border-[var(--b1)] bg-[var(--s1)] px-1 py-0.5 text-[11px] text-[var(--t1)]"
+              value={uniform ? allCap : ''} disabled={saving === 'all'}
+              onChange={(e) => setCap(Number(e.target.value) as Level)}>
+              {!uniform && <option value="" disabled>Mixed</option>}
+              {([0, 1, 2, 3] as Level[]).map((lv) => <option key={lv} value={lv}>L{lv} {LEVEL_NAMES[lv]}</option>)}
+            </select>
+          </label>
+          <span className="text-[var(--t3)]">
+            {perType ? 'Or set one per kind of work below.' : `Restraining the agent is on every plan. A ceiling per kind of work is on ${PLAN_NAMES[planWith('perTypePolicy')]}.`}
+          </span>
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-md border border-[var(--b1)]">
         <table className="w-full min-w-[560px] border-collapse text-left text-[11px]">
@@ -115,13 +154,13 @@ export function AutonomyLicenses() {
                         {l.n ? `${l.agree}/${l.n} agreed · ≥${Math.round(l.lowerBound * 100)}%` : 'no decisions yet'}
                       </p>
                       {nextStep(l) && <p className="mt-0.5 text-[10px] leading-snug text-[var(--t3)]">{nextStep(l)}</p>}
-                      {isAdmin && licenses.some((x) => x.taskType === t && x.action === a) && (
+                      {isAdmin && perType && (
                         <label className="mt-1 flex items-center gap-1 text-[10px] text-[var(--t3)]">
                           Ceiling
                           <select className="rounded border border-[var(--b1)] bg-[var(--s1)] px-1 py-0.5 text-[10px] text-[var(--t1)]"
                             value={l.cap} disabled={saving === key}
                             aria-label={`Ceiling for ${t} ${ACTIONS[a].label.toLowerCase()}`}
-                            onChange={(e) => setCap(l, Number(e.target.value) as Level)}>
+                            onChange={(e) => setCap(Number(e.target.value) as Level, l)}>
                             {([0, 1, 2, 3] as Level[]).map((lv) => <option key={lv} value={lv}>L{lv} {LEVEL_NAMES[lv]}</option>)}
                           </select>
                         </label>

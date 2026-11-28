@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: FSL-1.1-ALv2
 // SPDX-FileCopyrightText: 2026 Akchhya Singh & Aryan Anand
 import { NextResponse } from 'next/server'
+import { canConnect } from '@/server/billing/plan'
 import { getSession } from '@/lib/session'
 import { siteOrigin } from '@/lib/origin'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -26,6 +27,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ kind: string }>
   if (!code || code.length > 2_000) return back('invalid')
 
   const db = createAdminClient()
+  if (!(await canConnect(db, state.ws, p.kind))) return back('plan-limit')
   try {
     const link = await p.provider.complete(code, `${origin}/api/trackers/${p.kind}/oauth`)
     const result = await saveConnection(db, state.ws, session.user.id, { kind: p.kind, ...link })
