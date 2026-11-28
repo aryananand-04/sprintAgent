@@ -9,19 +9,21 @@ import type { SlackLink } from './install'
 
 type Db = SupabaseClient<Database>
 
-export type Member = { userId: string; role: Role }
+export type Member = { userId: string; role: Role; name: string }
 
 /**
  * Who a Slack user is in the linked workspace: Slack's verified profile email, matched to a member
  * with a confirmed email. Null for bots, deactivated users, hidden emails and non-members.
  */
 export async function memberForSlackUser(db: Db, link: SlackLink, slackUserId: string): Promise<Member | null> {
-  const info = await slackApi<{ user?: { is_bot?: boolean; deleted?: boolean; profile?: { email?: string } } }>('users.info', link.token, { user: slackUserId }).catch(() => null)
+  const info = await slackApi<{ user?: { is_bot?: boolean; deleted?: boolean; real_name?: string; profile?: { email?: string; display_name?: string; real_name?: string } } }>('users.info', link.token, { user: slackUserId }).catch(() => null)
   const email = info?.user?.profile?.email
   if (!email || info?.user?.is_bot || info?.user?.deleted) return null
   const { data } = await db.rpc('member_by_email', { ws: link.workspaceId, member_email: email })
   const m = data?.[0]
-  return m ? { userId: m.user_id, role: m.role as Role } : null
+  const p = info?.user?.profile
+  const name = (p?.real_name || info?.user?.real_name || p?.display_name || email.split('@')[0]).slice(0, 80)
+  return m ? { userId: m.user_id, role: m.role as Role, name } : null
 }
 
 export type Gate = { ok: true; member: Member } | { ok: false; message: string }

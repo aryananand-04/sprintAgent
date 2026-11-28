@@ -22,7 +22,7 @@ const signed = (raw: string, type = 'application/x-www-form-urlencoded') => {
   return { method: 'POST', body: raw, headers: { 'content-type': type, 'x-slack-request-timestamp': ts, 'x-slack-signature': `v0=${createHmac('sha256', SECRET).update(`v0:${ts}:${raw}`).digest('hex')}` } }
 }
 const slash = async (user: string, text: string) =>
-  (await (await command(new Request('http://localhost/api/slack/commands', signed(new URLSearchParams({ team_id: TEAM, user_id: user, text, command: '/sprint' }).toString())))).json()) as { text: string; response_type: string }
+  (await (await command(new Request('http://localhost/api/slack/commands', signed(new URLSearchParams({ team_id: TEAM, user_id: user, text, command: '/sprint' }).toString())))).json()) as { text: string; response_type: string; blocks?: unknown[] }
 const mention = (user: string, text: string, eventId: string) =>
   event(new Request('http://localhost/api/slack/events', signed(JSON.stringify({ type: 'event_callback', team_id: TEAM, event_id: eventId, event: { type: 'app_mention', user, text, channel: 'C1', ts: '1.1' } }), 'application/json')))
 
@@ -66,7 +66,9 @@ describe('Slack intake (database, Slack faked)', () => {
   })
 
   it('a vague request gets its one question', async () => {
-    expect((await slash('UDEV', 'make the settings page feel a bit nicer for people this sprint')).text).toMatch(/One question before anyone starts: /)
+    const r = await slash('UDEV', 'make the settings page feel a bit nicer for people this sprint')
+    expect(r.text).toMatch(/One question before anyone starts: /)
+    expect(JSON.stringify(r)).toContain('"action_id":"ask_answer"')
   })
 
   it('viewers cannot file work; empty commands get help', async () => {

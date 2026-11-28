@@ -7,6 +7,7 @@ import type { EscalationItem, Sprint, Task, TeamMember } from '@/types'
 import { can, type Role } from '@/lib/permissions'
 import { personalBriefing } from '@/logic/personalBriefing'
 import { standupDue } from '@/logic/standup'
+import { withAnswerButtons } from '@/logic/slack'
 import { askQuestion } from '@/logic/textSignals'
 import { slackApi } from './api'
 import { linkForWorkspace } from './install'
@@ -56,7 +57,8 @@ export async function sendDmBriefings(
     if (!text) { skipped++; continue }
     try {
       const { user } = await slackApi<{ user: { id: string } }>('users.lookupByEmail', link.token, { email })
-      await slackApi('chat.postMessage', link.token, { channel: user.id, text })
+      const buttons = waitingOnThem.map((w) => ({ taskId: w.task.id, label: `Answer: ${w.task.title}` }))
+      await slackApi('chat.postMessage', link.token, { channel: user.id, ...withAnswerButtons(text, buttons) })
       sent++
     } catch (e) {
       skipped++ // not in this Slack team, deactivated, or a hiccup: never block the others

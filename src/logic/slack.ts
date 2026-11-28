@@ -45,8 +45,10 @@ export function resolvedMessage(taskTitle: string, slackUserId: string) {
   return { replace_original: true, text, blocks: [{ type: 'section', text: { type: 'mrkdwn', text } }] }
 }
 
+export interface SlackMessage { text: string; blocks?: unknown[] }
+
 /** A reply only the clicker sees. */
-export const ephemeral = (text: string) => ({ response_type: 'ephemeral', replace_original: false, text })
+export const ephemeral = (m: string | SlackMessage) => ({ response_type: 'ephemeral', replace_original: false, ...(typeof m === 'string' ? { text: m } : m) })
 
 /**
  * Slack message text → plain text for a ticket: drops user/channel mentions, keeps link labels (or
@@ -70,4 +72,55 @@ export function intakeReply(r: { title: string; decision: 'ACT' | 'ASK' | 'ESCAL
   if (r.decision === 'ASK') return `Added ${t}. One question before anyone starts: ${slackEscape(r.question ?? 'what does done look like?')}`
   if (r.decision === 'ESCALATE') return `Added ${t}. It needs a PM’s decision, so I’ve escalated it.`
   return `Added ${t} to the backlog. It’ll be triaged on the next pass.`
+}
+
+export const ANSWER_ACTION = 'ask_answer'
+export const ANSWER_VIEW = 'ask_answer'
+export const ANSWER_BLOCK = 'answer'
+export const ANSWER_INPUT = 'text'
+
+const short = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
+
+/** A button that opens the answer box for one ASK ticket. */
+export const answerButton = (taskId: string, label = 'Answer') =>
+  ({ type: 'button', action_id: ANSWER_ACTION, value: taskId, text: { type: 'plain_text', text: short(label, 75) } })
+
+/** A message with Answer buttons under it (one per ASK ticket, at most five). */
+export function withAnswerButtons(text: string, items: Array<{ taskId: string; label?: string }>) {
+  if (!items.length) return { text }
+  return {
+    text,
+    blocks: [
+      { type: 'section', text: { type: 'mrkdwn', text: short(text, 3_000) } },
+      { type: 'actions', elements: items.slice(0, 5).map((i) => answerButton(i.taskId, i.label)) },
+    ],
+  }
+}
+
+/** The answer box. The ticket id rides in private_metadata; the server re-checks it on submit. */
+export function answerModal(t: { taskId: string; title: string; question: string }) {
+  return {
+    type: 'modal',
+    callback_id: ANSWER_VIEW,
+    private_metadata: t.taskId,
+    title: { type: 'plain_text', text: 'Answer the agent' },
+    submit: { type: 'plain_text', text: 'Send' },
+    close: { type: 'plain_text', text: 'Cancel' },
+    blocks: [
+      { type: 'section', text: { type: 'mrkdwn', text: `*${slackEscape(short(t.title, 200))}*\n${slackEscape(t.question)}` } },
+      {
+        type: 'input', block_id: ANSWER_BLOCK, label: { type: 'plain_text', text: 'Your answer' },
+        hint: { type: 'plain_text', text: 'Saved as a comment on the ticket. Specifics help: what “done” looks like, numbers, an example.' },
+        element: { type: 'plain_text_input', action_id: ANSWER_INPUT, multiline: true, min_length: 3, max_length: 3_000 },
+      },
+    ],
+  }
+}
+
+/** What the person who answered is told afterwards. */
+export function answerOutcome(r: { title: string; decision: 'ACT' | 'ASK' | 'ESCALATE'; question?: string | null }): string {
+  const t = `“${slackEscape(r.title)}”`
+  if (r.decision === 'ACT') return `Thanks. ${t} is clear enough to start now.`
+  if (r.decision === 'ESCALATE') return `Thanks. ${t} now needs a PM’s decision, so it’s with them.`
+  return `Thanks, that’s on ${t}. It still needs a little more before anyone starts: ${slackEscape(r.question ?? 'what does “done” look like?')}`
 }

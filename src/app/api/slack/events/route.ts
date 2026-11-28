@@ -55,9 +55,9 @@ export async function POST(req: Request): Promise<Response> {
       await slackApi('chat.postEphemeral', link.token, { channel: event.channel, user: event.user, text: g.message }).catch(() => {})
       return
     }
-    const text = await intakeFromSlack(db, link.workspaceId, g.member, event.text ?? '')
-      .catch((e) => { console.error('[slack] mention', e instanceof Error ? e.message : e); return 'Something went wrong while filing that. Check the board before trying again, in case it got through.' })
-    await slackApi('chat.postMessage', link.token, { channel: event.channel, thread_ts: thread, text }).catch((e) => console.error('[slack] reply', e))
+    const msg = await intakeFromSlack(db, link.workspaceId, g.member, event.text ?? '')
+      .catch((e) => { console.error('[slack] mention', e instanceof Error ? e.message : e); return { text: 'Something went wrong while filing that. Check the board before trying again, in case it got through.' } })
+    await slackApi('chat.postMessage', link.token, { channel: event.channel, thread_ts: thread, ...msg }).catch((e) => console.error('[slack] reply', e))
   })
   return new Response(null, { status: 200 })
 }
