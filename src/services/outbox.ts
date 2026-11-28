@@ -3,7 +3,7 @@
 import type { AgentDecision } from '../types'
 
 export type OutgoingEvent =
-  | { type: 'escalation'; taskTitle: string; reason: string; recommendation: string; urgency: 'critical' | 'high' | 'medium' | 'low' }
+  | { type: 'escalation'; taskTitle: string; reason: string; recommendation: string; urgency: 'critical' | 'high' | 'medium' | 'low'; escalationId?: string }
   | { type: 'decision'; taskTitle: string; decision: AgentDecision; reason: string }
 
 /** Hands an event to the server outbox (which owns the webhook URLs and retries). Resolves to the number queued. */

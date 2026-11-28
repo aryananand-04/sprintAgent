@@ -233,6 +233,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"slack_installations": {
+                  Row: {
+                    "bot_token_sealed": string,"bot_user_id": string,"channel_id": string | null,"channel_name": string | null,"connected_by": string | null,"created_at": string,"id": string,"team_id": string,"team_name": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bot_token_sealed": string,"bot_user_id": string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"team_id": string,"team_name": string,"workspace_id": string
+                  }
+                  Update: {
+                    "bot_token_sealed"?: string,"bot_user_id"?: string,"channel_id"?: string | null,"channel_name"?: string | null,"connected_by"?: string | null,"created_at"?: string,"id"?: string,"team_id"?: string,"team_name"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "slack_installations_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"sprints": {
                   Row: {
                     "committed_points": number,"completed_points": number,"created_at": string,"end_date": string,"goal": string,"health": Database["public"]['Enums']["sprint_health"],"id": string,"name": string,"snapshot": Json | null,"start_date": string,"status": Database["public"]['Enums']["sprint_status"],"total_points": number,"velocity": number,"workspace_id": string
@@ -408,6 +428,11 @@ isOneToOne: false
                            },
 "create_workspace":
 { Args: { "p_name": string,"p_slug": string }; Returns: string
+                           },
+"member_by_email":
+{ Args: { "member_email": string,"ws": string }; Returns: {
+              "role": Database["public"]['Enums']["workspace_role"],"user_id": string
+            }[]
                            },
 "start_new_sprint":
 { Args: { "p_committed": number,"p_end": string,"p_goal": string,"p_name": string,"p_snapshot"?: Json,"p_start": string,"p_velocity": number,"p_workspace": string }; Returns: string

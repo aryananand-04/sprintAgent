@@ -3,6 +3,7 @@
 import 'server-only'
 import { createHmac, createSign, timingSafeEqual } from 'node:crypto'
 import { nextPageUrl } from '@/logic/github'
+import { readState as sealReadState, signState as sealSignState } from '@/server/seal'
 
 const API = 'https://api.github.com'
 
@@ -81,22 +82,6 @@ export function verifyWebhook(rawBody: string, signature: string | null): boolea
   return got.length === want.length && timingSafeEqual(got, want)
 }
 
-/** Signed, expiring `state` for the install round-trip, binding it to one workspace and one user. */
-export function signState(payload: { ws: string; uid: string }, ttlMs = 15 * 60_000): string {
-  const body = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + ttlMs })).toString('base64url')
-  return `${body}.${createHmac('sha256', `state:${env()!.webhookSecret}`).update(body).digest('base64url')}`
-}
-
-export function readState(state: string | null): { ws: string; uid: string } | null {
-  const e = env()
-  if (!e || !state) return null
-  const [body, sig] = state.split('.')
-  if (!body || !sig) return null
-  const want = Buffer.from(createHmac('sha256', `state:${e.webhookSecret}`).update(body).digest('base64url'))
-  const got = Buffer.from(sig)
-  if (got.length !== want.length || !timingSafeEqual(got, want)) return null
-  try {
-    const p = JSON.parse(Buffer.from(body, 'base64url').toString()) as { ws: string; uid: string; exp: number }
-    return p.exp > Date.now() && typeof p.ws === 'string' && typeof p.uid === 'string' ? { ws: p.ws, uid: p.uid } : null
-  } catch { return null }
-}
+/** Install round-trip state, signed with the webhook secret (see `server/seal`). */
+export const signState = (payload: { ws: string; uid: string }) => sealSignState(payload, env()!.webhookSecret)
+export const readState = (state: string | null) => { const e = env(); return e ? sealReadState(state, e.webhookSecret) : null }

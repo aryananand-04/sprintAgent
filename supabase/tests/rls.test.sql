@@ -3,7 +3,7 @@
 -- RLS & integrity tests. Run: npm run db:test
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(44);
+select plan(50);
 
 -- Fixtures: a second workspace + outsider user
 insert into auth.users (id, email, aud, role) values
@@ -170,6 +170,22 @@ select pg_temp.logout();
 select pg_temp.login('admin@demo.sprintagent.dev');
 select throws_ok('select count(*) from public.agent_cooldowns', '42501', null, 'users cannot read agent cooldowns');
 select throws_ok($q$select public.claim_agent_cooldown(md5('demo-workspace')::uuid, 'x', 60)$q$, '42501', null, 'users cannot claim agent cooldowns');
+select pg_temp.logout();
+
+-- ── Slack installs: PMs see the link, nobody sees the token ─────────
+insert into public.slack_installations (workspace_id, team_id, team_name, bot_user_id, bot_token_sealed, channel_name)
+  values (md5('demo-workspace')::uuid, 'T0TEST', 'Acme', 'U0BOT', 'v1.sealed', '#eng');
+select pg_temp.login('pm@demo.sprintagent.dev');
+select is((select team_name from public.slack_installations), 'Acme', 'PM sees the linked Slack team');
+select throws_ok('select bot_token_sealed from public.slack_installations', '42501', null, 'PM cannot read the sealed bot token');
+select pg_temp.logout();
+select pg_temp.login('admin@demo.sprintagent.dev');
+select throws_ok('select * from public.slack_installations', '42501', null, 'not even admins can select the token column');
+select throws_ok($q$update public.slack_installations set channel_name = 'x'$q$, '42501', null, 'admins cannot edit the install directly');
+select throws_ok($q$select * from public.member_by_email(md5('demo-workspace')::uuid, 'pm@demo.sprintagent.dev')$q$, '42501', null, 'users cannot look members up by email');
+select pg_temp.logout();
+select pg_temp.login('dev@demo.sprintagent.dev');
+select is((select count(*)::int from public.slack_installations), 0, 'contributors do not see the Slack link');
 select pg_temp.logout();
 
 select * from finish();

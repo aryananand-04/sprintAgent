@@ -5,6 +5,7 @@ import { lookup } from 'node:dns/promises'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/db/database.types'
+import { escalationMessage, slackEscape } from '@/logic/slack'
 import { MAX_ATTEMPTS, backoffMs, checkWebhookUrl, isPrivateHost, type IntegrationKind } from '@/logic/delivery'
 
 type Db = SupabaseClient<Database>
@@ -17,6 +18,8 @@ export const OutboxEvent = z.discriminatedUnion('type', [
     reason: z.string().max(2_000),
     recommendation: z.string().max(2_000).default(''),
     urgency: z.enum(['critical', 'high', 'medium', 'low']),
+    /** Lets the Slack app put a Resolve button on the message. Checked against the workspace on click. */
+    escalationId: z.guid().optional(),
   }),
   z.object({ type: z.literal('standup'), text: z.string().min(1).max(8_000) }),
   z.object({
@@ -34,22 +37,11 @@ const ROUTES: Record<IntegrationKind, OutboxEvent['type'][]> = {
   outbound_webhook: ['escalation', 'standup', 'decision'],
 }
 
-/** Slack mrkdwn treats <, > and & as control characters. */
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-
-export function formatPayload(kind: IntegrationKind, e: OutboxEvent, appUrl?: string): unknown {
+/** `interactive`: the workspace's Slack channel belongs to our installed app, so buttons will reach us. */
+export function formatPayload(kind: IntegrationKind, e: OutboxEvent, appUrl?: string, interactive = false): unknown {
   if (kind === 'outbound_webhook') return { event: e.type, data: e, sentAt: new Date().toISOString() }
-  if (e.type === 'standup') return { text: e.text, blocks: [{ type: 'section', text: { type: 'mrkdwn', text: esc(e.text) } }] }
-  if (e.type === 'escalation') {
-    const link = appUrl ? `\n<${appUrl}|Open in Sprint Agent>` : ''
-    return {
-      text: `Escalation: ${e.taskTitle}`,
-      blocks: [
-        { type: 'header', text: { type: 'plain_text', text: `Needs a decision: ${e.taskTitle}`.slice(0, 150) } },
-        { type: 'section', text: { type: 'mrkdwn', text: `*Why:* ${esc(e.reason)}\n*Suggested:* ${esc(e.recommendation || '—')}\n*Urgency:* ${e.urgency}${link}` } },
-      ],
-    }
-  }
+  if (e.type === 'standup') return { text: e.text, blocks: [{ type: 'section', text: { type: 'mrkdwn', text: slackEscape(e.text) } }] }
+  if (e.type === 'escalation') return escalationMessage(e, { appUrl, interactive })
   return { text: `${e.decision}: ${e.taskTitle}` }
 }
 
@@ -58,10 +50,11 @@ export async function enqueue(db: Db, workspaceId: string, event: OutboxEvent, a
   const { data: integrations, error } = await db.from('integrations').select('id, kind')
     .eq('workspace_id', workspaceId).eq('enabled', true)
   if (error) throw error
-  const rows = (integrations ?? [])
-    .filter((i) => ROUTES[i.kind].includes(event.type))
-    .map((i) => ({ workspace_id: workspaceId, integration_id: i.id, event: event.type, payload: formatPayload(i.kind, event, appUrl) as never }))
-  if (!rows.length) return 0
+  const targets = (integrations ?? []).filter((i) => ROUTES[i.kind].includes(event.type))
+  if (!targets.length) return 0
+  const interactive = event.type === 'escalation' && !!event.escalationId && targets.some((i) => i.kind === 'slack_webhook')
+    && !!(await db.from('slack_installations').select('id').eq('workspace_id', workspaceId).maybeSingle()).data
+  const rows = targets.map((i) => ({ workspace_id: workspaceId, integration_id: i.id, event: event.type, payload: formatPayload(i.kind, event, appUrl, interactive) as never }))
   const { error: insErr } = await db.from('outbox').insert(rows)
   if (insErr) throw insErr
   return rows.length

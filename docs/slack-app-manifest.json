@@ -1,0 +1,55 @@
+{
+  "display_information": {
+    "name": "Sprint Agent",
+    "description": "Files requests, asks the one question, and escalates what needs a human.",
+    "background_color": "#14171a"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Sprint Agent",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/sprint",
+        "url": "https://YOUR-SITE/api/slack/commands",
+        "description": "File a request for the team's backlog",
+        "usage_hint": "Checkout fails on Safari 17 after a promo code",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "redirect_urls": [
+      "https://YOUR-SITE/api/slack/oauth"
+    ],
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "commands",
+        "app_mentions:read",
+        "incoming-webhook",
+        "users:read",
+        "users:read.email",
+        "im:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://YOUR-SITE/api/slack/events",
+      "bot_events": [
+        "app_mention",
+        "app_uninstalled",
+        "tokens_revoked"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://YOUR-SITE/api/slack/interactions"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

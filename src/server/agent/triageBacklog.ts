@@ -18,7 +18,7 @@ export const TRIAGE_PER_TICK = 10
 /** A claimed task isn't retried for this long if the run dies half-way. */
 const CLAIM_SECONDS = 6 * 3600
 
-export interface BacklogOptions { apiKey?: string; complete?: Completer; max?: number }
+export interface BacklogOptions { apiKey?: string; complete?: Completer; max?: number; /** Only these task ids (e.g. one just filed from Slack). */ only?: string[] }
 
 type Outcome = TriageOutcome & { source: 'ai' | 'rules'; audit?: TriageAudit }
 
@@ -43,10 +43,10 @@ async function decide(task: Task, config: AutonomyConfig, apiKey: string | undef
  */
 export async function triageBacklog(
   db: Db, ws: string, snap: { tasks: Task[]; team: TeamMember[]; autonomyConfig: AutonomyConfig },
-  { apiKey = process.env.GROQ_API_KEY, complete = groqCompleter, max = TRIAGE_PER_TICK }: BacklogOptions = {},
+  { apiKey = process.env.GROQ_API_KEY, complete = groqCompleter, max = TRIAGE_PER_TICK, only }: BacklogOptions = {},
 ): Promise<number> {
   const claimed: Task[] = []
-  for (const task of snap.tasks.filter(needsTriage)) {
+  for (const task of snap.tasks.filter((t) => needsTriage(t) && (!only || only.includes(t.id)))) {
     if (claimed.length >= max) break
     const { data: ok, error } = await db.rpc('claim_agent_cooldown', { ws, check_key: `triage-${task.id}`, cooldown_seconds: CLAIM_SECONDS })
     if (error) throw error
@@ -88,9 +88,9 @@ export async function triageBacklog(
     if (step.escalation) {
       const { count } = await db.from('escalations').select('id', { count: 'exact', head: true }).eq('workspace_id', ws).eq('task_id', task.id).is('resolved_at', null)
       if (!count) {
-        await db.from('escalations').insert({ workspace_id: ws, task_id: task.id, task_title: task.title, reason, recommendation: step.escalation.recommendation, urgency: task.urgency, category: step.escalation.category })
+        const { data: created } = await db.from('escalations').insert({ workspace_id: ws, task_id: task.id, task_title: task.title, reason, recommendation: step.escalation.recommendation, urgency: task.urgency, category: step.escalation.category }).select('id').single()
         await feed({ type: 'escalate', message: reason, task_id: task.id, decision: 'ESCALATE' })
-        await enqueue(db, ws, { type: 'escalation', taskTitle: task.title, reason, recommendation: step.escalation.recommendation, urgency: task.urgency }).catch(() => 0)
+        await enqueue(db, ws, { type: 'escalation', taskTitle: task.title, reason, recommendation: step.escalation.recommendation, urgency: task.urgency, escalationId: created?.id }).catch(() => 0)
       }
     }
   }

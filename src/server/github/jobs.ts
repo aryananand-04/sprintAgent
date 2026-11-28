@@ -3,6 +3,7 @@
 import 'server-only'
 import { after } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { afterResponse } from '@/server/background'
 import { inngest, jobsEnabled } from '@/server/inngest/client'
 import { importInstallation } from './sync'
 import { writeBack } from './writeback'
@@ -32,6 +33,5 @@ export async function requestWriteBack(workspaceId: string, taskIds: string[]) {
     const db = createAdminClient()
     for (const id of taskIds) await writeBack(db, workspaceId, id).catch((e) => console.error('[github] write-back', e))
   }
-  // After the response when there is one; inline when called from a scheduled run with no request.
-  try { after(run) } catch { await run() }
+  await afterResponse(run)
 }

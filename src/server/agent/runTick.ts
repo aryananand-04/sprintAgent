@@ -83,11 +83,11 @@ async function apply(db: Db, ws: string, a: AgentAction, tasks: { id: string; ti
       .eq('workspace_id', ws).eq('task_id', a.taskId).is('resolved_at', null)
     if (count) return
     const title = tasks.find((t) => t.id === a.taskId)?.title ?? 'Task'
-    await db.from('escalations').insert({ workspace_id: ws, task_id: a.taskId, task_title: title, reason: a.reason, recommendation: a.recommendation, urgency: a.urgency, category: a.category })
+    const { data: created } = await db.from('escalations').insert({ workspace_id: ws, task_id: a.taskId, task_title: title, reason: a.reason, recommendation: a.recommendation, urgency: a.urgency, category: a.category }).select('id').single()
     await db.from('tasks').update({ decision: 'ESCALATE', is_ai_triaged: false }).eq('id', a.taskId).eq('workspace_id', ws)
     await feed({ type: 'escalate', message: a.reason, task_id: a.taskId, decision: 'ESCALATE' })
     await audit({ task_id: a.taskId, kind: 'escalate', decision: 'ESCALATE', rationale: a.reason, payload: { check: a.key, category: a.category } })
-    await enqueue(db, ws, { type: 'escalation', taskTitle: title, reason: a.reason, recommendation: a.recommendation, urgency: a.urgency }).catch(() => 0)
+    await enqueue(db, ws, { type: 'escalation', taskTitle: title, reason: a.reason, recommendation: a.recommendation, urgency: a.urgency, escalationId: created?.id }).catch(() => 0)
     return
   }
 

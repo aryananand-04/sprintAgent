@@ -92,6 +92,20 @@
       "when": 1795836275730,
       "tag": "20261128032435_workspace_timezone",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795837153977,
+      "tag": "20261128033913_slack_installations",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1795837154275,
+      "tag": "20261128033914_slack_installations_security",
+      "breakpoints": true
     }
   ]
 }

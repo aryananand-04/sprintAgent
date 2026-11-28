@@ -805,7 +805,7 @@ export const useSprintStore = create<SprintStore>()(
 
     get().addFeedEvent({ type: 'escalate', message: reason, taskId, decision: 'ESCALATE' })
 
-    sendEvent({ type: 'escalation', taskTitle: esc.taskTitle, reason, recommendation, urgency }).catch(() => {})
+    sendEvent({ type: 'escalation', taskTitle: esc.taskTitle, reason, recommendation, urgency, escalationId: esc.id }).catch(() => {})
     refreshSprintHealth(get, s => set(s as Partial<SprintStore>))
   },
 

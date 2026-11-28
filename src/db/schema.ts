@@ -278,3 +278,24 @@ export const githubInstallations = pgTable('github_installations', {
   writeBack: boolean('write_back').notNull().default(false),
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('github_installations_installation_key').on(t.installationId)])
+
+/**
+ * The Sprint Agent Slack app installed in a Slack team, linked to one workspace (and vice versa).
+ * The bot token is sealed (AES-256-GCM) by the server and never readable by users (column grants).
+ */
+export const slackInstallations = pgTable('slack_installations', {
+  id: id(),
+  workspaceId: workspaceId(),
+  teamId: text('team_id').notNull(),
+  teamName: text('team_name').notNull(),
+  botUserId: text('bot_user_id').notNull(),
+  botTokenSealed: text('bot_token_sealed').notNull(),
+  /** Channel chosen at install for escalations and the standup. */
+  channelId: text('channel_id'),
+  channelName: text('channel_name'),
+  connectedBy: uuid('connected_by').references(() => authUsers.id, { onDelete: 'set null' }),
+  createdAt: createdAt(),
+}, (t) => [
+  uniqueIndex('slack_installations_team_key').on(t.teamId),
+  uniqueIndex('slack_installations_workspace_key').on(t.workspaceId),
+])
